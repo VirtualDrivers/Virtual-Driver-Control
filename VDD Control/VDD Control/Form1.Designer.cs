@@ -111,6 +111,7 @@
             listBox1 = new ListBox();
             groupBox2 = new GroupBox();
             groupBox3 = new GroupBox();
+            button2 = new Button();
             contextMenuStrip1.SuspendLayout();
             menuStrip1.SuspendLayout();
             groupBox1.SuspendLayout();
@@ -547,13 +548,14 @@
             // richTextBox1
             // 
             richTextBox1.BackColor = Color.FromArgb(32, 32, 32);
-            richTextBox1.DetectUrls = false;
-            richTextBox1.ForeColor = Color.Green;
+            richTextBox1.ForeColor = Color.FromArgb(0, 192, 0);
             richTextBox1.Location = new Point(12, 27);
             richTextBox1.Name = "richTextBox1";
-            richTextBox1.Size = new Size(520, 411);
+            richTextBox1.Size = new Size(520, 414);
             richTextBox1.TabIndex = 2;
             richTextBox1.Text = "Information will appear here when specific tools are used.";
+            richTextBox1.WordWrap = false;
+            richTextBox1.ZoomFactor = 1.2F;
             // 
             // label1
             // 
@@ -576,7 +578,6 @@
             linkLabel1.TabIndex = 5;
             linkLabel1.TabStop = true;
             linkLabel1.Text = "https://discord.mikethetech.com/";
-            linkLabel1.LinkClicked += linkLabel1_LinkClicked;
             // 
             // label2
             // 
@@ -601,9 +602,9 @@
             // 
             // button1
             // 
-            button1.Location = new Point(648, 419);
+            button1.Location = new Point(555, 419);
             button1.Name = "button1";
-            button1.Size = new Size(134, 22);
+            button1.Size = new Size(109, 22);
             button1.TabIndex = 9;
             button1.Text = "Restart All Drivers";
             button1.UseVisualStyleBackColor = true;
@@ -737,6 +738,15 @@
             groupBox3.TabStop = false;
             groupBox3.Text = "Resources";
             // 
+            // button2
+            // 
+            button2.Location = new Point(670, 419);
+            button2.Name = "button2";
+            button2.Size = new Size(112, 22);
+            button2.TabIndex = 28;
+            button2.Text = "Minimize to Tray";
+            button2.UseVisualStyleBackColor = true;
+            // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
@@ -744,6 +754,7 @@
             AutoSizeMode = AutoSizeMode.GrowAndShrink;
             ClientSize = new Size(800, 450);
             ContextMenuStrip = contextMenuStrip1;
+            Controls.Add(button2);
             Controls.Add(groupBox3);
             Controls.Add(groupBox2);
             Controls.Add(groupBox1);
@@ -757,6 +768,7 @@
             MaximumSize = new Size(816, 489);
             MinimumSize = new Size(816, 489);
             Name = "Form1";
+            SizeGripStyle = SizeGripStyle.Hide;
             Text = "Virtual Driver Control";
             Load += Form1_Load;
             contextMenuStrip1.ResumeLayout(false);
@@ -854,5 +866,6 @@
         private ListBox listBox1;
         private GroupBox groupBox2;
         private GroupBox groupBox3;
+        private Button button2;
     }
 }

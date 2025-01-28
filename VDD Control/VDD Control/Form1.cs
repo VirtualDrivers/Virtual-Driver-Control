@@ -40,7 +40,7 @@ namespace VDD_Control
                 }
                 else
                 {
-                    systemInfo += "CPU Information: Unable to retrieve.\n\n";
+                    systemInfo += "CPU Information: Unable to retrieve.\n\n";  // This really shouldn't happen.
                 }
 
                 // Add OS Information
@@ -73,12 +73,13 @@ namespace VDD_Control
             {
                 // Display error details in richTextBox1
                 richTextBox1.Clear();
-                richTextBox1.AppendText("An error occurred while retrieving system information:\n" + ex.Message);
+                richTextBox1.AppendText("An error occurred while retrieving system information:\n" + ex.Message); // This really shouldn't happen. But probably will.
             }
         }
 
         private string LocateSettingsFile()
         {
+            // Yo XML. Where u at?
             string settingsInfo = "Settings File Information:\n";
             string registryKeyPath = @"SOFTWARE\MikeTheTech\VirtualDisplayDriver";
             string registryFilePath = null;
@@ -124,7 +125,7 @@ namespace VDD_Control
                 }
 
                 // If no file is found
-                settingsInfo += "vdd_settings.xml not found in default locations.\n";
+                settingsInfo += "vdd_settings.xml not found in default locations. Are you using an older version of the driver?\n";
             }
             catch (Exception ex)
             {
@@ -175,17 +176,14 @@ namespace VDD_Control
 
         private void contextMenuStrip1_Opening(object sender, System.ComponentModel.CancelEventArgs e)
         {
-            // Handle context menu opening logic here, if needed.
         }
 
         private void enableToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            // Handle enable menu item click here, if needed.
         }
 
         private void label1_Click(object sender, EventArgs e)
         {
-            // Handle label click logic here, if needed.
         }
 
         private void getDisplayInformationToolStripMenuItem2_Click(object sender, EventArgs e)
@@ -193,6 +191,7 @@ namespace VDD_Control
             try
             {
                 // Initialize a process to execute PowerShell
+                // Redo all of this.
                 Process process = new Process
                 {
                     StartInfo = new ProcessStartInfo
@@ -243,6 +242,7 @@ namespace VDD_Control
             try
             {
                 // Initialize a process to execute PowerShell
+                // Redo all of this.
                 Process process = new Process
                 {
                     StartInfo = new ProcessStartInfo
@@ -293,6 +293,8 @@ namespace VDD_Control
             try
             {
                 // Initialize a process to execute PowerShell
+                // This needs to be changed to just run the script directly.
+                // I'm just lazy.
                 Process process = new Process
                 {
                     StartInfo = new ProcessStartInfo
@@ -372,31 +374,15 @@ namespace VDD_Control
             Application.Exit();
         }
 
-        private void linkLabel1_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
-        {
-
-        }
-
-        private void listBox1_SelectedIndexChanged(object sender, EventArgs e)
-        {
-
-        }
-
         private void xMLOptionsEditorToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            // Create an instance of the Form2 class
             Form2 form2 = new Form2();
-
-            // Show the form
             form2.Show();
         }
 
         private void toolStripMenuItem1_Click(object sender, EventArgs e)
         {
-            // Create an instance of the Form2 class
             Form2 form2 = new Form2();
-
-            // Show the form
             form2.Show();
         }
     }
