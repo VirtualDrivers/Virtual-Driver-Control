@@ -112,11 +112,16 @@
             groupBox2 = new GroupBox();
             groupBox3 = new GroupBox();
             button2 = new Button();
+            textBox1 = new TextBox();
+            button3 = new Button();
+            progressBar1 = new ProgressBar();
+            groupBox4 = new GroupBox();
             contextMenuStrip1.SuspendLayout();
             menuStrip1.SuspendLayout();
             groupBox1.SuspendLayout();
             groupBox2.SuspendLayout();
             groupBox3.SuspendLayout();
+            groupBox4.SuspendLayout();
             SuspendLayout();
             // 
             // notifyIcon1
@@ -551,7 +556,7 @@
             richTextBox1.ForeColor = Color.FromArgb(0, 192, 0);
             richTextBox1.Location = new Point(12, 27);
             richTextBox1.Name = "richTextBox1";
-            richTextBox1.Size = new Size(520, 414);
+            richTextBox1.Size = new Size(520, 382);
             richTextBox1.TabIndex = 2;
             richTextBox1.Text = "Information will appear here when specific tools are used.";
             richTextBox1.WordWrap = false;
@@ -654,12 +659,13 @@
             // 
             linkLabel6.AutoSize = true;
             linkLabel6.Font = new Font("Segoe UI", 7F, FontStyle.Regular, GraphicsUnit.Point);
-            linkLabel6.Location = new Point(182, 164);
+            linkLabel6.Location = new Point(182, 95);
             linkLabel6.Name = "linkLabel6";
             linkLabel6.Size = new Size(39, 12);
             linkLabel6.TabIndex = 22;
             linkLabel6.TabStop = true;
             linkLabel6.Text = "Patreon";
+            linkLabel6.LinkClicked += linkLabel6_LinkClicked;
             // 
             // linkLabel4
             // 
@@ -690,7 +696,7 @@
             groupBox1.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
             groupBox1.Location = new Point(555, 229);
             groupBox1.Name = "groupBox1";
-            groupBox1.Size = new Size(227, 184);
+            groupBox1.Size = new Size(227, 115);
             groupBox1.TabIndex = 25;
             groupBox1.TabStop = false;
             groupBox1.Text = "Patreon Supporters";
@@ -705,7 +711,7 @@
             listBox1.Items.AddRange(new object[] { "- Gabriel Posso" });
             listBox1.Location = new Point(6, 22);
             listBox1.Name = "listBox1";
-            listBox1.Size = new Size(215, 150);
+            listBox1.Size = new Size(215, 90);
             listBox1.TabIndex = 23;
             // 
             // groupBox2
@@ -747,6 +753,41 @@
             button2.Text = "Minimize to Tray";
             button2.UseVisualStyleBackColor = true;
             // 
+            // textBox1
+            // 
+            textBox1.Location = new Point(12, 415);
+            textBox1.Name = "textBox1";
+            textBox1.Size = new Size(453, 23);
+            textBox1.TabIndex = 29;
+            textBox1.Text = "Command Console";
+            // 
+            // button3
+            // 
+            button3.Location = new Point(471, 414);
+            button3.Name = "button3";
+            button3.Size = new Size(61, 22);
+            button3.TabIndex = 30;
+            button3.Text = "Enter";
+            button3.UseVisualStyleBackColor = true;
+            // 
+            // progressBar1
+            // 
+            progressBar1.Location = new Point(12, 22);
+            progressBar1.Name = "progressBar1";
+            progressBar1.Size = new Size(209, 23);
+            progressBar1.TabIndex = 31;
+            // 
+            // groupBox4
+            // 
+            groupBox4.Controls.Add(progressBar1);
+            groupBox4.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
+            groupBox4.Location = new Point(555, 350);
+            groupBox4.Name = "groupBox4";
+            groupBox4.Size = new Size(227, 59);
+            groupBox4.TabIndex = 32;
+            groupBox4.TabStop = false;
+            groupBox4.Text = "Task Progress";
+            // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
@@ -754,6 +795,9 @@
             AutoSizeMode = AutoSizeMode.GrowAndShrink;
             ClientSize = new Size(800, 450);
             ContextMenuStrip = contextMenuStrip1;
+            Controls.Add(groupBox4);
+            Controls.Add(button3);
+            Controls.Add(textBox1);
             Controls.Add(button2);
             Controls.Add(groupBox3);
             Controls.Add(groupBox2);
@@ -780,6 +824,7 @@
             groupBox2.PerformLayout();
             groupBox3.ResumeLayout(false);
             groupBox3.PerformLayout();
+            groupBox4.ResumeLayout(false);
             ResumeLayout(false);
             PerformLayout();
         }
@@ -867,5 +912,9 @@
         private GroupBox groupBox2;
         private GroupBox groupBox3;
         private Button button2;
+        private TextBox textBox1;
+        private Button button3;
+        private ProgressBar progressBar1;
+        private GroupBox groupBox4;
     }
 }

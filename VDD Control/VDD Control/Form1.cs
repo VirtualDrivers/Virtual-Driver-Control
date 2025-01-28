@@ -385,5 +385,15 @@ namespace VDD_Control
             Form2 form2 = new Form2();
             form2.Show();
         }
+
+        private void linkLabel6_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
+        {
+
+        }
+
+        private void label3_Click(object sender, EventArgs e)
+        {
+
+        }
     }
 }
