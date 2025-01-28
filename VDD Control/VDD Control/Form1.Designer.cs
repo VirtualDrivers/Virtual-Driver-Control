@@ -37,6 +37,8 @@
             toolsToolStripMenuItem1 = new ToolStripMenuItem();
             getDisplayInformationToolStripMenuItem1 = new ToolStripMenuItem();
             getGPUInformationToolStripMenuItem1 = new ToolStripMenuItem();
+            getCPUInformationToolStripMenuItem1 = new ToolStripMenuItem();
+            getAudioInformationToolStripMenuItem1 = new ToolStripMenuItem();
             virtualDisplayDriverToolStripMenuItem1 = new ToolStripMenuItem();
             sDR10bitToolStripMenuItem1 = new ToolStripMenuItem();
             hDRToolStripMenuItem1 = new ToolStripMenuItem();
@@ -86,9 +88,10 @@
             aboutToolStripMenuItem = new ToolStripMenuItem();
             menuStrip1 = new MenuStrip();
             toolsToolStripMenuItem = new ToolStripMenuItem();
-            getDisplayInformationToolStripMenuItem = new ToolStripMenuItem();
             getGPUInformationToolStripMenuItem = new ToolStripMenuItem();
             getCPUInformationToolStripMenuItem = new ToolStripMenuItem();
+            getDisplayInformationToolStripMenuItem2 = new ToolStripMenuItem();
+            getAudioInformationToolStripMenuItem = new ToolStripMenuItem();
             richTextBox1 = new RichTextBox();
             monthCalendar1 = new MonthCalendar();
             label1 = new Label();
@@ -111,7 +114,7 @@
             // 
             contextMenuStrip1.Items.AddRange(new ToolStripItem[] { menuToolStripMenuItem1, toolsToolStripMenuItem1, virtualDisplayDriverToolStripMenuItem1, virtualAudioDriverToolStripMenuItem1, aboutToolStripMenuItem1, exitToolStripMenuItem2 });
             contextMenuStrip1.Name = "contextMenuStrip1";
-            contextMenuStrip1.Size = new Size(184, 136);
+            contextMenuStrip1.Size = new Size(184, 158);
             // 
             // menuToolStripMenuItem1
             // 
@@ -128,7 +131,7 @@
             // 
             // toolsToolStripMenuItem1
             // 
-            toolsToolStripMenuItem1.DropDownItems.AddRange(new ToolStripItem[] { getDisplayInformationToolStripMenuItem1, getGPUInformationToolStripMenuItem1 });
+            toolsToolStripMenuItem1.DropDownItems.AddRange(new ToolStripItem[] { getDisplayInformationToolStripMenuItem1, getGPUInformationToolStripMenuItem1, getCPUInformationToolStripMenuItem1, getAudioInformationToolStripMenuItem1 });
             toolsToolStripMenuItem1.Name = "toolsToolStripMenuItem1";
             toolsToolStripMenuItem1.Size = new Size(183, 22);
             toolsToolStripMenuItem1.Text = "Tools";
@@ -138,12 +141,28 @@
             getDisplayInformationToolStripMenuItem1.Name = "getDisplayInformationToolStripMenuItem1";
             getDisplayInformationToolStripMenuItem1.Size = new Size(199, 22);
             getDisplayInformationToolStripMenuItem1.Text = "Get Display Information";
+            getDisplayInformationToolStripMenuItem1.Click += getDisplayInformationToolStripMenuItem1_Click;
             // 
             // getGPUInformationToolStripMenuItem1
             // 
             getGPUInformationToolStripMenuItem1.Name = "getGPUInformationToolStripMenuItem1";
             getGPUInformationToolStripMenuItem1.Size = new Size(199, 22);
             getGPUInformationToolStripMenuItem1.Text = "Get GPU Information";
+            getGPUInformationToolStripMenuItem1.Click += getGPUInformationToolStripMenuItem1_Click;
+            // 
+            // getCPUInformationToolStripMenuItem1
+            // 
+            getCPUInformationToolStripMenuItem1.Name = "getCPUInformationToolStripMenuItem1";
+            getCPUInformationToolStripMenuItem1.Size = new Size(199, 22);
+            getCPUInformationToolStripMenuItem1.Text = "Get CPU information";
+            getCPUInformationToolStripMenuItem1.Click += getCPUInformationToolStripMenuItem1_Click;
+            // 
+            // getAudioInformationToolStripMenuItem1
+            // 
+            getAudioInformationToolStripMenuItem1.Name = "getAudioInformationToolStripMenuItem1";
+            getAudioInformationToolStripMenuItem1.Size = new Size(199, 22);
+            getAudioInformationToolStripMenuItem1.Text = "Get Audio Information";
+            getAudioInformationToolStripMenuItem1.Click += getAudioInformationToolStripMenuItem1_Click;
             // 
             // virtualDisplayDriverToolStripMenuItem1
             // 
@@ -287,6 +306,7 @@
             exitToolStripMenuItem2.Name = "exitToolStripMenuItem2";
             exitToolStripMenuItem2.Size = new Size(183, 22);
             exitToolStripMenuItem2.Text = "Exit";
+            exitToolStripMenuItem2.Click += exitToolStripMenuItem2_Click;
             // 
             // menuToolStripMenuItem
             // 
@@ -298,8 +318,9 @@
             // exitToolStripMenuItem
             // 
             exitToolStripMenuItem.Name = "exitToolStripMenuItem";
-            exitToolStripMenuItem.Size = new Size(92, 22);
+            exitToolStripMenuItem.Size = new Size(180, 22);
             exitToolStripMenuItem.Text = "Exit";
+            exitToolStripMenuItem.Click += exitToolStripMenuItem_Click;
             // 
             // virtualDisplayDriverToolStripMenuItem
             // 
@@ -451,29 +472,46 @@
             // 
             // toolsToolStripMenuItem
             // 
-            toolsToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { getDisplayInformationToolStripMenuItem, getGPUInformationToolStripMenuItem, getCPUInformationToolStripMenuItem });
+            toolsToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { getGPUInformationToolStripMenuItem, getCPUInformationToolStripMenuItem, getDisplayInformationToolStripMenuItem2, getAudioInformationToolStripMenuItem });
             toolsToolStripMenuItem.Name = "toolsToolStripMenuItem";
             toolsToolStripMenuItem.Size = new Size(47, 20);
             toolsToolStripMenuItem.Text = "Tools";
             // 
-            // getDisplayInformationToolStripMenuItem
-            // 
-            getDisplayInformationToolStripMenuItem.Name = "getDisplayInformationToolStripMenuItem";
-            getDisplayInformationToolStripMenuItem.Size = new Size(199, 22);
-            getDisplayInformationToolStripMenuItem.Text = "Get Display Information";
-            // 
             // getGPUInformationToolStripMenuItem
             // 
+            getGPUInformationToolStripMenuItem.DisplayStyle = ToolStripItemDisplayStyle.Text;
+            getGPUInformationToolStripMenuItem.Font = new Font("Segoe UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
             getGPUInformationToolStripMenuItem.Name = "getGPUInformationToolStripMenuItem";
             getGPUInformationToolStripMenuItem.Size = new Size(199, 22);
             getGPUInformationToolStripMenuItem.Text = "Get GPU Information";
+            getGPUInformationToolStripMenuItem.Click += getGPUInformationToolStripMenuItem_Click;
             // 
             // getCPUInformationToolStripMenuItem
             // 
+            getCPUInformationToolStripMenuItem.DisplayStyle = ToolStripItemDisplayStyle.Text;
+            getCPUInformationToolStripMenuItem.Font = new Font("Segoe UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
             getCPUInformationToolStripMenuItem.Name = "getCPUInformationToolStripMenuItem";
             getCPUInformationToolStripMenuItem.Size = new Size(199, 22);
             getCPUInformationToolStripMenuItem.Text = "Get CPU Information";
             getCPUInformationToolStripMenuItem.Click += getCPUInformationToolStripMenuItem_Click;
+            // 
+            // getDisplayInformationToolStripMenuItem2
+            // 
+            getDisplayInformationToolStripMenuItem2.DisplayStyle = ToolStripItemDisplayStyle.Text;
+            getDisplayInformationToolStripMenuItem2.Font = new Font("Segoe UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
+            getDisplayInformationToolStripMenuItem2.Name = "getDisplayInformationToolStripMenuItem2";
+            getDisplayInformationToolStripMenuItem2.Size = new Size(199, 22);
+            getDisplayInformationToolStripMenuItem2.Text = "Get Display Information";
+            getDisplayInformationToolStripMenuItem2.Click += getDisplayInformationToolStripMenuItem2_Click;
+            // 
+            // getAudioInformationToolStripMenuItem
+            // 
+            getAudioInformationToolStripMenuItem.DisplayStyle = ToolStripItemDisplayStyle.Text;
+            getAudioInformationToolStripMenuItem.Font = new Font("Segoe UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
+            getAudioInformationToolStripMenuItem.Name = "getAudioInformationToolStripMenuItem";
+            getAudioInformationToolStripMenuItem.Size = new Size(199, 22);
+            getAudioInformationToolStripMenuItem.Text = "Get Audio Information";
+            getAudioInformationToolStripMenuItem.Click += getAudioInformationToolStripMenuItem_Click;
             // 
             // richTextBox1
             // 
@@ -560,7 +598,6 @@
             MaximumSize = new Size(816, 489);
             MinimumSize = new Size(816, 489);
             Name = "Form1";
-            ShowInTaskbar = false;
             Text = "VDD Control";
             Load += Form1_Load;
             contextMenuStrip1.ResumeLayout(false);
@@ -623,7 +660,6 @@
         private ToolStripMenuItem getDisplayInformationToolStripMenuItem1;
         private ToolStripMenuItem getGPUInformationToolStripMenuItem1;
         private ToolStripMenuItem toolsToolStripMenuItem;
-        private ToolStripMenuItem getDisplayInformationToolStripMenuItem;
         private ToolStripMenuItem getGPUInformationToolStripMenuItem;
         private Label label1;
         private LinkLabel linkLabel1;
@@ -637,5 +673,9 @@
         private ToolStripMenuItem enableUserModeLoggingToolStripMenuItem;
         private ToolStripMenuItem enableDevModeLoggingToolStripMenuItem;
         private ToolStripMenuItem getCPUInformationToolStripMenuItem;
+        private ToolStripMenuItem getDisplayInformationToolStripMenuItem2;
+        private ToolStripMenuItem getAudioInformationToolStripMenuItem;
+        private ToolStripMenuItem getCPUInformationToolStripMenuItem1;
+        private ToolStripMenuItem getAudioInformationToolStripMenuItem1;
     }
 }

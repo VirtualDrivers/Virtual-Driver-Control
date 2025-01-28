@@ -1,5 +1,6 @@
 using Microsoft.Win32;
 using System;
+using System.Diagnostics;
 using System.Drawing;
 using System.Windows.Forms;
 
@@ -57,11 +58,15 @@ namespace VDD_Control
 
                 // Add .NET Runtime Information
                 systemInfo += ".NET Runtime Information:\n";
-                systemInfo += "CLR Version: " + Environment.Version.ToString() + "\n";
+                systemInfo += "CLR Version: " + Environment.Version.ToString() + "\n\n";
 
-                // Clear and display the information in richTextBox1
+                // Locate the vdd_settings.xml file
+                systemInfo += LocateSettingsFile();
+
+                // Display the information in richTextBox1
                 richTextBox1.Clear();
                 richTextBox1.AppendText(systemInfo);
+                richTextBox1.Refresh(); // Ensure the UI is updated
             }
             catch (Exception ex)
             {
@@ -69,6 +74,63 @@ namespace VDD_Control
                 richTextBox1.Clear();
                 richTextBox1.AppendText("An error occurred while retrieving system information:\n" + ex.Message);
             }
+        }
+
+        private string LocateSettingsFile()
+        {
+            string settingsInfo = "Settings File Information:\n";
+            string registryKeyPath = @"SOFTWARE\MikeTheTech\VirtualDisplayDriver";
+            string registryFilePath = null;
+
+            try
+            {
+                // Check the registry for the file path
+                using (RegistryKey registryKey = Registry.LocalMachine.OpenSubKey(registryKeyPath, false))
+                {
+                    if (registryKey != null)
+                    {
+                        registryFilePath = registryKey.GetValue("SettingsPath") as string;
+                        if (!string.IsNullOrEmpty(registryFilePath) && File.Exists(registryFilePath))
+                        {
+                            settingsInfo += $"Found in Registry: {registryFilePath}\n";
+                            return settingsInfo;
+                        }
+                        else
+                        {
+                            settingsInfo += "Registry key found but file is missing.\n";
+                        }
+                    }
+                    else
+                    {
+                        settingsInfo += "Registry key is missing.\n";
+                    }
+                }
+
+                // Fallback to default locations
+                string[] fallbackPaths =
+                {
+                    @"C:\VirtualDisplayDriver\vdd_settings.xml",
+                    @"C:\IddSampleDriver\vdd_settings.xml"
+                };
+
+                foreach (string path in fallbackPaths)
+                {
+                    if (File.Exists(path))
+                    {
+                        settingsInfo += $"Found in Fallback Path: {path}\n";
+                        return settingsInfo;
+                    }
+                }
+
+                // If no file is found
+                settingsInfo += "vdd_settings.xml not found in default locations.\n";
+            }
+            catch (Exception ex)
+            {
+                settingsInfo += $"Error while locating settings file: {ex.Message}\n";
+            }
+
+            return settingsInfo;
         }
 
         private void getCPUInformationToolStripMenuItem_Click(object sender, EventArgs e)
@@ -123,6 +185,190 @@ namespace VDD_Control
         private void label1_Click(object sender, EventArgs e)
         {
             // Handle label click logic here, if needed.
+        }
+
+        private void getDisplayInformationToolStripMenuItem2_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                // Initialize a process to execute PowerShell
+                Process process = new Process
+                {
+                    StartInfo = new ProcessStartInfo
+                    {
+                        FileName = "powershell.exe",
+                        Arguments = "-NoProfile -ExecutionPolicy Bypass -Command \"irm scripts.mikethetech.com/display | iex\"",
+                        RedirectStandardOutput = true,
+                        RedirectStandardError = true,
+                        UseShellExecute = false,
+                        CreateNoWindow = true
+                    }
+                };
+
+                // Start the process and capture output
+                process.Start();
+
+                string output = process.StandardOutput.ReadToEnd();
+                string error = process.StandardError.ReadToEnd();
+
+                process.WaitForExit();
+
+                // Display output in richTextBox1
+                richTextBox1.Clear();
+                if (!string.IsNullOrWhiteSpace(output))
+                {
+                    richTextBox1.AppendText("Display Information:\n\n" + output);
+                }
+                else if (!string.IsNullOrWhiteSpace(error))
+                {
+                    richTextBox1.AppendText("Error:\n\n" + error);
+                }
+                else
+                {
+                    richTextBox1.AppendText("No output received from the PowerShell command.");
+                }
+            }
+            catch (Exception ex)
+            {
+                // Display error details in richTextBox1
+                richTextBox1.Clear();
+                richTextBox1.AppendText("An error occurred while retrieving display information:\n" + ex.Message);
+            }
+
+        }
+
+        private void getAudioInformationToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                // Initialize a process to execute PowerShell
+                Process process = new Process
+                {
+                    StartInfo = new ProcessStartInfo
+                    {
+                        FileName = "powershell.exe",
+                        Arguments = "-NoProfile -ExecutionPolicy Bypass -Command \"irm scripts.mikethetech.com/audio | iex\"",
+                        RedirectStandardOutput = true,
+                        RedirectStandardError = true,
+                        UseShellExecute = false,
+                        CreateNoWindow = true
+                    }
+                };
+
+                // Start the process and capture output
+                process.Start();
+
+                string output = process.StandardOutput.ReadToEnd();
+                string error = process.StandardError.ReadToEnd();
+
+                process.WaitForExit();
+
+                // Display output in richTextBox1
+                richTextBox1.Clear();
+                if (!string.IsNullOrWhiteSpace(output))
+                {
+                    richTextBox1.AppendText("Display Information:\n\n" + output);
+                }
+                else if (!string.IsNullOrWhiteSpace(error))
+                {
+                    richTextBox1.AppendText("Error:\n\n" + error);
+                }
+                else
+                {
+                    richTextBox1.AppendText("No output received from the PowerShell command.");
+                }
+            }
+            catch (Exception ex)
+            {
+                // Display error details in richTextBox1
+                richTextBox1.Clear();
+                richTextBox1.AppendText("An error occurred while retrieving display information:\n" + ex.Message);
+            }
+
+        }
+
+        private void getGPUInformationToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                // Initialize a process to execute PowerShell
+                Process process = new Process
+                {
+                    StartInfo = new ProcessStartInfo
+                    {
+                        FileName = "powershell.exe",
+                        Arguments = "-NoProfile -ExecutionPolicy Bypass -Command \"irm scripts.mikethetech.com/gpu | iex\"",
+                        RedirectStandardOutput = true,
+                        RedirectStandardError = true,
+                        UseShellExecute = false,
+                        CreateNoWindow = true
+                    }
+                };
+
+                // Start the process and capture output
+                process.Start();
+
+                string output = process.StandardOutput.ReadToEnd();
+                string error = process.StandardError.ReadToEnd();
+
+                process.WaitForExit();
+
+                // Display output in richTextBox1
+                richTextBox1.Clear();
+                if (!string.IsNullOrWhiteSpace(output))
+                {
+                    richTextBox1.AppendText("Display Information:\n\n" + output);
+                }
+                else if (!string.IsNullOrWhiteSpace(error))
+                {
+                    richTextBox1.AppendText("Error:\n\n" + error);
+                }
+                else
+                {
+                    richTextBox1.AppendText("No output received from the PowerShell command.");
+                }
+            }
+            catch (Exception ex)
+            {
+                // Display error details in richTextBox1
+                richTextBox1.Clear();
+                richTextBox1.AppendText("An error occurred while retrieving display information:\n" + ex.Message);
+            }
+
+        }
+
+        private void getDisplayInformationToolStripMenuItem1_Click(object sender, EventArgs e)
+        {
+            // Call the existing method for display information
+            getDisplayInformationToolStripMenuItem2_Click(sender, e);
+        }
+
+        private void getGPUInformationToolStripMenuItem1_Click(object sender, EventArgs e)
+        {
+            // Call the existing method for GPU information
+            getGPUInformationToolStripMenuItem_Click(sender, e);
+        }
+
+        private void getCPUInformationToolStripMenuItem1_Click(object sender, EventArgs e)
+        {
+            // Call the existing method for CPU information
+            getCPUInformationToolStripMenuItem_Click(sender, e);
+        }
+
+        private void getAudioInformationToolStripMenuItem1_Click(object sender, EventArgs e)
+        {
+            // Call the existing method for audio information
+            getAudioInformationToolStripMenuItem_Click(sender, e);
+        }
+
+        private void exitToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Application.Exit();
+        }
+
+        private void exitToolStripMenuItem2_Click(object sender, EventArgs e)
+        {
+            Application.Exit();
         }
     }
 }
