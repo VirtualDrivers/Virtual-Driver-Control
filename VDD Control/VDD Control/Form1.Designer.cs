@@ -34,6 +34,9 @@
             contextMenuStrip1 = new ContextMenuStrip(components);
             menuToolStripMenuItem1 = new ToolStripMenuItem();
             exitToolStripMenuItem1 = new ToolStripMenuItem();
+            toolsToolStripMenuItem1 = new ToolStripMenuItem();
+            getDisplayInformationToolStripMenuItem1 = new ToolStripMenuItem();
+            getGPUInformationToolStripMenuItem1 = new ToolStripMenuItem();
             virtualDisplayDriverToolStripMenuItem1 = new ToolStripMenuItem();
             sDR10bitToolStripMenuItem1 = new ToolStripMenuItem();
             hDRToolStripMenuItem1 = new ToolStripMenuItem();
@@ -47,6 +50,9 @@
             enableDriverToolStripMenuItem2 = new ToolStripMenuItem();
             disableDriverToolStripMenuItem2 = new ToolStripMenuItem();
             restartDriverToolStripMenuItem2 = new ToolStripMenuItem();
+            loggingToolStripMenuItem1 = new ToolStripMenuItem();
+            userModeLoggingToolStripMenuItem = new ToolStripMenuItem();
+            devModeLoggingToolStripMenuItem = new ToolStripMenuItem();
             virtualAudioDriverToolStripMenuItem1 = new ToolStripMenuItem();
             systemToolStripMenuItem2 = new ToolStripMenuItem();
             enableDriverToolStripMenuItem3 = new ToolStripMenuItem();
@@ -69,6 +75,9 @@
             enableDriverToolStripMenuItem = new ToolStripMenuItem();
             disableDriverToolStripMenuItem = new ToolStripMenuItem();
             restartDriverToolStripMenuItem = new ToolStripMenuItem();
+            loggingToolStripMenuItem = new ToolStripMenuItem();
+            enableUserModeLoggingToolStripMenuItem = new ToolStripMenuItem();
+            enableDevModeLoggingToolStripMenuItem = new ToolStripMenuItem();
             virtualAudioDriverToolStripMenuItem = new ToolStripMenuItem();
             systemToolStripMenuItem = new ToolStripMenuItem();
             enableDriverToolStripMenuItem1 = new ToolStripMenuItem();
@@ -76,27 +85,17 @@
             restartDriverToolStripMenuItem1 = new ToolStripMenuItem();
             aboutToolStripMenuItem = new ToolStripMenuItem();
             menuStrip1 = new MenuStrip();
-            richTextBox1 = new RichTextBox();
-            monthCalendar1 = new MonthCalendar();
             toolsToolStripMenuItem = new ToolStripMenuItem();
             getDisplayInformationToolStripMenuItem = new ToolStripMenuItem();
             getGPUInformationToolStripMenuItem = new ToolStripMenuItem();
-            toolsToolStripMenuItem1 = new ToolStripMenuItem();
-            getDisplayInformationToolStripMenuItem1 = new ToolStripMenuItem();
-            getGPUInformationToolStripMenuItem1 = new ToolStripMenuItem();
+            getCPUInformationToolStripMenuItem = new ToolStripMenuItem();
+            richTextBox1 = new RichTextBox();
+            monthCalendar1 = new MonthCalendar();
             label1 = new Label();
             linkLabel1 = new LinkLabel();
             label2 = new Label();
             linkLabel2 = new LinkLabel();
-            label3 = new Label();
             button1 = new Button();
-            textBox1 = new TextBox();
-            loggingToolStripMenuItem = new ToolStripMenuItem();
-            enableUserModeLoggingToolStripMenuItem = new ToolStripMenuItem();
-            enableDevModeLoggingToolStripMenuItem = new ToolStripMenuItem();
-            loggingToolStripMenuItem1 = new ToolStripMenuItem();
-            userModeLoggingToolStripMenuItem = new ToolStripMenuItem();
-            devModeLoggingToolStripMenuItem = new ToolStripMenuItem();
             contextMenuStrip1.SuspendLayout();
             menuStrip1.SuspendLayout();
             SuspendLayout();
@@ -112,7 +111,7 @@
             // 
             contextMenuStrip1.Items.AddRange(new ToolStripItem[] { menuToolStripMenuItem1, toolsToolStripMenuItem1, virtualDisplayDriverToolStripMenuItem1, virtualAudioDriverToolStripMenuItem1, aboutToolStripMenuItem1, exitToolStripMenuItem2 });
             contextMenuStrip1.Name = "contextMenuStrip1";
-            contextMenuStrip1.Size = new Size(184, 158);
+            contextMenuStrip1.Size = new Size(184, 136);
             // 
             // menuToolStripMenuItem1
             // 
@@ -126,6 +125,25 @@
             exitToolStripMenuItem1.Name = "exitToolStripMenuItem1";
             exitToolStripMenuItem1.Size = new Size(92, 22);
             exitToolStripMenuItem1.Text = "Exit";
+            // 
+            // toolsToolStripMenuItem1
+            // 
+            toolsToolStripMenuItem1.DropDownItems.AddRange(new ToolStripItem[] { getDisplayInformationToolStripMenuItem1, getGPUInformationToolStripMenuItem1 });
+            toolsToolStripMenuItem1.Name = "toolsToolStripMenuItem1";
+            toolsToolStripMenuItem1.Size = new Size(183, 22);
+            toolsToolStripMenuItem1.Text = "Tools";
+            // 
+            // getDisplayInformationToolStripMenuItem1
+            // 
+            getDisplayInformationToolStripMenuItem1.Name = "getDisplayInformationToolStripMenuItem1";
+            getDisplayInformationToolStripMenuItem1.Size = new Size(199, 22);
+            getDisplayInformationToolStripMenuItem1.Text = "Get Display Information";
+            // 
+            // getGPUInformationToolStripMenuItem1
+            // 
+            getGPUInformationToolStripMenuItem1.Name = "getGPUInformationToolStripMenuItem1";
+            getGPUInformationToolStripMenuItem1.Size = new Size(199, 22);
+            getGPUInformationToolStripMenuItem1.Text = "Get GPU Information";
             // 
             // virtualDisplayDriverToolStripMenuItem1
             // 
@@ -207,6 +225,25 @@
             restartDriverToolStripMenuItem2.Size = new Size(146, 22);
             restartDriverToolStripMenuItem2.Text = "Restart Driver";
             // 
+            // loggingToolStripMenuItem1
+            // 
+            loggingToolStripMenuItem1.DropDownItems.AddRange(new ToolStripItem[] { userModeLoggingToolStripMenuItem, devModeLoggingToolStripMenuItem });
+            loggingToolStripMenuItem1.Name = "loggingToolStripMenuItem1";
+            loggingToolStripMenuItem1.Size = new Size(194, 22);
+            loggingToolStripMenuItem1.Text = "Logging";
+            // 
+            // userModeLoggingToolStripMenuItem
+            // 
+            userModeLoggingToolStripMenuItem.Name = "userModeLoggingToolStripMenuItem";
+            userModeLoggingToolStripMenuItem.Size = new Size(180, 22);
+            userModeLoggingToolStripMenuItem.Text = "User-Mode Logging";
+            // 
+            // devModeLoggingToolStripMenuItem
+            // 
+            devModeLoggingToolStripMenuItem.Name = "devModeLoggingToolStripMenuItem";
+            devModeLoggingToolStripMenuItem.Size = new Size(180, 22);
+            devModeLoggingToolStripMenuItem.Text = "Dev-Mode Logging";
+            // 
             // virtualAudioDriverToolStripMenuItem1
             // 
             virtualAudioDriverToolStripMenuItem1.DropDownItems.AddRange(new ToolStripItem[] { systemToolStripMenuItem2 });
@@ -261,7 +298,7 @@
             // exitToolStripMenuItem
             // 
             exitToolStripMenuItem.Name = "exitToolStripMenuItem";
-            exitToolStripMenuItem.Size = new Size(180, 22);
+            exitToolStripMenuItem.Size = new Size(92, 22);
             exitToolStripMenuItem.Text = "Exit";
             // 
             // virtualDisplayDriverToolStripMenuItem
@@ -330,20 +367,39 @@
             // enableDriverToolStripMenuItem
             // 
             enableDriverToolStripMenuItem.Name = "enableDriverToolStripMenuItem";
-            enableDriverToolStripMenuItem.Size = new Size(180, 22);
+            enableDriverToolStripMenuItem.Size = new Size(146, 22);
             enableDriverToolStripMenuItem.Text = "Enable Driver";
             // 
             // disableDriverToolStripMenuItem
             // 
             disableDriverToolStripMenuItem.Name = "disableDriverToolStripMenuItem";
-            disableDriverToolStripMenuItem.Size = new Size(180, 22);
+            disableDriverToolStripMenuItem.Size = new Size(146, 22);
             disableDriverToolStripMenuItem.Text = "Disable Driver";
             // 
             // restartDriverToolStripMenuItem
             // 
             restartDriverToolStripMenuItem.Name = "restartDriverToolStripMenuItem";
-            restartDriverToolStripMenuItem.Size = new Size(180, 22);
+            restartDriverToolStripMenuItem.Size = new Size(146, 22);
             restartDriverToolStripMenuItem.Text = "Restart Driver";
+            // 
+            // loggingToolStripMenuItem
+            // 
+            loggingToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { enableUserModeLoggingToolStripMenuItem, enableDevModeLoggingToolStripMenuItem });
+            loggingToolStripMenuItem.Name = "loggingToolStripMenuItem";
+            loggingToolStripMenuItem.Size = new Size(194, 22);
+            loggingToolStripMenuItem.Text = "Logging";
+            // 
+            // enableUserModeLoggingToolStripMenuItem
+            // 
+            enableUserModeLoggingToolStripMenuItem.Name = "enableUserModeLoggingToolStripMenuItem";
+            enableUserModeLoggingToolStripMenuItem.Size = new Size(180, 22);
+            enableUserModeLoggingToolStripMenuItem.Text = "User-Mode Logging";
+            // 
+            // enableDevModeLoggingToolStripMenuItem
+            // 
+            enableDevModeLoggingToolStripMenuItem.Name = "enableDevModeLoggingToolStripMenuItem";
+            enableDevModeLoggingToolStripMenuItem.Size = new Size(180, 22);
+            enableDevModeLoggingToolStripMenuItem.Text = "Dev-Mode Logging";
             // 
             // virtualAudioDriverToolStripMenuItem
             // 
@@ -393,23 +449,9 @@
             menuStrip1.TabIndex = 1;
             menuStrip1.Text = "menuStrip1";
             // 
-            // richTextBox1
-            // 
-            richTextBox1.Location = new Point(12, 27);
-            richTextBox1.Name = "richTextBox1";
-            richTextBox1.Size = new Size(520, 411);
-            richTextBox1.TabIndex = 2;
-            richTextBox1.Text = "Information will appear here when specific tools are used.";
-            // 
-            // monthCalendar1
-            // 
-            monthCalendar1.Location = new Point(555, 241);
-            monthCalendar1.Name = "monthCalendar1";
-            monthCalendar1.TabIndex = 3;
-            // 
             // toolsToolStripMenuItem
             // 
-            toolsToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { getDisplayInformationToolStripMenuItem, getGPUInformationToolStripMenuItem });
+            toolsToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { getDisplayInformationToolStripMenuItem, getGPUInformationToolStripMenuItem, getCPUInformationToolStripMenuItem });
             toolsToolStripMenuItem.Name = "toolsToolStripMenuItem";
             toolsToolStripMenuItem.Size = new Size(47, 20);
             toolsToolStripMenuItem.Text = "Tools";
@@ -426,24 +468,26 @@
             getGPUInformationToolStripMenuItem.Size = new Size(199, 22);
             getGPUInformationToolStripMenuItem.Text = "Get GPU Information";
             // 
-            // toolsToolStripMenuItem1
+            // getCPUInformationToolStripMenuItem
             // 
-            toolsToolStripMenuItem1.DropDownItems.AddRange(new ToolStripItem[] { getDisplayInformationToolStripMenuItem1, getGPUInformationToolStripMenuItem1 });
-            toolsToolStripMenuItem1.Name = "toolsToolStripMenuItem1";
-            toolsToolStripMenuItem1.Size = new Size(183, 22);
-            toolsToolStripMenuItem1.Text = "Tools";
+            getCPUInformationToolStripMenuItem.Name = "getCPUInformationToolStripMenuItem";
+            getCPUInformationToolStripMenuItem.Size = new Size(199, 22);
+            getCPUInformationToolStripMenuItem.Text = "Get CPU Information";
+            getCPUInformationToolStripMenuItem.Click += getCPUInformationToolStripMenuItem_Click;
             // 
-            // getDisplayInformationToolStripMenuItem1
+            // richTextBox1
             // 
-            getDisplayInformationToolStripMenuItem1.Name = "getDisplayInformationToolStripMenuItem1";
-            getDisplayInformationToolStripMenuItem1.Size = new Size(199, 22);
-            getDisplayInformationToolStripMenuItem1.Text = "Get Display Information";
+            richTextBox1.Location = new Point(12, 27);
+            richTextBox1.Name = "richTextBox1";
+            richTextBox1.Size = new Size(520, 411);
+            richTextBox1.TabIndex = 2;
+            richTextBox1.Text = "Information will appear here when specific tools are used.";
             // 
-            // getGPUInformationToolStripMenuItem1
+            // monthCalendar1
             // 
-            getGPUInformationToolStripMenuItem1.Name = "getGPUInformationToolStripMenuItem1";
-            getGPUInformationToolStripMenuItem1.Size = new Size(199, 22);
-            getGPUInformationToolStripMenuItem1.Text = "Get GPU Information";
+            monthCalendar1.Location = new Point(555, 241);
+            monthCalendar1.Name = "monthCalendar1";
+            monthCalendar1.TabIndex = 3;
             // 
             // label1
             // 
@@ -486,16 +530,6 @@
             linkLabel2.TabStop = true;
             linkLabel2.Text = "https://github.com/VirtualDisplay/";
             // 
-            // label3
-            // 
-            label3.AutoSize = true;
-            label3.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
-            label3.Location = new Point(555, 110);
-            label3.Name = "label3";
-            label3.Size = new Size(77, 15);
-            label3.TabIndex = 8;
-            label3.Text = "System Info:";
-            // 
             // button1
             // 
             button1.Location = new Point(648, 415);
@@ -505,53 +539,6 @@
             button1.Text = "Restart All Drivers";
             button1.UseVisualStyleBackColor = true;
             // 
-            // textBox1
-            // 
-            textBox1.Location = new Point(555, 128);
-            textBox1.Multiline = true;
-            textBox1.Name = "textBox1";
-            textBox1.ScrollBars = ScrollBars.Vertical;
-            textBox1.Size = new Size(227, 106);
-            textBox1.TabIndex = 10;
-            // 
-            // loggingToolStripMenuItem
-            // 
-            loggingToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { enableUserModeLoggingToolStripMenuItem, enableDevModeLoggingToolStripMenuItem });
-            loggingToolStripMenuItem.Name = "loggingToolStripMenuItem";
-            loggingToolStripMenuItem.Size = new Size(194, 22);
-            loggingToolStripMenuItem.Text = "Logging";
-            // 
-            // enableUserModeLoggingToolStripMenuItem
-            // 
-            enableUserModeLoggingToolStripMenuItem.Name = "enableUserModeLoggingToolStripMenuItem";
-            enableUserModeLoggingToolStripMenuItem.Size = new Size(180, 22);
-            enableUserModeLoggingToolStripMenuItem.Text = "User-Mode Logging";
-            // 
-            // enableDevModeLoggingToolStripMenuItem
-            // 
-            enableDevModeLoggingToolStripMenuItem.Name = "enableDevModeLoggingToolStripMenuItem";
-            enableDevModeLoggingToolStripMenuItem.Size = new Size(180, 22);
-            enableDevModeLoggingToolStripMenuItem.Text = "Dev-Mode Logging";
-            // 
-            // loggingToolStripMenuItem1
-            // 
-            loggingToolStripMenuItem1.DropDownItems.AddRange(new ToolStripItem[] { userModeLoggingToolStripMenuItem, devModeLoggingToolStripMenuItem });
-            loggingToolStripMenuItem1.Name = "loggingToolStripMenuItem1";
-            loggingToolStripMenuItem1.Size = new Size(194, 22);
-            loggingToolStripMenuItem1.Text = "Logging";
-            // 
-            // userModeLoggingToolStripMenuItem
-            // 
-            userModeLoggingToolStripMenuItem.Name = "userModeLoggingToolStripMenuItem";
-            userModeLoggingToolStripMenuItem.Size = new Size(180, 22);
-            userModeLoggingToolStripMenuItem.Text = "User-Mode Logging";
-            // 
-            // devModeLoggingToolStripMenuItem
-            // 
-            devModeLoggingToolStripMenuItem.Name = "devModeLoggingToolStripMenuItem";
-            devModeLoggingToolStripMenuItem.Size = new Size(180, 22);
-            devModeLoggingToolStripMenuItem.Text = "Dev-Mode Logging";
-            // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
@@ -559,9 +546,7 @@
             AutoSizeMode = AutoSizeMode.GrowAndShrink;
             ClientSize = new Size(800, 450);
             ContextMenuStrip = contextMenuStrip1;
-            Controls.Add(textBox1);
             Controls.Add(button1);
-            Controls.Add(label3);
             Controls.Add(linkLabel2);
             Controls.Add(label2);
             Controls.Add(linkLabel1);
@@ -577,6 +562,7 @@
             Name = "Form1";
             ShowInTaskbar = false;
             Text = "VDD Control";
+            Load += Form1_Load;
             contextMenuStrip1.ResumeLayout(false);
             menuStrip1.ResumeLayout(false);
             menuStrip1.PerformLayout();
@@ -643,14 +629,13 @@
         private LinkLabel linkLabel1;
         private Label label2;
         private LinkLabel linkLabel2;
-        private Label label3;
         private Button button1;
-        private TextBox textBox1;
         private ToolStripMenuItem loggingToolStripMenuItem1;
         private ToolStripMenuItem userModeLoggingToolStripMenuItem;
         private ToolStripMenuItem devModeLoggingToolStripMenuItem;
         private ToolStripMenuItem loggingToolStripMenuItem;
         private ToolStripMenuItem enableUserModeLoggingToolStripMenuItem;
         private ToolStripMenuItem enableDevModeLoggingToolStripMenuItem;
+        private ToolStripMenuItem getCPUInformationToolStripMenuItem;
     }
 }
