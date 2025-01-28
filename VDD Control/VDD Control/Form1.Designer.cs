@@ -55,6 +55,7 @@
             loggingToolStripMenuItem1 = new ToolStripMenuItem();
             userModeLoggingToolStripMenuItem = new ToolStripMenuItem();
             devModeLoggingToolStripMenuItem = new ToolStripMenuItem();
+            toolStripMenuItem1 = new ToolStripMenuItem();
             virtualAudioDriverToolStripMenuItem1 = new ToolStripMenuItem();
             systemToolStripMenuItem2 = new ToolStripMenuItem();
             enableDriverToolStripMenuItem3 = new ToolStripMenuItem();
@@ -80,6 +81,7 @@
             loggingToolStripMenuItem = new ToolStripMenuItem();
             enableUserModeLoggingToolStripMenuItem = new ToolStripMenuItem();
             enableDevModeLoggingToolStripMenuItem = new ToolStripMenuItem();
+            xMLOptionsEditorToolStripMenuItem = new ToolStripMenuItem();
             virtualAudioDriverToolStripMenuItem = new ToolStripMenuItem();
             systemToolStripMenuItem = new ToolStripMenuItem();
             enableDriverToolStripMenuItem1 = new ToolStripMenuItem();
@@ -98,18 +100,22 @@
             label2 = new Label();
             linkLabel2 = new LinkLabel();
             button1 = new Button();
-            label3 = new Label();
             label4 = new Label();
             label5 = new Label();
             label6 = new Label();
-            label7 = new Label();
             linkLabel3 = new LinkLabel();
-            listBox1 = new ListBox();
             linkLabel6 = new LinkLabel();
             linkLabel4 = new LinkLabel();
             linkLabel5 = new LinkLabel();
+            groupBox1 = new GroupBox();
+            listBox1 = new ListBox();
+            groupBox2 = new GroupBox();
+            groupBox3 = new GroupBox();
             contextMenuStrip1.SuspendLayout();
             menuStrip1.SuspendLayout();
+            groupBox1.SuspendLayout();
+            groupBox2.SuspendLayout();
+            groupBox3.SuspendLayout();
             SuspendLayout();
             // 
             // notifyIcon1
@@ -124,6 +130,7 @@
             contextMenuStrip1.Items.AddRange(new ToolStripItem[] { menuToolStripMenuItem1, toolsToolStripMenuItem1, virtualDisplayDriverToolStripMenuItem1, virtualAudioDriverToolStripMenuItem1, aboutToolStripMenuItem1, exitToolStripMenuItem2 });
             contextMenuStrip1.Name = "contextMenuStrip1";
             contextMenuStrip1.Size = new Size(184, 136);
+            contextMenuStrip1.Text = "Menu";
             // 
             // menuToolStripMenuItem1
             // 
@@ -175,7 +182,7 @@
             // 
             // virtualDisplayDriverToolStripMenuItem1
             // 
-            virtualDisplayDriverToolStripMenuItem1.DropDownItems.AddRange(new ToolStripItem[] { sDR10bitToolStripMenuItem1, hDRToolStripMenuItem1, customEDIDToolStripMenuItem1, hardwareCursorToolStripMenuItem1, preventMonitorSpoofToolStripMenuItem1, eDIDCEAOverrideToolStripMenuItem1, selectGPUToolStripMenuItem1, displayCountToolStripMenuItem1, systemToolStripMenuItem1, loggingToolStripMenuItem1 });
+            virtualDisplayDriverToolStripMenuItem1.DropDownItems.AddRange(new ToolStripItem[] { sDR10bitToolStripMenuItem1, hDRToolStripMenuItem1, customEDIDToolStripMenuItem1, hardwareCursorToolStripMenuItem1, preventMonitorSpoofToolStripMenuItem1, eDIDCEAOverrideToolStripMenuItem1, selectGPUToolStripMenuItem1, displayCountToolStripMenuItem1, systemToolStripMenuItem1, loggingToolStripMenuItem1, toolStripMenuItem1 });
             virtualDisplayDriverToolStripMenuItem1.Name = "virtualDisplayDriverToolStripMenuItem1";
             virtualDisplayDriverToolStripMenuItem1.Size = new Size(183, 22);
             virtualDisplayDriverToolStripMenuItem1.Text = "Virtual Display Driver";
@@ -272,6 +279,13 @@
             devModeLoggingToolStripMenuItem.Size = new Size(180, 22);
             devModeLoggingToolStripMenuItem.Text = "Dev-Mode Logging";
             // 
+            // toolStripMenuItem1
+            // 
+            toolStripMenuItem1.Name = "toolStripMenuItem1";
+            toolStripMenuItem1.Size = new Size(194, 22);
+            toolStripMenuItem1.Text = "XML/Options Editor";
+            toolStripMenuItem1.Click += toolStripMenuItem1_Click;
+            // 
             // virtualAudioDriverToolStripMenuItem1
             // 
             virtualAudioDriverToolStripMenuItem1.DropDownItems.AddRange(new ToolStripItem[] { systemToolStripMenuItem2 });
@@ -320,6 +334,7 @@
             // menuToolStripMenuItem
             // 
             menuToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { exitToolStripMenuItem });
+            menuToolStripMenuItem.Font = new Font("Segoe UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
             menuToolStripMenuItem.Name = "menuToolStripMenuItem";
             menuToolStripMenuItem.Size = new Size(50, 20);
             menuToolStripMenuItem.Text = "Menu";
@@ -333,7 +348,7 @@
             // 
             // virtualDisplayDriverToolStripMenuItem
             // 
-            virtualDisplayDriverToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { sDR10bitToolStripMenuItem, hDRToolStripMenuItem, customEDIDToolStripMenuItem, hardwareCursorToolStripMenuItem, preventMonitorSpoofToolStripMenuItem, eDIDCEAOverrideToolStripMenuItem, selectGPUToolStripMenuItem, displayCountToolStripMenuItem, enableToolStripMenuItem, loggingToolStripMenuItem });
+            virtualDisplayDriverToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { sDR10bitToolStripMenuItem, hDRToolStripMenuItem, customEDIDToolStripMenuItem, hardwareCursorToolStripMenuItem, preventMonitorSpoofToolStripMenuItem, eDIDCEAOverrideToolStripMenuItem, selectGPUToolStripMenuItem, displayCountToolStripMenuItem, enableToolStripMenuItem, loggingToolStripMenuItem, xMLOptionsEditorToolStripMenuItem });
             virtualDisplayDriverToolStripMenuItem.Name = "virtualDisplayDriverToolStripMenuItem";
             virtualDisplayDriverToolStripMenuItem.Size = new Size(128, 20);
             virtualDisplayDriverToolStripMenuItem.Text = "Virtual Display Driver";
@@ -431,6 +446,13 @@
             enableDevModeLoggingToolStripMenuItem.Size = new Size(180, 22);
             enableDevModeLoggingToolStripMenuItem.Text = "Dev-Mode Logging";
             // 
+            // xMLOptionsEditorToolStripMenuItem
+            // 
+            xMLOptionsEditorToolStripMenuItem.Name = "xMLOptionsEditorToolStripMenuItem";
+            xMLOptionsEditorToolStripMenuItem.Size = new Size(194, 22);
+            xMLOptionsEditorToolStripMenuItem.Text = "XML/Options Editor";
+            xMLOptionsEditorToolStripMenuItem.Click += xMLOptionsEditorToolStripMenuItem_Click;
+            // 
             // virtualAudioDriverToolStripMenuItem
             // 
             virtualAudioDriverToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { systemToolStripMenuItem });
@@ -524,6 +546,9 @@
             // 
             // richTextBox1
             // 
+            richTextBox1.BackColor = Color.FromArgb(32, 32, 32);
+            richTextBox1.DetectUrls = false;
+            richTextBox1.ForeColor = Color.Green;
             richTextBox1.Location = new Point(12, 27);
             richTextBox1.Name = "richTextBox1";
             richTextBox1.Size = new Size(520, 411);
@@ -533,10 +558,10 @@
             // label1
             // 
             label1.AutoSize = true;
-            label1.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
-            label1.Location = new Point(555, 30);
+            label1.Font = new Font("Segoe UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
+            label1.Location = new Point(6, 19);
             label1.Name = "label1";
-            label1.Size = new Size(47, 15);
+            label1.Size = new Size(45, 15);
             label1.TabIndex = 4;
             label1.Text = "GitHub";
             label1.Click += label1_Click;
@@ -544,7 +569,8 @@
             // linkLabel1
             // 
             linkLabel1.AutoSize = true;
-            linkLabel1.Location = new Point(555, 86);
+            linkLabel1.Font = new Font("Segoe UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
+            linkLabel1.Location = new Point(6, 73);
             linkLabel1.Name = "linkLabel1";
             linkLabel1.Size = new Size(187, 15);
             linkLabel1.TabIndex = 5;
@@ -555,17 +581,18 @@
             // label2
             // 
             label2.AutoSize = true;
-            label2.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
-            label2.Location = new Point(555, 71);
+            label2.Font = new Font("Segoe UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
+            label2.Location = new Point(6, 58);
             label2.Name = "label2";
-            label2.Size = new Size(49, 15);
+            label2.Size = new Size(47, 15);
             label2.TabIndex = 6;
             label2.Text = "Discord";
             // 
             // linkLabel2
             // 
             linkLabel2.AutoSize = true;
-            linkLabel2.Location = new Point(555, 45);
+            linkLabel2.Font = new Font("Segoe UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
+            linkLabel2.Location = new Point(6, 34);
             linkLabel2.Name = "linkLabel2";
             linkLabel2.Size = new Size(191, 15);
             linkLabel2.TabIndex = 7;
@@ -574,28 +601,18 @@
             // 
             // button1
             // 
-            button1.Location = new Point(648, 415);
+            button1.Location = new Point(648, 419);
             button1.Name = "button1";
-            button1.Size = new Size(134, 23);
+            button1.Size = new Size(134, 22);
             button1.TabIndex = 9;
             button1.Text = "Restart All Drivers";
             button1.UseVisualStyleBackColor = true;
-            // 
-            // label3
-            // 
-            label3.AutoSize = true;
-            label3.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
-            label3.Location = new Point(555, 114);
-            label3.Name = "label3";
-            label3.Size = new Size(117, 15);
-            label3.TabIndex = 10;
-            label3.Text = "Development Team";
             // 
             // label4
             // 
             label4.AutoSize = true;
             label4.Font = new Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point);
-            label4.Location = new Point(555, 129);
+            label4.Location = new Point(6, 22);
             label4.Name = "label4";
             label4.Size = new Size(109, 21);
             label4.TabIndex = 11;
@@ -605,7 +622,7 @@
             // 
             label5.AutoSize = true;
             label5.Font = new Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point);
-            label5.Location = new Point(555, 150);
+            label5.Location = new Point(6, 44);
             label5.Name = "label5";
             label5.Size = new Size(47, 21);
             label5.TabIndex = 12;
@@ -615,49 +632,30 @@
             // 
             label6.AutoSize = true;
             label6.Font = new Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point);
-            label6.Location = new Point(555, 171);
+            label6.Location = new Point(6, 65);
             label6.Name = "label6";
             label6.Size = new Size(58, 21);
             label6.TabIndex = 13;
             label6.Text = "- Jocke";
             // 
-            // label7
-            // 
-            label7.AutoSize = true;
-            label7.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
-            label7.Location = new Point(555, 201);
-            label7.Name = "label7";
-            label7.Size = new Size(116, 15);
-            label7.TabIndex = 14;
-            label7.Text = "Patreon Supporters";
-            // 
             // linkLabel3
             // 
             linkLabel3.AutoSize = true;
-            linkLabel3.Font = new Font("Segoe UI", 8.25F, FontStyle.Regular, GraphicsUnit.Point);
-            linkLabel3.Location = new Point(683, 135);
+            linkLabel3.Font = new Font("Segoe UI", 7F, FontStyle.Regular, GraphicsUnit.Point);
+            linkLabel3.Location = new Point(137, 29);
             linkLabel3.Name = "linkLabel3";
-            linkLabel3.Size = new Size(99, 13);
+            linkLabel3.Size = new Size(84, 12);
             linkLabel3.TabIndex = 16;
             linkLabel3.TabStop = true;
             linkLabel3.Text = "(Support this Dev)";
             // 
-            // listBox1
-            // 
-            listBox1.FormattingEnabled = true;
-            listBox1.ItemHeight = 15;
-            listBox1.Items.AddRange(new object[] { "- Gabriel Posso" });
-            listBox1.Location = new Point(555, 216);
-            listBox1.Name = "listBox1";
-            listBox1.Size = new Size(227, 184);
-            listBox1.TabIndex = 21;
-            // 
             // linkLabel6
             // 
             linkLabel6.AutoSize = true;
-            linkLabel6.Location = new Point(734, 201);
+            linkLabel6.Font = new Font("Segoe UI", 7F, FontStyle.Regular, GraphicsUnit.Point);
+            linkLabel6.Location = new Point(182, 164);
             linkLabel6.Name = "linkLabel6";
-            linkLabel6.Size = new Size(48, 15);
+            linkLabel6.Size = new Size(39, 12);
             linkLabel6.TabIndex = 22;
             linkLabel6.TabStop = true;
             linkLabel6.Text = "Patreon";
@@ -665,10 +663,10 @@
             // linkLabel4
             // 
             linkLabel4.AutoSize = true;
-            linkLabel4.Font = new Font("Segoe UI", 8.25F, FontStyle.Regular, GraphicsUnit.Point);
-            linkLabel4.Location = new Point(683, 177);
+            linkLabel4.Font = new Font("Segoe UI", 7F, FontStyle.Regular, GraphicsUnit.Point);
+            linkLabel4.Location = new Point(137, 72);
             linkLabel4.Name = "linkLabel4";
-            linkLabel4.Size = new Size(99, 13);
+            linkLabel4.Size = new Size(84, 12);
             linkLabel4.TabIndex = 23;
             linkLabel4.TabStop = true;
             linkLabel4.Text = "(Support this Dev)";
@@ -676,13 +674,68 @@
             // linkLabel5
             // 
             linkLabel5.AutoSize = true;
-            linkLabel5.Font = new Font("Segoe UI", 8.25F, FontStyle.Regular, GraphicsUnit.Point);
-            linkLabel5.Location = new Point(683, 156);
+            linkLabel5.Font = new Font("Segoe UI", 7F, FontStyle.Regular, GraphicsUnit.Point);
+            linkLabel5.Location = new Point(137, 51);
             linkLabel5.Name = "linkLabel5";
-            linkLabel5.Size = new Size(99, 13);
+            linkLabel5.Size = new Size(84, 12);
             linkLabel5.TabIndex = 24;
             linkLabel5.TabStop = true;
             linkLabel5.Text = "(Support this Dev)";
+            // 
+            // groupBox1
+            // 
+            groupBox1.Controls.Add(linkLabel6);
+            groupBox1.Controls.Add(listBox1);
+            groupBox1.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
+            groupBox1.Location = new Point(555, 229);
+            groupBox1.Name = "groupBox1";
+            groupBox1.Size = new Size(227, 184);
+            groupBox1.TabIndex = 25;
+            groupBox1.TabStop = false;
+            groupBox1.Text = "Patreon Supporters";
+            // 
+            // listBox1
+            // 
+            listBox1.BackColor = SystemColors.ButtonFace;
+            listBox1.BorderStyle = BorderStyle.None;
+            listBox1.Font = new Font("Segoe UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
+            listBox1.FormattingEnabled = true;
+            listBox1.ItemHeight = 15;
+            listBox1.Items.AddRange(new object[] { "- Gabriel Posso" });
+            listBox1.Location = new Point(6, 22);
+            listBox1.Name = "listBox1";
+            listBox1.Size = new Size(215, 150);
+            listBox1.TabIndex = 23;
+            // 
+            // groupBox2
+            // 
+            groupBox2.Controls.Add(label4);
+            groupBox2.Controls.Add(label5);
+            groupBox2.Controls.Add(label6);
+            groupBox2.Controls.Add(linkLabel4);
+            groupBox2.Controls.Add(linkLabel5);
+            groupBox2.Controls.Add(linkLabel3);
+            groupBox2.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
+            groupBox2.Location = new Point(555, 127);
+            groupBox2.Name = "groupBox2";
+            groupBox2.Size = new Size(227, 95);
+            groupBox2.TabIndex = 26;
+            groupBox2.TabStop = false;
+            groupBox2.Text = "Developers";
+            // 
+            // groupBox3
+            // 
+            groupBox3.Controls.Add(label1);
+            groupBox3.Controls.Add(linkLabel2);
+            groupBox3.Controls.Add(label2);
+            groupBox3.Controls.Add(linkLabel1);
+            groupBox3.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
+            groupBox3.Location = new Point(555, 27);
+            groupBox3.Name = "groupBox3";
+            groupBox3.Size = new Size(227, 95);
+            groupBox3.TabIndex = 27;
+            groupBox3.TabStop = false;
+            groupBox3.Text = "Resources";
             // 
             // Form1
             // 
@@ -691,34 +744,30 @@
             AutoSizeMode = AutoSizeMode.GrowAndShrink;
             ClientSize = new Size(800, 450);
             ContextMenuStrip = contextMenuStrip1;
-            Controls.Add(linkLabel5);
-            Controls.Add(linkLabel4);
-            Controls.Add(linkLabel6);
-            Controls.Add(listBox1);
-            Controls.Add(linkLabel3);
-            Controls.Add(label7);
-            Controls.Add(label6);
-            Controls.Add(label5);
-            Controls.Add(label4);
-            Controls.Add(label3);
+            Controls.Add(groupBox3);
+            Controls.Add(groupBox2);
+            Controls.Add(groupBox1);
             Controls.Add(button1);
-            Controls.Add(linkLabel2);
-            Controls.Add(label2);
-            Controls.Add(linkLabel1);
-            Controls.Add(label1);
             Controls.Add(richTextBox1);
             Controls.Add(menuStrip1);
+            FormBorderStyle = FormBorderStyle.FixedToolWindow;
             Icon = (Icon)resources.GetObject("$this.Icon");
             MainMenuStrip = menuStrip1;
             MaximizeBox = false;
             MaximumSize = new Size(816, 489);
             MinimumSize = new Size(816, 489);
             Name = "Form1";
-            Text = "VDD Control";
+            Text = "Virtual Driver Control";
             Load += Form1_Load;
             contextMenuStrip1.ResumeLayout(false);
             menuStrip1.ResumeLayout(false);
             menuStrip1.PerformLayout();
+            groupBox1.ResumeLayout(false);
+            groupBox1.PerformLayout();
+            groupBox2.ResumeLayout(false);
+            groupBox2.PerformLayout();
+            groupBox3.ResumeLayout(false);
+            groupBox3.PerformLayout();
             ResumeLayout(false);
             PerformLayout();
         }
@@ -792,15 +841,18 @@
         private ToolStripMenuItem getAudioInformationToolStripMenuItem;
         private ToolStripMenuItem getCPUInformationToolStripMenuItem1;
         private ToolStripMenuItem getAudioInformationToolStripMenuItem1;
-        private Label label3;
         private Label label4;
         private Label label5;
         private Label label6;
-        private Label label7;
         private LinkLabel linkLabel3;
-        private ListBox listBox1;
         private LinkLabel linkLabel6;
         private LinkLabel linkLabel4;
         private LinkLabel linkLabel5;
+        private ToolStripMenuItem xMLOptionsEditorToolStripMenuItem;
+        private ToolStripMenuItem toolStripMenuItem1;
+        private GroupBox groupBox1;
+        private ListBox listBox1;
+        private GroupBox groupBox2;
+        private GroupBox groupBox3;
     }
 }

@@ -7,6 +7,7 @@ using System.Windows.Forms;
 namespace VDD_Control
 {
     public partial class Form1 : Form
+
     {
         public Form1()
         {
@@ -379,6 +380,24 @@ namespace VDD_Control
         private void listBox1_SelectedIndexChanged(object sender, EventArgs e)
         {
 
+        }
+
+        private void xMLOptionsEditorToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            // Create an instance of the Form2 class
+            Form2 form2 = new Form2();
+
+            // Show the form
+            form2.Show();
+        }
+
+        private void toolStripMenuItem1_Click(object sender, EventArgs e)
+        {
+            // Create an instance of the Form2 class
+            Form2 form2 = new Form2();
+
+            // Show the form
+            form2.Show();
         }
     }
 }
