@@ -1,20 +1,24 @@
-using Microsoft.Win32;
+﻿using Microsoft.Win32;
 using System;
 using System.Diagnostics;
-using System.Drawing;
+using System.IO;
+using System.IO.Pipes;
+using System.Text;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace VDD_Control
 {
     public partial class Form1 : Form
-
     {
+        private const string PIPE_NAME = "MTTVirtualDisplayPipe";
+
         public Form1()
         {
-            InitializeComponent();
+            InitializeComponent(GetRestartDriverToolStripMenuItem());
         }
 
-        private void Form1_Load(object sender, EventArgs e)
+        private async void Form1_Load(object sender, EventArgs e)
         {
             try
             {
@@ -65,18 +69,22 @@ namespace VDD_Control
                 systemInfo += LocateSettingsFile();
 
                 // Display the information in richTextBox1
-                richTextBox1.Clear();
                 richTextBox1.AppendText(systemInfo);
                 richTextBox1.Refresh(); // Ensure the UI is updated
             }
             catch (Exception ex)
             {
                 // Display error details in richTextBox1
-                richTextBox1.Clear();
                 richTextBox1.AppendText("An error occurred while retrieving system information:\n" + ex.Message); // This really shouldn't happen. But probably will.
             }
-        }
+            
+            richTextBox1.AppendText("Virtual Display Driver Control Initialized.\n");
 
+            if (!await TryConnectToDriver())
+            {
+                richTextBox1.AppendText("[WARNING] Could not verify driver connection. Ensure the driver is running.\n");
+            }
+        }
         private string LocateSettingsFile()
         {
             // Yo XML. Where u at?
@@ -134,7 +142,108 @@ namespace VDD_Control
 
             return settingsInfo;
         }
+        private async Task<bool> TryConnectToDriver()
+        {
+            const int maxAttempts = 5;
+            int attempt = 0;
 
+            while (attempt < maxAttempts)
+            {
+                try
+                {
+                    using (var pipeClient = new NamedPipeClientStream(".", PIPE_NAME, PipeDirection.InOut))
+                    {
+                        await pipeClient.ConnectAsync(2000);
+                        richTextBox1.AppendText("[SUCCESS] Connected to the driver.\n");
+                        return true;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    attempt++;
+                    richTextBox1.AppendText($"[ERROR] Connection failed: {ex.Message} (Attempt {attempt}/{maxAttempts})\n");
+                    richTextBox1.AppendText("Note: This may also occur if the driver is off or restarting.\n");
+
+                    if (attempt >= maxAttempts)
+                    {
+                        richTextBox1.AppendText("[ERROR] Unable to connect after multiple attempts.\n");
+                        return false;
+                    }
+
+                    await Task.Delay(2000);
+                }
+            }
+
+            return false;
+        }
+
+        private async Task<string> SendCommandToDriver(string command)
+        {
+            if (command != "RESTART_DRIVER" && !await TryConnectToDriver())
+            {
+                return "[ERROR] Connection failed: The driver may be off or restarting.";
+            }
+
+            try
+            {
+                using (var pipeClient = new NamedPipeClientStream(".", PIPE_NAME, PipeDirection.InOut))
+                {
+                    await pipeClient.ConnectAsync(2000);
+
+                    using (var writer = new StreamWriter(pipeClient, Encoding.UTF8, leaveOpen: true))
+                    using (var reader = new StreamReader(pipeClient, Encoding.UTF8))
+                    {
+                        await writer.WriteLineAsync(command);
+                        await writer.FlushAsync();
+
+                        string response = await reader.ReadLineAsync();
+
+                        richTextBox1.AppendText($"[{command}] Response: {response}\n");
+
+                        return response;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                return $"[ERROR] Sending command failed: {ex.Message}";
+            }
+        }
+
+        private void RestartDriverHandler(object sender, EventArgs e)
+        {
+            _ = restartDriverToolStripMenuItem_Click(sender, e); // Fire and forget (safe async call)
+        }
+
+        private async Task restartDriverToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            richTextBox1.AppendText("[ACTION] Restarting driver...\n");
+
+            string response;
+            try
+            {
+                response = await SendCommandToDriver("RESTART_DRIVER");
+            }
+            catch (Exception ex)
+            {
+                response = $"[ERROR] Could not send restart command: {ex.Message}";
+            }
+
+            richTextBox1.AppendText(response + "\n");
+
+            await Task.Delay(5000);  // Wait for the restart process
+
+            richTextBox1.AppendText("[INFO] Attempting to reconnect...\n");
+
+            if (await TryConnectToDriver())
+            {
+                richTextBox1.AppendText("[SUCCESS] Driver restarted and reconnected successfully.\n");
+            }
+            else
+            {
+                richTextBox1.AppendText("[WARNING] Driver restart detected, but reconnection failed. Ensure the driver is running.\n");
+            }
+        }
         private void getCPUInformationToolStripMenuItem_Click(object sender, EventArgs e)
         {
             try
@@ -172,18 +281,6 @@ namespace VDD_Control
             {
                 MessageBox.Show("An error occurred while retrieving CPU information:\n" + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
-        }
-
-        private void contextMenuStrip1_Opening(object sender, System.ComponentModel.CancelEventArgs e)
-        {
-        }
-
-        private void enableToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-        }
-
-        private void label1_Click(object sender, EventArgs e)
-        {
         }
 
         private void getDisplayInformationToolStripMenuItem2_Click(object sender, EventArgs e)
@@ -386,14 +483,5 @@ namespace VDD_Control
             form2.Show();
         }
 
-        private void linkLabel6_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
-        {
-
-        }
-
-        private void label3_Click(object sender, EventArgs e)
-        {
-
-        }
     }
 }

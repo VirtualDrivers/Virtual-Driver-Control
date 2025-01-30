@@ -1,4 +1,5 @@
-﻿namespace VDD_Control
+﻿
+namespace VDD_Control
 {
     partial class Form1
     {
@@ -20,13 +21,18 @@
             base.Dispose(disposing);
         }
 
+        private ToolStripMenuItem GetRestartDriverToolStripMenuItem()
+        {
+            return restartDriverToolStripMenuItem;
+        }
+
         #region Windows Form Designer generated code
 
         /// <summary>
         ///  Required method for Designer support - do not modify
         ///  the contents of this method with the code editor.
         /// </summary>
-        private void InitializeComponent()
+        private void InitializeComponent(ToolStripMenuItem restartDriverToolStripMenuItem)
         {
             components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
@@ -163,28 +169,24 @@
             getDisplayInformationToolStripMenuItem1.Name = "getDisplayInformationToolStripMenuItem1";
             getDisplayInformationToolStripMenuItem1.Size = new Size(199, 22);
             getDisplayInformationToolStripMenuItem1.Text = "Get Display Information";
-            getDisplayInformationToolStripMenuItem1.Click += getDisplayInformationToolStripMenuItem1_Click;
             // 
             // getGPUInformationToolStripMenuItem1
             // 
             getGPUInformationToolStripMenuItem1.Name = "getGPUInformationToolStripMenuItem1";
             getGPUInformationToolStripMenuItem1.Size = new Size(199, 22);
             getGPUInformationToolStripMenuItem1.Text = "Get GPU Information";
-            getGPUInformationToolStripMenuItem1.Click += getGPUInformationToolStripMenuItem1_Click;
             // 
             // getCPUInformationToolStripMenuItem1
             // 
             getCPUInformationToolStripMenuItem1.Name = "getCPUInformationToolStripMenuItem1";
             getCPUInformationToolStripMenuItem1.Size = new Size(199, 22);
             getCPUInformationToolStripMenuItem1.Text = "Get CPU information";
-            getCPUInformationToolStripMenuItem1.Click += getCPUInformationToolStripMenuItem1_Click;
             // 
             // getAudioInformationToolStripMenuItem1
             // 
             getAudioInformationToolStripMenuItem1.Name = "getAudioInformationToolStripMenuItem1";
             getAudioInformationToolStripMenuItem1.Size = new Size(199, 22);
             getAudioInformationToolStripMenuItem1.Text = "Get Audio Information";
-            getAudioInformationToolStripMenuItem1.Click += getAudioInformationToolStripMenuItem1_Click;
             // 
             // virtualDisplayDriverToolStripMenuItem1
             // 
@@ -291,6 +293,7 @@
             toolStripMenuItem1.Size = new Size(194, 22);
             toolStripMenuItem1.Text = "XML/Options Editor";
             toolStripMenuItem1.Click += toolStripMenuItem1_Click;
+
             // 
             // virtualAudioDriverToolStripMenuItem1
             // 
@@ -336,6 +339,7 @@
             exitToolStripMenuItem2.Size = new Size(183, 22);
             exitToolStripMenuItem2.Text = "Exit";
             exitToolStripMenuItem2.Click += exitToolStripMenuItem2_Click;
+
             // 
             // menuToolStripMenuItem
             // 
@@ -351,6 +355,7 @@
             exitToolStripMenuItem.Size = new Size(92, 22);
             exitToolStripMenuItem.Text = "Exit";
             exitToolStripMenuItem.Click += exitToolStripMenuItem_Click;
+
             // 
             // virtualDisplayDriverToolStripMenuItem
             // 
@@ -413,25 +418,26 @@
             enableToolStripMenuItem.Name = "enableToolStripMenuItem";
             enableToolStripMenuItem.Size = new Size(194, 22);
             enableToolStripMenuItem.Text = "System";
-            enableToolStripMenuItem.Click += enableToolStripMenuItem_Click;
             // 
             // enableDriverToolStripMenuItem
             // 
             enableDriverToolStripMenuItem.Name = "enableDriverToolStripMenuItem";
-            enableDriverToolStripMenuItem.Size = new Size(146, 22);
+            enableDriverToolStripMenuItem.Size = new Size(180, 22);
             enableDriverToolStripMenuItem.Text = "Enable Driver";
             // 
             // disableDriverToolStripMenuItem
             // 
             disableDriverToolStripMenuItem.Name = "disableDriverToolStripMenuItem";
-            disableDriverToolStripMenuItem.Size = new Size(146, 22);
+            disableDriverToolStripMenuItem.Size = new Size(180, 22);
             disableDriverToolStripMenuItem.Text = "Disable Driver";
             // 
             // restartDriverToolStripMenuItem
             // 
             restartDriverToolStripMenuItem.Name = "restartDriverToolStripMenuItem";
-            restartDriverToolStripMenuItem.Size = new Size(146, 22);
+            restartDriverToolStripMenuItem.Size = new Size(180, 22);
             restartDriverToolStripMenuItem.Text = "Restart Driver";
+            restartDriverToolStripMenuItem.Click += RestartDriverHandler;
+
             // 
             // loggingToolStripMenuItem
             // 
@@ -458,6 +464,7 @@
             xMLOptionsEditorToolStripMenuItem.Size = new Size(194, 22);
             xMLOptionsEditorToolStripMenuItem.Text = "XML/Options Editor";
             xMLOptionsEditorToolStripMenuItem.Click += xMLOptionsEditorToolStripMenuItem_Click;
+
             // 
             // virtualAudioDriverToolStripMenuItem
             // 
@@ -490,6 +497,8 @@
             restartDriverToolStripMenuItem1.Name = "restartDriverToolStripMenuItem1";
             restartDriverToolStripMenuItem1.Size = new Size(146, 22);
             restartDriverToolStripMenuItem1.Text = "Restart Driver";
+            restartDriverToolStripMenuItem1.Click += RestartDriverHandler;
+
             // 
             // aboutToolStripMenuItem
             // 
@@ -522,6 +531,7 @@
             getGPUInformationToolStripMenuItem.Size = new Size(199, 22);
             getGPUInformationToolStripMenuItem.Text = "Get GPU Information";
             getGPUInformationToolStripMenuItem.Click += getGPUInformationToolStripMenuItem_Click;
+
             // 
             // getCPUInformationToolStripMenuItem
             // 
@@ -531,6 +541,7 @@
             getCPUInformationToolStripMenuItem.Size = new Size(199, 22);
             getCPUInformationToolStripMenuItem.Text = "Get CPU Information";
             getCPUInformationToolStripMenuItem.Click += getCPUInformationToolStripMenuItem_Click;
+
             // 
             // getDisplayInformationToolStripMenuItem2
             // 
@@ -540,6 +551,7 @@
             getDisplayInformationToolStripMenuItem2.Size = new Size(199, 22);
             getDisplayInformationToolStripMenuItem2.Text = "Get Display Information";
             getDisplayInformationToolStripMenuItem2.Click += getDisplayInformationToolStripMenuItem2_Click;
+
             // 
             // getAudioInformationToolStripMenuItem
             // 
@@ -549,6 +561,7 @@
             getAudioInformationToolStripMenuItem.Size = new Size(199, 22);
             getAudioInformationToolStripMenuItem.Text = "Get Audio Information";
             getAudioInformationToolStripMenuItem.Click += getAudioInformationToolStripMenuItem_Click;
+
             // 
             // richTextBox1
             // 
@@ -558,7 +571,7 @@
             richTextBox1.Name = "richTextBox1";
             richTextBox1.Size = new Size(520, 382);
             richTextBox1.TabIndex = 2;
-            richTextBox1.Text = "Information will appear here when specific tools are used.";
+            richTextBox1.Text = "Information will appear here when specific tools are used.\n";
             richTextBox1.WordWrap = false;
             richTextBox1.ZoomFactor = 1.2F;
             // 
@@ -571,7 +584,6 @@
             label1.Size = new Size(45, 15);
             label1.TabIndex = 4;
             label1.Text = "GitHub";
-            label1.Click += label1_Click;
             // 
             // linkLabel1
             // 
@@ -665,7 +677,6 @@
             linkLabel6.TabIndex = 22;
             linkLabel6.TabStop = true;
             linkLabel6.Text = "Patreon";
-            linkLabel6.LinkClicked += linkLabel6_LinkClicked;
             // 
             // linkLabel4
             // 
@@ -828,6 +839,8 @@
             ResumeLayout(false);
             PerformLayout();
         }
+
+
 
         #endregion
         private NotifyIcon notifyIcon1;
