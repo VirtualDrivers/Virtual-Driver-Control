@@ -21,10 +21,7 @@ namespace VDD_Control
             base.Dispose(disposing);
         }
 
-        private ToolStripMenuItem GetRestartDriverToolStripMenuItem()
-        {
-            return restartDriverToolStripMenuItem;
-        }
+
 
         #region Windows Form Designer generated code
 
@@ -32,7 +29,7 @@ namespace VDD_Control
         ///  Required method for Designer support - do not modify
         ///  the contents of this method with the code editor.
         /// </summary>
-        private void InitializeComponent(ToolStripMenuItem restartDriverToolStripMenuItem)
+        private void InitializeComponent()
         {
             components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));

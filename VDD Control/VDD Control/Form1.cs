@@ -17,6 +17,10 @@ namespace VDD_Control
         {
             InitializeComponent(GetRestartDriverToolStripMenuItem());
         }
+        private ToolStripMenuItem GetRestartDriverToolStripMenuItem()
+        {
+            return restartDriverToolStripMenuItem;
+        }
 
         private async void Form1_Load(object sender, EventArgs e)
         {
