@@ -153,6 +153,7 @@ namespace VDD_Control
             exitToolStripMenuItem1.Name = "exitToolStripMenuItem1";
             exitToolStripMenuItem1.Size = new Size(92, 22);
             exitToolStripMenuItem1.Text = "Exit";
+            exitToolStripMenuItem1.Click += exitToolStripMenuItem1_Click;
             // 
             // toolsToolStripMenuItem1
             // 
@@ -166,24 +167,28 @@ namespace VDD_Control
             getDisplayInformationToolStripMenuItem1.Name = "getDisplayInformationToolStripMenuItem1";
             getDisplayInformationToolStripMenuItem1.Size = new Size(199, 22);
             getDisplayInformationToolStripMenuItem1.Text = "Get Display Information";
+            getDisplayInformationToolStripMenuItem1.Click += getDisplayInformationToolStripMenuItem1_Click_1;
             // 
             // getGPUInformationToolStripMenuItem1
             // 
             getGPUInformationToolStripMenuItem1.Name = "getGPUInformationToolStripMenuItem1";
             getGPUInformationToolStripMenuItem1.Size = new Size(199, 22);
             getGPUInformationToolStripMenuItem1.Text = "Get GPU Information";
+            getGPUInformationToolStripMenuItem1.Click += getGPUInformationToolStripMenuItem1_Click_1;
             // 
             // getCPUInformationToolStripMenuItem1
             // 
             getCPUInformationToolStripMenuItem1.Name = "getCPUInformationToolStripMenuItem1";
             getCPUInformationToolStripMenuItem1.Size = new Size(199, 22);
             getCPUInformationToolStripMenuItem1.Text = "Get CPU information";
+            getCPUInformationToolStripMenuItem1.Click += getCPUInformationToolStripMenuItem1_Click_1;
             // 
             // getAudioInformationToolStripMenuItem1
             // 
             getAudioInformationToolStripMenuItem1.Name = "getAudioInformationToolStripMenuItem1";
             getAudioInformationToolStripMenuItem1.Size = new Size(199, 22);
             getAudioInformationToolStripMenuItem1.Text = "Get Audio Information";
+            getAudioInformationToolStripMenuItem1.Click += getAudioInformationToolStripMenuItem1_Click_1;
             // 
             // virtualDisplayDriverToolStripMenuItem1
             // 
@@ -197,48 +202,56 @@ namespace VDD_Control
             sDR10bitToolStripMenuItem1.Name = "sDR10bitToolStripMenuItem1";
             sDR10bitToolStripMenuItem1.Size = new Size(194, 22);
             sDR10bitToolStripMenuItem1.Text = "SDR 10bit";
+            sDR10bitToolStripMenuItem1.Click += sDR10bitToolStripMenuItem1_Click;
             // 
             // hDRToolStripMenuItem1
             // 
             hDRToolStripMenuItem1.Name = "hDRToolStripMenuItem1";
             hDRToolStripMenuItem1.Size = new Size(194, 22);
             hDRToolStripMenuItem1.Text = "HDR+";
+            hDRToolStripMenuItem1.Click += hDRToolStripMenuItem1_Click;
             // 
             // customEDIDToolStripMenuItem1
             // 
             customEDIDToolStripMenuItem1.Name = "customEDIDToolStripMenuItem1";
             customEDIDToolStripMenuItem1.Size = new Size(194, 22);
             customEDIDToolStripMenuItem1.Text = "Custom EDID";
+            customEDIDToolStripMenuItem1.Click += customEDIDToolStripMenuItem1_Click;
             // 
             // hardwareCursorToolStripMenuItem1
             // 
             hardwareCursorToolStripMenuItem1.Name = "hardwareCursorToolStripMenuItem1";
             hardwareCursorToolStripMenuItem1.Size = new Size(194, 22);
             hardwareCursorToolStripMenuItem1.Text = "Hardware Cursor";
+            hardwareCursorToolStripMenuItem1.Click += hardwareCursorToolStripMenuItem1_Click;
             // 
             // preventMonitorSpoofToolStripMenuItem1
             // 
             preventMonitorSpoofToolStripMenuItem1.Name = "preventMonitorSpoofToolStripMenuItem1";
             preventMonitorSpoofToolStripMenuItem1.Size = new Size(194, 22);
             preventMonitorSpoofToolStripMenuItem1.Text = "Prevent Monitor Spoof";
+            preventMonitorSpoofToolStripMenuItem1.Click += preventMonitorSpoofToolStripMenuItem1_Click;
             // 
             // eDIDCEAOverrideToolStripMenuItem1
             // 
             eDIDCEAOverrideToolStripMenuItem1.Name = "eDIDCEAOverrideToolStripMenuItem1";
             eDIDCEAOverrideToolStripMenuItem1.Size = new Size(194, 22);
             eDIDCEAOverrideToolStripMenuItem1.Text = "EDID CEA Override";
+            eDIDCEAOverrideToolStripMenuItem1.Click += eDIDCEAOverrideToolStripMenuItem1_Click;
             // 
             // selectGPUToolStripMenuItem1
             // 
             selectGPUToolStripMenuItem1.Name = "selectGPUToolStripMenuItem1";
             selectGPUToolStripMenuItem1.Size = new Size(194, 22);
             selectGPUToolStripMenuItem1.Text = "Select GPU";
+            selectGPUToolStripMenuItem1.Click += selectGPUToolStripMenuItem1_Click;
             // 
             // displayCountToolStripMenuItem1
             // 
             displayCountToolStripMenuItem1.Name = "displayCountToolStripMenuItem1";
             displayCountToolStripMenuItem1.Size = new Size(194, 22);
             displayCountToolStripMenuItem1.Text = "Display Count";
+            displayCountToolStripMenuItem1.Click += displayCountToolStripMenuItem1_Click;
             // 
             // systemToolStripMenuItem1
             // 
@@ -252,18 +265,21 @@ namespace VDD_Control
             enableDriverToolStripMenuItem2.Name = "enableDriverToolStripMenuItem2";
             enableDriverToolStripMenuItem2.Size = new Size(146, 22);
             enableDriverToolStripMenuItem2.Text = "Enable Driver";
+            enableDriverToolStripMenuItem2.Click += enableDriverToolStripMenuItem2_Click;
             // 
             // disableDriverToolStripMenuItem2
             // 
             disableDriverToolStripMenuItem2.Name = "disableDriverToolStripMenuItem2";
             disableDriverToolStripMenuItem2.Size = new Size(146, 22);
             disableDriverToolStripMenuItem2.Text = "Disable Driver";
+            disableDriverToolStripMenuItem2.Click += disableDriverToolStripMenuItem2_Click;
             // 
             // restartDriverToolStripMenuItem2
             // 
             restartDriverToolStripMenuItem2.Name = "restartDriverToolStripMenuItem2";
             restartDriverToolStripMenuItem2.Size = new Size(146, 22);
             restartDriverToolStripMenuItem2.Text = "Restart Driver";
+            restartDriverToolStripMenuItem2.Click += restartDriverToolStripMenuItem2_Click;
             // 
             // loggingToolStripMenuItem1
             // 
@@ -277,12 +293,14 @@ namespace VDD_Control
             userModeLoggingToolStripMenuItem.Name = "userModeLoggingToolStripMenuItem";
             userModeLoggingToolStripMenuItem.Size = new Size(180, 22);
             userModeLoggingToolStripMenuItem.Text = "User-Mode Logging";
+            userModeLoggingToolStripMenuItem.Click += userModeLoggingToolStripMenuItem_Click;
             // 
             // devModeLoggingToolStripMenuItem
             // 
             devModeLoggingToolStripMenuItem.Name = "devModeLoggingToolStripMenuItem";
             devModeLoggingToolStripMenuItem.Size = new Size(180, 22);
             devModeLoggingToolStripMenuItem.Text = "Dev-Mode Logging";
+            devModeLoggingToolStripMenuItem.Click += devModeLoggingToolStripMenuItem_Click;
             // 
             // toolStripMenuItem1
             // 
@@ -290,7 +308,6 @@ namespace VDD_Control
             toolStripMenuItem1.Size = new Size(194, 22);
             toolStripMenuItem1.Text = "XML/Options Editor";
             toolStripMenuItem1.Click += toolStripMenuItem1_Click;
-
             // 
             // virtualAudioDriverToolStripMenuItem1
             // 
@@ -329,6 +346,7 @@ namespace VDD_Control
             aboutToolStripMenuItem1.Name = "aboutToolStripMenuItem1";
             aboutToolStripMenuItem1.Size = new Size(183, 22);
             aboutToolStripMenuItem1.Text = "About";
+            aboutToolStripMenuItem1.Click += aboutToolStripMenuItem1_Click;
             // 
             // exitToolStripMenuItem2
             // 
@@ -336,7 +354,6 @@ namespace VDD_Control
             exitToolStripMenuItem2.Size = new Size(183, 22);
             exitToolStripMenuItem2.Text = "Exit";
             exitToolStripMenuItem2.Click += exitToolStripMenuItem2_Click;
-
             // 
             // menuToolStripMenuItem
             // 
@@ -352,7 +369,6 @@ namespace VDD_Control
             exitToolStripMenuItem.Size = new Size(92, 22);
             exitToolStripMenuItem.Text = "Exit";
             exitToolStripMenuItem.Click += exitToolStripMenuItem_Click;
-
             // 
             // virtualDisplayDriverToolStripMenuItem
             // 
@@ -366,48 +382,56 @@ namespace VDD_Control
             sDR10bitToolStripMenuItem.Name = "sDR10bitToolStripMenuItem";
             sDR10bitToolStripMenuItem.Size = new Size(194, 22);
             sDR10bitToolStripMenuItem.Text = "SDR 10bit";
+            sDR10bitToolStripMenuItem.Click += sDR10bitToolStripMenuItem_Click;
             // 
             // hDRToolStripMenuItem
             // 
             hDRToolStripMenuItem.Name = "hDRToolStripMenuItem";
             hDRToolStripMenuItem.Size = new Size(194, 22);
             hDRToolStripMenuItem.Text = "HDR+";
+            hDRToolStripMenuItem.Click += hDRToolStripMenuItem_Click;
             // 
             // customEDIDToolStripMenuItem
             // 
             customEDIDToolStripMenuItem.Name = "customEDIDToolStripMenuItem";
             customEDIDToolStripMenuItem.Size = new Size(194, 22);
             customEDIDToolStripMenuItem.Text = "Custom EDID";
+            customEDIDToolStripMenuItem.Click += customEDIDToolStripMenuItem_Click;
             // 
             // hardwareCursorToolStripMenuItem
             // 
             hardwareCursorToolStripMenuItem.Name = "hardwareCursorToolStripMenuItem";
             hardwareCursorToolStripMenuItem.Size = new Size(194, 22);
             hardwareCursorToolStripMenuItem.Text = "Hardware Cursor";
+            hardwareCursorToolStripMenuItem.Click += hardwareCursorToolStripMenuItem_Click;
             // 
             // preventMonitorSpoofToolStripMenuItem
             // 
             preventMonitorSpoofToolStripMenuItem.Name = "preventMonitorSpoofToolStripMenuItem";
             preventMonitorSpoofToolStripMenuItem.Size = new Size(194, 22);
             preventMonitorSpoofToolStripMenuItem.Text = "Prevent Monitor Spoof";
+            preventMonitorSpoofToolStripMenuItem.Click += preventMonitorSpoofToolStripMenuItem_Click;
             // 
             // eDIDCEAOverrideToolStripMenuItem
             // 
             eDIDCEAOverrideToolStripMenuItem.Name = "eDIDCEAOverrideToolStripMenuItem";
             eDIDCEAOverrideToolStripMenuItem.Size = new Size(194, 22);
             eDIDCEAOverrideToolStripMenuItem.Text = "EDID CEA Override";
+            eDIDCEAOverrideToolStripMenuItem.Click += eDIDCEAOverrideToolStripMenuItem_Click;
             // 
             // selectGPUToolStripMenuItem
             // 
             selectGPUToolStripMenuItem.Name = "selectGPUToolStripMenuItem";
             selectGPUToolStripMenuItem.Size = new Size(194, 22);
             selectGPUToolStripMenuItem.Text = "Select GPU";
+            selectGPUToolStripMenuItem.Click += selectGPUToolStripMenuItem_Click;
             // 
             // displayCountToolStripMenuItem
             // 
             displayCountToolStripMenuItem.Name = "displayCountToolStripMenuItem";
             displayCountToolStripMenuItem.Size = new Size(194, 22);
             displayCountToolStripMenuItem.Text = "Display Count";
+            displayCountToolStripMenuItem.Click += displayCountToolStripMenuItem_Click;
             // 
             // enableToolStripMenuItem
             // 
@@ -415,26 +439,27 @@ namespace VDD_Control
             enableToolStripMenuItem.Name = "enableToolStripMenuItem";
             enableToolStripMenuItem.Size = new Size(194, 22);
             enableToolStripMenuItem.Text = "System";
+            enableToolStripMenuItem.Click += enableToolStripMenuItem_Click;
             // 
             // enableDriverToolStripMenuItem
             // 
             enableDriverToolStripMenuItem.Name = "enableDriverToolStripMenuItem";
-            enableDriverToolStripMenuItem.Size = new Size(180, 22);
+            enableDriverToolStripMenuItem.Size = new Size(146, 22);
             enableDriverToolStripMenuItem.Text = "Enable Driver";
             // 
             // disableDriverToolStripMenuItem
             // 
             disableDriverToolStripMenuItem.Name = "disableDriverToolStripMenuItem";
-            disableDriverToolStripMenuItem.Size = new Size(180, 22);
+            disableDriverToolStripMenuItem.Size = new Size(146, 22);
             disableDriverToolStripMenuItem.Text = "Disable Driver";
+            disableDriverToolStripMenuItem.Click += disableDriverToolStripMenuItem_Click;
             // 
             // restartDriverToolStripMenuItem
             // 
             restartDriverToolStripMenuItem.Name = "restartDriverToolStripMenuItem";
-            restartDriverToolStripMenuItem.Size = new Size(180, 22);
+            restartDriverToolStripMenuItem.Size = new Size(146, 22);
             restartDriverToolStripMenuItem.Text = "Restart Driver";
             restartDriverToolStripMenuItem.Click += RestartDriverHandler;
-
             // 
             // loggingToolStripMenuItem
             // 
@@ -448,12 +473,14 @@ namespace VDD_Control
             enableUserModeLoggingToolStripMenuItem.Name = "enableUserModeLoggingToolStripMenuItem";
             enableUserModeLoggingToolStripMenuItem.Size = new Size(180, 22);
             enableUserModeLoggingToolStripMenuItem.Text = "User-Mode Logging";
+            enableUserModeLoggingToolStripMenuItem.Click += enableUserModeLoggingToolStripMenuItem_Click;
             // 
             // enableDevModeLoggingToolStripMenuItem
             // 
             enableDevModeLoggingToolStripMenuItem.Name = "enableDevModeLoggingToolStripMenuItem";
             enableDevModeLoggingToolStripMenuItem.Size = new Size(180, 22);
             enableDevModeLoggingToolStripMenuItem.Text = "Dev-Mode Logging";
+            enableDevModeLoggingToolStripMenuItem.Click += enableDevModeLoggingToolStripMenuItem_Click;
             // 
             // xMLOptionsEditorToolStripMenuItem
             // 
@@ -461,7 +488,6 @@ namespace VDD_Control
             xMLOptionsEditorToolStripMenuItem.Size = new Size(194, 22);
             xMLOptionsEditorToolStripMenuItem.Text = "XML/Options Editor";
             xMLOptionsEditorToolStripMenuItem.Click += xMLOptionsEditorToolStripMenuItem_Click;
-
             // 
             // virtualAudioDriverToolStripMenuItem
             // 
@@ -495,13 +521,13 @@ namespace VDD_Control
             restartDriverToolStripMenuItem1.Size = new Size(146, 22);
             restartDriverToolStripMenuItem1.Text = "Restart Driver";
             restartDriverToolStripMenuItem1.Click += RestartDriverHandler;
-
             // 
             // aboutToolStripMenuItem
             // 
             aboutToolStripMenuItem.Name = "aboutToolStripMenuItem";
             aboutToolStripMenuItem.Size = new Size(52, 20);
             aboutToolStripMenuItem.Text = "About";
+            aboutToolStripMenuItem.Click += aboutToolStripMenuItem_Click;
             // 
             // menuStrip1
             // 
@@ -528,7 +554,6 @@ namespace VDD_Control
             getGPUInformationToolStripMenuItem.Size = new Size(199, 22);
             getGPUInformationToolStripMenuItem.Text = "Get GPU Information";
             getGPUInformationToolStripMenuItem.Click += getGPUInformationToolStripMenuItem_Click;
-
             // 
             // getCPUInformationToolStripMenuItem
             // 
@@ -538,7 +563,6 @@ namespace VDD_Control
             getCPUInformationToolStripMenuItem.Size = new Size(199, 22);
             getCPUInformationToolStripMenuItem.Text = "Get CPU Information";
             getCPUInformationToolStripMenuItem.Click += getCPUInformationToolStripMenuItem_Click;
-
             // 
             // getDisplayInformationToolStripMenuItem2
             // 
@@ -548,7 +572,6 @@ namespace VDD_Control
             getDisplayInformationToolStripMenuItem2.Size = new Size(199, 22);
             getDisplayInformationToolStripMenuItem2.Text = "Get Display Information";
             getDisplayInformationToolStripMenuItem2.Click += getDisplayInformationToolStripMenuItem2_Click;
-
             // 
             // getAudioInformationToolStripMenuItem
             // 
@@ -558,7 +581,6 @@ namespace VDD_Control
             getAudioInformationToolStripMenuItem.Size = new Size(199, 22);
             getAudioInformationToolStripMenuItem.Text = "Get Audio Information";
             getAudioInformationToolStripMenuItem.Click += getAudioInformationToolStripMenuItem_Click;
-
             // 
             // richTextBox1
             // 
@@ -592,6 +614,7 @@ namespace VDD_Control
             linkLabel1.TabIndex = 5;
             linkLabel1.TabStop = true;
             linkLabel1.Text = "https://discord.mikethetech.com/";
+            linkLabel1.LinkClicked += linkLabel1_LinkClicked;
             // 
             // label2
             // 
@@ -613,6 +636,7 @@ namespace VDD_Control
             linkLabel2.TabIndex = 7;
             linkLabel2.TabStop = true;
             linkLabel2.Text = "https://github.com/VirtualDisplay/";
+            linkLabel2.LinkClicked += linkLabel2_LinkClicked;
             // 
             // button1
             // 
@@ -622,6 +646,7 @@ namespace VDD_Control
             button1.TabIndex = 9;
             button1.Text = "Restart All Drivers";
             button1.UseVisualStyleBackColor = true;
+            button1.Click += button1_Click;
             // 
             // label4
             // 
@@ -760,6 +785,7 @@ namespace VDD_Control
             button2.TabIndex = 28;
             button2.Text = "Minimize to Tray";
             button2.UseVisualStyleBackColor = true;
+            button2.Click += button2_Click;
             // 
             // textBox1
             // 
@@ -768,6 +794,7 @@ namespace VDD_Control
             textBox1.Size = new Size(453, 23);
             textBox1.TabIndex = 29;
             textBox1.Text = "Command Console";
+            textBox1.TextChanged += textBox1_TextChanged;
             // 
             // button3
             // 
@@ -777,6 +804,7 @@ namespace VDD_Control
             button3.TabIndex = 30;
             button3.Text = "Enter";
             button3.UseVisualStyleBackColor = true;
+            button3.Click += button3_Click;
             // 
             // progressBar1
             // 

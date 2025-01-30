@@ -83,7 +83,7 @@ namespace VDD_Control
                 // Display error details in richTextBox1
                 richTextBox1.AppendText("An error occurred while retrieving system information:\n" + ex.Message); // This really shouldn't happen. But probably will.
             }
-            
+
             richTextBox1.AppendText("Virtual Display Driver Control Initialized.\n");
 
             if (!await TryConnectToDriver())
@@ -489,5 +489,194 @@ namespace VDD_Control
             form2.Show();
         }
 
+        private void sDR10bitToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void hDRToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void customEDIDToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void hardwareCursorToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void preventMonitorSpoofToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void eDIDCEAOverrideToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void selectGPUToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void displayCountToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void enableToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void disableDriverToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void enableUserModeLoggingToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void enableDevModeLoggingToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void aboutToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void exitToolStripMenuItem1_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void getDisplayInformationToolStripMenuItem1_Click_1(object sender, EventArgs e)
+        {
+
+        }
+
+        private void getGPUInformationToolStripMenuItem1_Click_1(object sender, EventArgs e)
+        {
+
+        }
+
+        private void getCPUInformationToolStripMenuItem1_Click_1(object sender, EventArgs e)
+        {
+
+        }
+
+        private void getAudioInformationToolStripMenuItem1_Click_1(object sender, EventArgs e)
+        {
+
+        }
+
+        private void sDR10bitToolStripMenuItem1_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void hDRToolStripMenuItem1_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void customEDIDToolStripMenuItem1_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void hardwareCursorToolStripMenuItem1_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void preventMonitorSpoofToolStripMenuItem1_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void eDIDCEAOverrideToolStripMenuItem1_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void selectGPUToolStripMenuItem1_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void displayCountToolStripMenuItem1_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void enableDriverToolStripMenuItem2_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void disableDriverToolStripMenuItem2_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void restartDriverToolStripMenuItem2_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void userModeLoggingToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void devModeLoggingToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void aboutToolStripMenuItem1_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void button1_Click(object sender, EventArgs e) // Restart Driver
+        {
+
+        }
+
+        private void button2_Click(object sender, EventArgs e) // Minimize to Tray
+        {
+
+        }
+
+        private void textBox1_TextChanged(object sender, EventArgs e) // Command Console
+        {
+
+        }
+
+        private void button3_Click(object sender, EventArgs e) // Enter command from command console
+        {
+
+        }
+
+        private void linkLabel2_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
+        {
+
+        }
+
+        private void linkLabel1_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
+        {
+
+        }
     }
 }
