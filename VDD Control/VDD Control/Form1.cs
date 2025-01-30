@@ -15,8 +15,10 @@ namespace VDD_Control
 
         public Form1()
         {
-            InitializeComponent(GetRestartDriverToolStripMenuItem());
+            InitializeComponent();
+            var restartItem = GetRestartDriverToolStripMenuItem(); // This is now safe
         }
+
         private ToolStripMenuItem GetRestartDriverToolStripMenuItem()
         {
             return restartDriverToolStripMenuItem;
