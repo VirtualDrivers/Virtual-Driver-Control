@@ -121,8 +121,6 @@ namespace VDD_Control
             chatButtonRight1 = new ReaLTaiizor.Controls.ChatButtonRight();
             foreverMinimize1 = new ReaLTaiizor.Controls.ForeverMinimize();
             foreverClose1 = new ReaLTaiizor.Controls.ForeverClose();
-            foreverContextMenuStrip1 = new ReaLTaiizor.Controls.ForeverContextMenuStrip();
-            tEstToolStripMenuItem = new ToolStripMenuItem();
             contextMenuStrip1.SuspendLayout();
             menuStrip1.SuspendLayout();
             groupBox1.SuspendLayout();
@@ -130,7 +128,6 @@ namespace VDD_Control
             groupBox3.SuspendLayout();
             groupBox4.SuspendLayout();
             themeForm1.SuspendLayout();
-            foreverContextMenuStrip1.SuspendLayout();
             SuspendLayout();
             // 
             // notifyIcon1
@@ -363,22 +360,25 @@ namespace VDD_Control
             // 
             // menuToolStripMenuItem
             // 
+            menuToolStripMenuItem.DisplayStyle = ToolStripItemDisplayStyle.Text;
             menuToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { exitToolStripMenuItem });
             menuToolStripMenuItem.Font = new Font("Segoe UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
             menuToolStripMenuItem.ForeColor = SystemColors.ButtonFace;
             menuToolStripMenuItem.Name = "menuToolStripMenuItem";
             menuToolStripMenuItem.Size = new Size(50, 20);
             menuToolStripMenuItem.Text = "Menu";
+            menuToolStripMenuItem.Click += menuToolStripMenuItem_Click;
             // 
             // exitToolStripMenuItem
             // 
             exitToolStripMenuItem.Name = "exitToolStripMenuItem";
-            exitToolStripMenuItem.Size = new Size(92, 22);
+            exitToolStripMenuItem.Size = new Size(180, 22);
             exitToolStripMenuItem.Text = "Exit";
             exitToolStripMenuItem.Click += exitToolStripMenuItem_Click;
             // 
             // virtualDisplayDriverToolStripMenuItem
             // 
+            virtualDisplayDriverToolStripMenuItem.DisplayStyle = ToolStripItemDisplayStyle.Text;
             virtualDisplayDriverToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { sDR10bitToolStripMenuItem, hDRToolStripMenuItem, customEDIDToolStripMenuItem, hardwareCursorToolStripMenuItem, preventMonitorSpoofToolStripMenuItem, eDIDCEAOverrideToolStripMenuItem, selectGPUToolStripMenuItem, displayCountToolStripMenuItem, enableToolStripMenuItem, loggingToolStripMenuItem, xMLOptionsEditorToolStripMenuItem });
             virtualDisplayDriverToolStripMenuItem.ForeColor = SystemColors.ButtonFace;
             virtualDisplayDriverToolStripMenuItem.Name = "virtualDisplayDriverToolStripMenuItem";
@@ -546,7 +546,7 @@ namespace VDD_Control
             menuStrip1.Items.AddRange(new ToolStripItem[] { menuToolStripMenuItem, toolsToolStripMenuItem, virtualDisplayDriverToolStripMenuItem, virtualAudioDriverToolStripMenuItem, aboutToolStripMenuItem });
             menuStrip1.Location = new Point(255, 22);
             menuStrip1.Name = "menuStrip1";
-            menuStrip1.Size = new Size(407, 24);
+            menuStrip1.Size = new Size(527, 24);
             menuStrip1.TabIndex = 1;
             menuStrip1.Text = "menuStrip1";
             // 
@@ -794,12 +794,13 @@ namespace VDD_Control
             // 
             textBox1.BackColor = Color.FromArgb(32, 32, 32);
             textBox1.BorderStyle = BorderStyle.FixedSingle;
-            textBox1.ForeColor = Color.FromArgb(0, 120, 0);
+            textBox1.ForeColor = Color.White;
             textBox1.Location = new Point(13, 461);
             textBox1.Name = "textBox1";
             textBox1.Size = new Size(453, 21);
             textBox1.TabIndex = 29;
             textBox1.Text = "Command Console";
+            textBox1.WordWrap = false;
             textBox1.TextChanged += textBox1_TextChanged;
             // 
             // groupBox4
@@ -858,6 +859,7 @@ namespace VDD_Control
             themeForm1.Controls.Add(textBox1);
             themeForm1.Dock = DockStyle.Fill;
             themeForm1.Font = new Font("Arial Rounded MT Bold", 9F, FontStyle.Regular, GraphicsUnit.Point);
+            themeForm1.ForeColor = Color.FromArgb(32, 41, 50);
             themeForm1.Image = (Image)resources.GetObject("themeForm1.Image");
             themeForm1.Location = new Point(0, 0);
             themeForm1.Name = "themeForm1";
@@ -943,21 +945,6 @@ namespace VDD_Control
             foreverClose1.Text = "foreverClose1";
             foreverClose1.TextColor = Color.FromArgb(243, 243, 243);
             // 
-            // foreverContextMenuStrip1
-            // 
-            foreverContextMenuStrip1.Font = new Font("Segoe UI", 8F, FontStyle.Regular, GraphicsUnit.Point);
-            foreverContextMenuStrip1.ForeColor = Color.White;
-            foreverContextMenuStrip1.Items.AddRange(new ToolStripItem[] { tEstToolStripMenuItem });
-            foreverContextMenuStrip1.Name = "foreverContextMenuStrip1";
-            foreverContextMenuStrip1.ShowImageMargin = false;
-            foreverContextMenuStrip1.Size = new Size(70, 26);
-            // 
-            // tEstToolStripMenuItem
-            // 
-            tEstToolStripMenuItem.Name = "tEstToolStripMenuItem";
-            tEstToolStripMenuItem.Size = new Size(69, 22);
-            tEstToolStripMenuItem.Text = "TEst";
-            // 
             // Form1
             // 
             AllowDrop = true;
@@ -967,6 +954,7 @@ namespace VDD_Control
             ClientSize = new Size(816, 489);
             ContextMenuStrip = contextMenuStrip1;
             Controls.Add(themeForm1);
+            ForeColor = SystemColors.ControlLightLight;
             FormBorderStyle = FormBorderStyle.None;
             Icon = (Icon)resources.GetObject("$this.Icon");
             MainMenuStrip = menuStrip1;
@@ -990,7 +978,6 @@ namespace VDD_Control
             groupBox4.ResumeLayout(false);
             themeForm1.ResumeLayout(false);
             themeForm1.PerformLayout();
-            foreverContextMenuStrip1.ResumeLayout(false);
             ResumeLayout(false);
         }
 
@@ -1081,8 +1068,6 @@ namespace VDD_Control
         private GroupBox groupBox4;
         private ReaLTaiizor.Forms.ThemeForm themeForm1;
         private ReaLTaiizor.Controls.ForeverClose foreverClose1;
-        private ReaLTaiizor.Controls.ForeverContextMenuStrip foreverContextMenuStrip1;
-        private ToolStripMenuItem tEstToolStripMenuItem;
         private ReaLTaiizor.Controls.ForeverMinimize foreverMinimize1;
         private ReaLTaiizor.Controls.ChatButtonRight chatButtonRight1;
         private ReaLTaiizor.Controls.ChatButtonRight chatButtonRight2;

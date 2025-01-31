@@ -6,6 +6,7 @@ using System.IO.Pipes;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Drawing;
 
 namespace VDD_Control
 {
@@ -16,7 +17,8 @@ namespace VDD_Control
         public Form1()
         {
             InitializeComponent();
-            var restartItem = GetRestartDriverToolStripMenuItem(); // This is now safe
+            ToolStripMenuItem restartItem = GetRestartDriverToolStripMenuItem(); // This is now safe
+
         }
 
         private ToolStripMenuItem GetRestartDriverToolStripMenuItem()
@@ -24,9 +26,30 @@ namespace VDD_Control
             return restartDriverToolStripMenuItem;
         }
 
+
+        // Recursive function to apply style to all sub-items
+        private void SetMenuItemStyle(ToolStripMenuItem item)
+        {
+            item.ForeColor = Color.White; // White text
+            item.BackColor = Color.FromArgb(32, 34, 37); // Default background
+
+            foreach (ToolStripItem subItem in item.DropDownItems)
+            {
+                if (subItem is ToolStripMenuItem subMenuItem)
+                {
+                    SetMenuItemStyle(subMenuItem);
+                }
+            }
+        }
         private async void Form1_Load(object sender, EventArgs e)
         {
+            menuStrip1.Renderer = new ToolStripProfessionalRenderer(new CustomColorTable());
 
+            // Set text color for all menu items
+            foreach (ToolStripMenuItem item in menuStrip1.Items)
+            {
+                SetMenuItemStyle(item);
+            }
             richTextBox1.AppendText("           ////////      ///////(/////////        //////////////(//     ////////\n");
             richTextBox1.AppendText("           ////                                                             ////\n");
             richTextBox1.AppendText("           ////                                                             ////\n");
@@ -129,6 +152,31 @@ namespace VDD_Control
                 richTextBox1.AppendText("[WARNING] Could not verify driver connection. Ensure the driver is running.\n");
             }
         }
+
+
+
+        class CustomColorTable : ProfessionalColorTable
+        {
+            private static readonly Color BackgroundColor = Color.FromArgb(32, 34, 37); // Default background
+            private static readonly Color HoverColor = Color.FromArgb(25, 25, 25); // Hover background
+            private static readonly Color TextColor = Color.White; // White text
+            private static readonly Color BorderColor = Color.FromArgb(60, 60, 60); // Border color
+
+            public override Color ToolStripDropDownBackground => BackgroundColor;
+            public override Color MenuBorder => BorderColor; // Menu border color
+            public override Color MenuItemBorder => BorderColor; // Item border color
+            public override Color MenuItemSelected => HoverColor; // Hover effect color
+
+            // Disable gradient effects by making begin and end colors the same
+            public override Color MenuItemSelectedGradientBegin => HoverColor;
+            public override Color MenuItemSelectedGradientEnd => HoverColor;
+            public override Color MenuItemPressedGradientBegin => HoverColor;
+            public override Color MenuItemPressedGradientEnd => HoverColor;
+            public override Color ToolStripGradientBegin => BackgroundColor;
+            public override Color ToolStripGradientMiddle => BackgroundColor;
+            public override Color ToolStripGradientEnd => BackgroundColor;
+        }
+
         private string LocateSettingsFile()
         {
             // Yo XML. Where u at?
@@ -719,6 +767,11 @@ namespace VDD_Control
         }
 
         private void themeForm1_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void menuToolStripMenuItem_Click(object sender, EventArgs e)
         {
 
         }
