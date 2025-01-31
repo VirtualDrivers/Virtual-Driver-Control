@@ -26,10 +26,44 @@ namespace VDD_Control
 
         private async void Form1_Load(object sender, EventArgs e)
         {
+
+            richTextBox1.AppendText("           ////////      ///////(/////////        //////////////(//     ////////\n");
+            richTextBox1.AppendText("           ////                                                             ////\n");
+            richTextBox1.AppendText("           ////                                                             ////\n");
+            richTextBox1.AppendText("                                                                                \n");
+            richTextBox1.AppendText("                                                                                \n");
+            richTextBox1.AppendText("                                                                                \n");
+            richTextBox1.AppendText("           ////                                                             ////\n");
+            richTextBox1.AppendText(" ///(///(///(///(///(///(///(///(///(///(///(///(///(///(///(///(/          (///\n");
+            richTextBox1.AppendText(" ///////////////////////////////(///////////////////////////////(/          ////\n");
+            richTextBox1.AppendText(" ///      .............................................        /(/          ////\n");
+            richTextBox1.AppendText(" ///     .......................,........................      /(/          ////\n");
+            richTextBox1.AppendText(" ///   .................,,,,,,,,,,,,,,,,,.................     /(/          ////\n");
+            richTextBox1.AppendText(" ///  ...............,,,,,,,,,,,,,,,,,,,,,,,...............    /(/              \n");
+            richTextBox1.AppendText(" /// ..............,,,,,,,,,,,,,,,,,,,,,,,,.................   /(/              \n");
+            richTextBox1.AppendText(" /// ....... @@@@.,,,, @@@.@@@@@@@@@@@,,.@@@@@@@@@@@........   /(/          ////\n");
+            richTextBox1.AppendText(" /(/......... @@@.,,,.@@@.,@@@@,,,, @@@,.@@@.,,.. @@@........  /(/          (/(/\n");
+            richTextBox1.AppendText(" ///.......... @@@,,.@@@%,,@@@@,,,,,@@@@.@@@.,,,..@@@(.......  /(/          ////\n");
+            richTextBox1.AppendText(" ///........... @@@.@@@@,,,@@@@,,,,,@@@@.@@@.,,,..@@@........  /(/      ////////\n");
+            richTextBox1.AppendText(" /// ........... @@@@@@,,,.@@@@,,,,@@@@,.@@@.,,..@@@@.......   /(/              \n");
+            richTextBox1.AppendText(" /// ............@@@@@,,,,.@@@@@@@@@@.,,.@@@@@@@@@@.........   /(/              \n");
+            richTextBox1.AppendText(" ///  ................,,,,,,..,,,,,,,,,,,..................    /(/              \n");
+            richTextBox1.AppendText(" ///   .................,,,,,,,,,,,,,,,,,.................     /(/              \n");
+            richTextBox1.AppendText(" ///    ......................,,,,,,.....................      /(/              \n");
+            richTextBox1.AppendText(" ///      .............................................        /(/              \n");
+            richTextBox1.AppendText(" ///        .........................................          /(/              \n");
+            richTextBox1.AppendText(" /////////////((MIKETHETECH))//(BUD)//(JOCKE)///////////////////(/              \n");
+            richTextBox1.AppendText("                              //(///                                            \n");
+            richTextBox1.AppendText("                              //(///                                            \n");
+            richTextBox1.AppendText("                *///////////////(////////////////                               \n");
+            richTextBox1.AppendText("                *///////////////(///////////////(\n\n");
+
             try
             {
                 // Initialize a string to hold all system information
                 string systemInfo = "System Information:\n\n";
+
+                
 
                 // Access the registry for CPU information
                 RegistryKey localMachine = Registry.LocalMachine;
@@ -264,9 +298,6 @@ namespace VDD_Control
 
                 if (processorInfo != null)
                 {
-                    // Clear the RichTextBox
-                    richTextBox1.Clear();
-
                     // Set bold font for the title
                     Font boldFont = new Font(richTextBox1.Font, FontStyle.Bold);
                     richTextBox1.SelectionFont = boldFont;
@@ -317,7 +348,6 @@ namespace VDD_Control
                 process.WaitForExit();
 
                 // Display output in richTextBox1
-                richTextBox1.Clear();
                 if (!string.IsNullOrWhiteSpace(output))
                 {
                     richTextBox1.AppendText("Display Information:\n\n" + output);
@@ -334,7 +364,6 @@ namespace VDD_Control
             catch (Exception ex)
             {
                 // Display error details in richTextBox1
-                richTextBox1.Clear();
                 richTextBox1.AppendText("An error occurred while retrieving display information:\n" + ex.Message);
             }
 
@@ -368,7 +397,6 @@ namespace VDD_Control
                 process.WaitForExit();
 
                 // Display output in richTextBox1
-                richTextBox1.Clear();
                 if (!string.IsNullOrWhiteSpace(output))
                 {
                     richTextBox1.AppendText("Display Information:\n\n" + output);
@@ -385,7 +413,6 @@ namespace VDD_Control
             catch (Exception ex)
             {
                 // Display error details in richTextBox1
-                richTextBox1.Clear();
                 richTextBox1.AppendText("An error occurred while retrieving display information:\n" + ex.Message);
             }
 
@@ -420,7 +447,6 @@ namespace VDD_Control
                 process.WaitForExit();
 
                 // Display output in richTextBox1
-                richTextBox1.Clear();
                 if (!string.IsNullOrWhiteSpace(output))
                 {
                     richTextBox1.AppendText("Display Information:\n\n" + output);
@@ -437,7 +463,6 @@ namespace VDD_Control
             catch (Exception ex)
             {
                 // Display error details in richTextBox1
-                richTextBox1.Clear();
                 richTextBox1.AppendText("An error occurred while retrieving display information:\n" + ex.Message);
             }
 

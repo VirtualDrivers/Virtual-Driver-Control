@@ -585,14 +585,15 @@ namespace VDD_Control
             // richTextBox1
             // 
             richTextBox1.BackColor = Color.FromArgb(32, 32, 32);
+            richTextBox1.Font = new Font("Consolas", 9F, FontStyle.Regular, GraphicsUnit.Point);
             richTextBox1.ForeColor = Color.FromArgb(0, 192, 0);
             richTextBox1.Location = new Point(12, 27);
             richTextBox1.Name = "richTextBox1";
             richTextBox1.Size = new Size(520, 382);
             richTextBox1.TabIndex = 2;
-            richTextBox1.Text = "Information will appear here when specific tools are used.\n";
+            richTextBox1.Text = "Information will appear here when specific tools are used.\n\n";
             richTextBox1.WordWrap = false;
-            richTextBox1.ZoomFactor = 1.2F;
+            richTextBox1.ZoomFactor = 0.8F;
             // 
             // label1
             // 
