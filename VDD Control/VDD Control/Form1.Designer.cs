@@ -102,7 +102,6 @@ namespace VDD_Control
             linkLabel1 = new LinkLabel();
             label2 = new Label();
             linkLabel2 = new LinkLabel();
-            button1 = new Button();
             label4 = new Label();
             label5 = new Label();
             label6 = new Label();
@@ -114,16 +113,16 @@ namespace VDD_Control
             listBox1 = new ListBox();
             groupBox2 = new GroupBox();
             groupBox3 = new GroupBox();
-            button2 = new Button();
             textBox1 = new TextBox();
-            button3 = new Button();
-            progressBar1 = new ProgressBar();
             groupBox4 = new GroupBox();
+            ribbonProgressBarCenter1 = new ReaLTaiizor.Controls.RibbonProgressBarCenter();
             themeForm1 = new ReaLTaiizor.Forms.ThemeForm();
+            chatButtonRight2 = new ReaLTaiizor.Controls.ChatButtonRight();
+            chatButtonRight1 = new ReaLTaiizor.Controls.ChatButtonRight();
+            foreverMinimize1 = new ReaLTaiizor.Controls.ForeverMinimize();
             foreverClose1 = new ReaLTaiizor.Controls.ForeverClose();
             foreverContextMenuStrip1 = new ReaLTaiizor.Controls.ForeverContextMenuStrip();
             tEstToolStripMenuItem = new ToolStripMenuItem();
-            foreverMinimize1 = new ReaLTaiizor.Controls.ForeverMinimize();
             contextMenuStrip1.SuspendLayout();
             menuStrip1.SuspendLayout();
             groupBox1.SuspendLayout();
@@ -374,7 +373,7 @@ namespace VDD_Control
             // exitToolStripMenuItem
             // 
             exitToolStripMenuItem.Name = "exitToolStripMenuItem";
-            exitToolStripMenuItem.Size = new Size(180, 22);
+            exitToolStripMenuItem.Size = new Size(92, 22);
             exitToolStripMenuItem.Text = "Exit";
             exitToolStripMenuItem.Click += exitToolStripMenuItem_Click;
             // 
@@ -510,7 +509,7 @@ namespace VDD_Control
             // 
             systemToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { enableDriverToolStripMenuItem1, disableDriverToolStripMenuItem1, restartDriverToolStripMenuItem1 });
             systemToolStripMenuItem.Name = "systemToolStripMenuItem";
-            systemToolStripMenuItem.Size = new Size(180, 22);
+            systemToolStripMenuItem.Size = new Size(112, 22);
             systemToolStripMenuItem.Text = "System";
             // 
             // enableDriverToolStripMenuItem1
@@ -655,17 +654,6 @@ namespace VDD_Control
             linkLabel2.Text = "https://github.com/VirtualDisplay/";
             linkLabel2.LinkClicked += linkLabel2_LinkClicked;
             // 
-            // button1
-            // 
-            button1.Font = new Font("Consolas", 8.25F, FontStyle.Regular, GraphicsUnit.Point);
-            button1.Location = new Point(555, 460);
-            button1.Name = "button1";
-            button1.Size = new Size(109, 22);
-            button1.TabIndex = 9;
-            button1.Text = "Restart All Drivers";
-            button1.UseVisualStyleBackColor = true;
-            button1.Click += button1_Click;
-            // 
             // label4
             // 
             label4.AutoSize = true;
@@ -802,19 +790,11 @@ namespace VDD_Control
             groupBox3.TabStop = false;
             groupBox3.Text = "Resources";
             // 
-            // button2
-            // 
-            button2.Font = new Font("Consolas", 8.25F, FontStyle.Regular, GraphicsUnit.Point);
-            button2.Location = new Point(691, 460);
-            button2.Name = "button2";
-            button2.Size = new Size(112, 22);
-            button2.TabIndex = 28;
-            button2.Text = "Minimize to Tray";
-            button2.UseVisualStyleBackColor = true;
-            button2.Click += button2_Click;
-            // 
             // textBox1
             // 
+            textBox1.BackColor = Color.FromArgb(32, 32, 32);
+            textBox1.BorderStyle = BorderStyle.FixedSingle;
+            textBox1.ForeColor = Color.FromArgb(0, 120, 0);
             textBox1.Location = new Point(13, 461);
             textBox1.Name = "textBox1";
             textBox1.Size = new Size(453, 21);
@@ -822,27 +802,9 @@ namespace VDD_Control
             textBox1.Text = "Command Console";
             textBox1.TextChanged += textBox1_TextChanged;
             // 
-            // button3
-            // 
-            button3.Font = new Font("Consolas", 8.25F, FontStyle.Regular, GraphicsUnit.Point);
-            button3.Location = new Point(472, 460);
-            button3.Name = "button3";
-            button3.Size = new Size(61, 22);
-            button3.TabIndex = 30;
-            button3.Text = "Enter";
-            button3.UseVisualStyleBackColor = true;
-            button3.Click += button3_Click;
-            // 
-            // progressBar1
-            // 
-            progressBar1.Location = new Point(12, 22);
-            progressBar1.Name = "progressBar1";
-            progressBar1.Size = new Size(230, 23);
-            progressBar1.TabIndex = 31;
-            // 
             // groupBox4
             // 
-            groupBox4.Controls.Add(progressBar1);
+            groupBox4.Controls.Add(ribbonProgressBarCenter1);
             groupBox4.Font = new Font("Consolas", 8.25F, FontStyle.Regular, GraphicsUnit.Point);
             groupBox4.ForeColor = SystemColors.ButtonHighlight;
             groupBox4.Location = new Point(555, 395);
@@ -852,9 +814,39 @@ namespace VDD_Control
             groupBox4.TabStop = false;
             groupBox4.Text = "Task Progress";
             // 
+            // ribbonProgressBarCenter1
+            // 
+            ribbonProgressBarCenter1.BackColor = Color.Transparent;
+            ribbonProgressBarCenter1.BaseColor = Color.FromArgb(75, 255, 255, 255);
+            ribbonProgressBarCenter1.BorderColor = Color.FromArgb(117, 120, 117);
+            ribbonProgressBarCenter1.ColorA = Color.FromArgb(203, 201, 205);
+            ribbonProgressBarCenter1.ColorB = Color.FromArgb(188, 186, 190);
+            ribbonProgressBarCenter1.EdgeColor = Color.FromArgb(125, 97, 94, 90);
+            ribbonProgressBarCenter1.ForeColor = Color.Black;
+            ribbonProgressBarCenter1.HatchType = System.Drawing.Drawing2D.HatchStyle.DarkUpwardDiagonal;
+            ribbonProgressBarCenter1.Location = new Point(6, 19);
+            ribbonProgressBarCenter1.Maximum = 100;
+            ribbonProgressBarCenter1.Name = "ribbonProgressBarCenter1";
+            ribbonProgressBarCenter1.PercentageText = "%";
+            ribbonProgressBarCenter1.ProgressBorderColorA = Color.FromArgb(150, 97, 94, 90);
+            ribbonProgressBarCenter1.ProgressBorderColorB = Color.FromArgb(0, 120, 0);
+            ribbonProgressBarCenter1.ProgressColorA = Color.FromArgb(0, 120, 0);
+            ribbonProgressBarCenter1.ProgressColorB = Color.FromArgb(0, 120, 0);
+            ribbonProgressBarCenter1.ProgressLineColorA = Color.FromArgb(40, 255, 255, 255);
+            ribbonProgressBarCenter1.ProgressLineColorB = Color.FromArgb(20, 255, 255, 255);
+            ribbonProgressBarCenter1.ShowEdge = false;
+            ribbonProgressBarCenter1.ShowPercentage = false;
+            ribbonProgressBarCenter1.Size = new Size(236, 34);
+            ribbonProgressBarCenter1.SmoothingType = System.Drawing.Drawing2D.SmoothingMode.HighQuality;
+            ribbonProgressBarCenter1.TabIndex = 0;
+            ribbonProgressBarCenter1.Text = "ribbonProgressBarCenter1";
+            ribbonProgressBarCenter1.Value = 37;
+            // 
             // themeForm1
             // 
             themeForm1.BackColor = Color.FromArgb(32, 41, 50);
+            themeForm1.Controls.Add(chatButtonRight2);
+            themeForm1.Controls.Add(chatButtonRight1);
             themeForm1.Controls.Add(foreverMinimize1);
             themeForm1.Controls.Add(foreverClose1);
             themeForm1.Controls.Add(richTextBox1);
@@ -863,10 +855,7 @@ namespace VDD_Control
             themeForm1.Controls.Add(groupBox2);
             themeForm1.Controls.Add(menuStrip1);
             themeForm1.Controls.Add(groupBox1);
-            themeForm1.Controls.Add(button2);
-            themeForm1.Controls.Add(button3);
             themeForm1.Controls.Add(textBox1);
-            themeForm1.Controls.Add(button1);
             themeForm1.Dock = DockStyle.Fill;
             themeForm1.Font = new Font("Arial Rounded MT Bold", 9F, FontStyle.Regular, GraphicsUnit.Point);
             themeForm1.Image = (Image)resources.GetObject("themeForm1.Image");
@@ -882,6 +871,62 @@ namespace VDD_Control
             themeForm1.Text = "Virtual Driver Control";
             themeForm1.Click += themeForm1_Click;
             // 
+            // chatButtonRight2
+            // 
+            chatButtonRight2.BackColor = Color.Transparent;
+            chatButtonRight2.Font = new Font("Consolas", 9.75F, FontStyle.Bold, GraphicsUnit.Point);
+            chatButtonRight2.ForeColor = Color.LightGray;
+            chatButtonRight2.Image = null;
+            chatButtonRight2.ImageAlign = ContentAlignment.MiddleLeft;
+            chatButtonRight2.InactiveColorA = Color.FromArgb(0, 120, 0);
+            chatButtonRight2.InactiveColorB = Color.FromArgb(0, 120, 0);
+            chatButtonRight2.Location = new Point(650, 460);
+            chatButtonRight2.Name = "chatButtonRight2";
+            chatButtonRight2.PressedColorA = Color.FromArgb(0, 80, 0);
+            chatButtonRight2.PressedColorB = Color.FromArgb(0, 80, 0);
+            chatButtonRight2.PressedContourColorA = Color.FromArgb(0, 80, 0);
+            chatButtonRight2.PressedContourColorB = Color.FromArgb(0, 80, 0);
+            chatButtonRight2.Size = new Size(154, 22);
+            chatButtonRight2.TabIndex = 35;
+            chatButtonRight2.Text = "Restart All Drivers";
+            chatButtonRight2.TextAlignment = StringAlignment.Center;
+            // 
+            // chatButtonRight1
+            // 
+            chatButtonRight1.BackColor = Color.Transparent;
+            chatButtonRight1.Font = new Font("Consolas", 9.75F, FontStyle.Bold, GraphicsUnit.Point);
+            chatButtonRight1.ForeColor = Color.LightGray;
+            chatButtonRight1.Image = null;
+            chatButtonRight1.ImageAlign = ContentAlignment.MiddleLeft;
+            chatButtonRight1.InactiveColorA = Color.FromArgb(0, 120, 0);
+            chatButtonRight1.InactiveColorB = Color.FromArgb(0, 120, 0);
+            chatButtonRight1.Location = new Point(472, 460);
+            chatButtonRight1.Name = "chatButtonRight1";
+            chatButtonRight1.PressedColorA = Color.FromArgb(0, 80, 0);
+            chatButtonRight1.PressedColorB = Color.FromArgb(0, 80, 0);
+            chatButtonRight1.PressedContourColorA = Color.FromArgb(0, 80, 0);
+            chatButtonRight1.PressedContourColorB = Color.FromArgb(0, 80, 0);
+            chatButtonRight1.Size = new Size(61, 22);
+            chatButtonRight1.TabIndex = 34;
+            chatButtonRight1.Text = "Enter";
+            chatButtonRight1.TextAlignment = StringAlignment.Center;
+            // 
+            // foreverMinimize1
+            // 
+            foreverMinimize1.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            foreverMinimize1.BackColor = Color.White;
+            foreverMinimize1.BaseColor = Color.FromArgb(45, 47, 49);
+            foreverMinimize1.DefaultLocation = true;
+            foreverMinimize1.DownColor = Color.FromArgb(30, 0, 0, 0);
+            foreverMinimize1.Font = new Font("Marlett", 12F, FontStyle.Regular, GraphicsUnit.Point);
+            foreverMinimize1.Location = new Point(738, 16);
+            foreverMinimize1.Name = "foreverMinimize1";
+            foreverMinimize1.OverColor = Color.FromArgb(30, 255, 255, 255);
+            foreverMinimize1.Size = new Size(18, 18);
+            foreverMinimize1.TabIndex = 33;
+            foreverMinimize1.Text = "foreverMinimize1";
+            foreverMinimize1.TextColor = Color.FromArgb(243, 243, 243);
+            // 
             // foreverClose1
             // 
             foreverClose1.Anchor = AnchorStyles.Top | AnchorStyles.Right;
@@ -890,7 +935,7 @@ namespace VDD_Control
             foreverClose1.DefaultLocation = true;
             foreverClose1.DownColor = Color.FromArgb(30, 0, 0, 0);
             foreverClose1.Font = new Font("Marlett", 10F, FontStyle.Regular, GraphicsUnit.Point);
-            foreverClose1.Location = new Point(764, 22);
+            foreverClose1.Location = new Point(786, 16);
             foreverClose1.Name = "foreverClose1";
             foreverClose1.OverColor = Color.FromArgb(30, 255, 255, 255);
             foreverClose1.Size = new Size(18, 18);
@@ -912,22 +957,6 @@ namespace VDD_Control
             tEstToolStripMenuItem.Name = "tEstToolStripMenuItem";
             tEstToolStripMenuItem.Size = new Size(69, 22);
             tEstToolStripMenuItem.Text = "TEst";
-            // 
-            // foreverMinimize1
-            // 
-            foreverMinimize1.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            foreverMinimize1.BackColor = Color.White;
-            foreverMinimize1.BaseColor = Color.FromArgb(45, 47, 49);
-            foreverMinimize1.DefaultLocation = true;
-            foreverMinimize1.DownColor = Color.FromArgb(30, 0, 0, 0);
-            foreverMinimize1.Font = new Font("Marlett", 12F, FontStyle.Regular, GraphicsUnit.Point);
-            foreverMinimize1.Location = new Point(737, 22);
-            foreverMinimize1.Name = "foreverMinimize1";
-            foreverMinimize1.OverColor = Color.FromArgb(30, 255, 255, 255);
-            foreverMinimize1.Size = new Size(18, 18);
-            foreverMinimize1.TabIndex = 33;
-            foreverMinimize1.Text = "foreverMinimize1";
-            foreverMinimize1.TextColor = Color.FromArgb(243, 243, 243);
             // 
             // Form1
             // 
@@ -1024,7 +1053,6 @@ namespace VDD_Control
         private LinkLabel linkLabel1;
         private Label label2;
         private LinkLabel linkLabel2;
-        private Button button1;
         private ToolStripMenuItem loggingToolStripMenuItem1;
         private ToolStripMenuItem userModeLoggingToolStripMenuItem;
         private ToolStripMenuItem devModeLoggingToolStripMenuItem;
@@ -1049,15 +1077,15 @@ namespace VDD_Control
         private ListBox listBox1;
         private GroupBox groupBox2;
         private GroupBox groupBox3;
-        private Button button2;
         private TextBox textBox1;
-        private Button button3;
-        private ProgressBar progressBar1;
         private GroupBox groupBox4;
         private ReaLTaiizor.Forms.ThemeForm themeForm1;
         private ReaLTaiizor.Controls.ForeverClose foreverClose1;
         private ReaLTaiizor.Controls.ForeverContextMenuStrip foreverContextMenuStrip1;
         private ToolStripMenuItem tEstToolStripMenuItem;
         private ReaLTaiizor.Controls.ForeverMinimize foreverMinimize1;
+        private ReaLTaiizor.Controls.ChatButtonRight chatButtonRight1;
+        private ReaLTaiizor.Controls.ChatButtonRight chatButtonRight2;
+        private ReaLTaiizor.Controls.RibbonProgressBarCenter ribbonProgressBarCenter1;
     }
 }

@@ -21,5 +21,10 @@ namespace VDD_Control
         {
 
         }
+
+        private void themeForm1_Click(object sender, EventArgs e)
+        {
+
+        }
     }
 }
