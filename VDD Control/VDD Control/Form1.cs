@@ -63,7 +63,7 @@ namespace VDD_Control
                 // Initialize a string to hold all system information
                 string systemInfo = "System Information:\n\n";
 
-                
+
 
                 // Access the registry for CPU information
                 RegistryKey localMachine = Registry.LocalMachine;
@@ -77,6 +77,7 @@ namespace VDD_Control
                 if (processorInfo != null)
                 {
                     systemInfo += "CPU Information:\n";
+                    systemInfo += "----------------\n";
                     systemInfo += "Vendor: " + processorInfo.GetValue("VendorIdentifier") + "\n";
                     systemInfo += "Processor: " + processorInfo.GetValue("ProcessorNameString") + "\n";
                     systemInfo += "Type: " + processorInfo.GetValue("Identifier") + "\n";
@@ -89,6 +90,7 @@ namespace VDD_Control
 
                 // Add OS Information
                 systemInfo += "Operating System Information:\n";
+                systemInfo += "-----------------------------\n";
                 systemInfo += "OS Version: " + Environment.OSVersion.ToString() + "\n";
                 systemInfo += "Machine Name: " + Environment.MachineName + "\n";
                 systemInfo += "User Name: " + Environment.UserName + "\n";
@@ -98,11 +100,13 @@ namespace VDD_Control
 
                 // Add Memory Information
                 systemInfo += "Memory Information:\n";
+                systemInfo += "-------------------\n";
                 systemInfo += "System Page Size: " + Environment.SystemPageSize + " bytes\n";
                 systemInfo += "Working Set: " + (Environment.WorkingSet / 1024 / 1024) + " MB\n\n";
 
                 // Add .NET Runtime Information
                 systemInfo += ".NET Runtime Information:\n";
+                systemInfo += "-------------------------\n";
                 systemInfo += "CLR Version: " + Environment.Version.ToString() + "\n\n";
 
                 // Locate the vdd_settings.xml file
@@ -128,7 +132,7 @@ namespace VDD_Control
         private string LocateSettingsFile()
         {
             // Yo XML. Where u at?
-            string settingsInfo = "Settings File Information:\n";
+            string settingsInfo = "Settings File Information:\n--------------------------\n";
             string registryKeyPath = @"SOFTWARE\MikeTheTech\VirtualDisplayDriver";
             string registryFilePath = null;
 
@@ -700,6 +704,21 @@ namespace VDD_Control
         }
 
         private void linkLabel1_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
+        {
+
+        }
+
+        private void richTextBox1_TextChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void royalMenuStrip1_ItemClicked(object sender, ToolStripItemClickedEventArgs e)
+        {
+
+        }
+
+        private void themeForm1_Click(object sender, EventArgs e)
         {
 
         }
