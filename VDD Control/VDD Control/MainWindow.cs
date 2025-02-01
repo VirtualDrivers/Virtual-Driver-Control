@@ -10,11 +10,11 @@ using System.Drawing;
 
 namespace VDD_Control
 {
-    public partial class Form1 : Form
+    public partial class mainWindow : Form
     {
         private const string PIPE_NAME = "MTTVirtualDisplayPipe";
 
-        public Form1()
+        public mainWindow()
         {
             InitializeComponent();
             ToolStripMenuItem restartItem = GetRestartDriverToolStripMenuItem(); // This is now safe
@@ -556,13 +556,13 @@ namespace VDD_Control
 
         private void xMLOptionsEditorToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            Form2 form2 = new Form2();
+            XMLEditor form2 = new XMLEditor();
             form2.Show();
         }
 
         private void toolStripMenuItem1_Click(object sender, EventArgs e)
         {
-            Form2 form2 = new Form2();
+            XMLEditor form2 = new XMLEditor();
             form2.Show();
         }
 

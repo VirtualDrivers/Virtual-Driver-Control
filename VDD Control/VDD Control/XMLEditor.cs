@@ -10,9 +10,9 @@ using System.Windows.Forms;
 
 namespace VDD_Control
 {
-    public partial class Form2 : Form
+    public partial class XMLEditor : Form
     {
-        public Form2()
+        public XMLEditor()
         {
             InitializeComponent();
         }

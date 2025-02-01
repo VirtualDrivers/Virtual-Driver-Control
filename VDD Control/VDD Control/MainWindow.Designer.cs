@@ -1,7 +1,7 @@
 ﻿
 namespace VDD_Control
 {
-    partial class Form1
+    partial class mainWindow
     {
         /// <summary>
         ///  Required designer variable.
@@ -32,7 +32,7 @@ namespace VDD_Control
         private void InitializeComponent()
         {
             components = new System.ComponentModel.Container();
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(mainWindow));
             notificationIcon = new NotifyIcon(components);
             trayMenu = new ContextMenuStrip(components);
             menuToolStripMenuItem1 = new ToolStripMenuItem();
@@ -841,7 +841,7 @@ namespace VDD_Control
             taskProgressBar.SmoothingType = System.Drawing.Drawing2D.SmoothingMode.HighQuality;
             taskProgressBar.TabIndex = 0;
             taskProgressBar.Text = "ribbonProgressBarCenter1";
-            taskProgressBar.Value = 37;
+            taskProgressBar.Value = 0;
             // 
             // mainTheme
             // 
@@ -945,7 +945,7 @@ namespace VDD_Control
             closeButton.Text = "foreverClose1";
             closeButton.TextColor = Color.FromArgb(243, 243, 243);
             // 
-            // Form1
+            // mainWindow
             // 
             AllowDrop = true;
             AutoScaleDimensions = new SizeF(7F, 15F);
@@ -961,7 +961,7 @@ namespace VDD_Control
             MaximizeBox = false;
             MaximumSize = new Size(816, 489);
             MinimumSize = new Size(261, 61);
-            Name = "Form1";
+            Name = "mainWindow";
             SizeGripStyle = SizeGripStyle.Hide;
             Text = "Virtual Driver Control";
             TransparencyKey = Color.Fuchsia;
