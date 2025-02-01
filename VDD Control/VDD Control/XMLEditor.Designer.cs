@@ -30,7 +30,7 @@
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(XMLEditor));
             numericUpDown1 = new NumericUpDown();
-            label1 = new Label();
+            monitorCountLabel = new Label();
             label2 = new Label();
             listBox1 = new ListBox();
             label3 = new Label();
@@ -43,13 +43,13 @@
             label6 = new Label();
             comboBox1 = new ComboBox();
             themeForm1 = new ReaLTaiizor.Forms.ThemeForm();
-            foreverClose1 = new ReaLTaiizor.Controls.ForeverClose();
-            chatButtonRight1 = new ReaLTaiizor.Controls.ChatButtonRight();
-            chatButtonRight2 = new ReaLTaiizor.Controls.ChatButtonRight();
-            chatButtonRight3 = new ReaLTaiizor.Controls.ChatButtonRight();
-            chatButtonRight4 = new ReaLTaiizor.Controls.ChatButtonRight();
             chatButtonRight5 = new ReaLTaiizor.Controls.ChatButtonRight();
             chatButtonRight6 = new ReaLTaiizor.Controls.ChatButtonRight();
+            chatButtonRight3 = new ReaLTaiizor.Controls.ChatButtonRight();
+            chatButtonRight4 = new ReaLTaiizor.Controls.ChatButtonRight();
+            chatButtonRight2 = new ReaLTaiizor.Controls.ChatButtonRight();
+            chatButtonRight1 = new ReaLTaiizor.Controls.ChatButtonRight();
+            foreverClose1 = new ReaLTaiizor.Controls.ForeverClose();
             ((System.ComponentModel.ISupportInitialize)numericUpDown1).BeginInit();
             ((System.ComponentModel.ISupportInitialize)dataGridView1).BeginInit();
             themeForm1.SuspendLayout();
@@ -65,16 +65,16 @@
             numericUpDown1.Size = new Size(325, 21);
             numericUpDown1.TabIndex = 0;
             // 
-            // label1
+            // monitorCountLabel
             // 
-            label1.AutoSize = true;
-            label1.Font = new Font("Segoe UI", 10F, FontStyle.Bold, GraphicsUnit.Point);
-            label1.ForeColor = SystemColors.Window;
-            label1.Location = new Point(16, 74);
-            label1.Name = "label1";
-            label1.Size = new Size(110, 19);
-            label1.TabIndex = 1;
-            label1.Text = "Monitor Count:";
+            monitorCountLabel.AutoSize = true;
+            monitorCountLabel.Font = new Font("Segoe UI", 10F, FontStyle.Bold, GraphicsUnit.Point);
+            monitorCountLabel.ForeColor = SystemColors.Window;
+            monitorCountLabel.Location = new Point(16, 74);
+            monitorCountLabel.Name = "monitorCountLabel";
+            monitorCountLabel.Size = new Size(110, 19);
+            monitorCountLabel.TabIndex = 1;
+            monitorCountLabel.Text = "Monitor Count:";
             // 
             // label2
             // 
@@ -193,7 +193,7 @@
             themeForm1.Controls.Add(comboBox1);
             themeForm1.Controls.Add(listBox1);
             themeForm1.Controls.Add(numericUpDown1);
-            themeForm1.Controls.Add(label1);
+            themeForm1.Controls.Add(monitorCountLabel);
             themeForm1.Controls.Add(label6);
             themeForm1.Controls.Add(label2);
             themeForm1.Controls.Add(label3);
@@ -214,102 +214,6 @@
             themeForm1.TabIndex = 19;
             themeForm1.Text = "Virtual Display Driver XML Editor";
             themeForm1.Click += themeForm1_Click;
-            // 
-            // foreverClose1
-            // 
-            foreverClose1.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            foreverClose1.BackColor = Color.White;
-            foreverClose1.BaseColor = Color.FromArgb(45, 47, 49);
-            foreverClose1.DefaultLocation = true;
-            foreverClose1.DownColor = Color.FromArgb(30, 0, 0, 0);
-            foreverClose1.Font = new Font("Marlett", 10F, FontStyle.Regular, GraphicsUnit.Point);
-            foreverClose1.Location = new Point(439, 20);
-            foreverClose1.Name = "foreverClose1";
-            foreverClose1.OverColor = Color.FromArgb(30, 255, 255, 255);
-            foreverClose1.Size = new Size(18, 18);
-            foreverClose1.TabIndex = 19;
-            foreverClose1.Text = "foreverClose1";
-            foreverClose1.TextColor = Color.FromArgb(243, 243, 243);
-            // 
-            // chatButtonRight1
-            // 
-            chatButtonRight1.BackColor = Color.Transparent;
-            chatButtonRight1.Font = new Font("Consolas", 9.75F, FontStyle.Bold, GraphicsUnit.Point);
-            chatButtonRight1.ForeColor = Color.LightGray;
-            chatButtonRight1.Image = null;
-            chatButtonRight1.ImageAlign = ContentAlignment.MiddleLeft;
-            chatButtonRight1.InactiveColorA = Color.FromArgb(0, 120, 0);
-            chatButtonRight1.InactiveColorB = Color.FromArgb(0, 120, 0);
-            chatButtonRight1.Location = new Point(325, 237);
-            chatButtonRight1.Name = "chatButtonRight1";
-            chatButtonRight1.PressedColorA = Color.FromArgb(0, 80, 0);
-            chatButtonRight1.PressedColorB = Color.FromArgb(0, 80, 0);
-            chatButtonRight1.PressedContourColorA = Color.FromArgb(0, 80, 0);
-            chatButtonRight1.PressedContourColorB = Color.FromArgb(0, 80, 0);
-            chatButtonRight1.Size = new Size(61, 22);
-            chatButtonRight1.TabIndex = 35;
-            chatButtonRight1.Text = "Add";
-            chatButtonRight1.TextAlignment = StringAlignment.Center;
-            // 
-            // chatButtonRight2
-            // 
-            chatButtonRight2.BackColor = Color.Transparent;
-            chatButtonRight2.Font = new Font("Consolas", 9.75F, FontStyle.Bold, GraphicsUnit.Point);
-            chatButtonRight2.ForeColor = Color.LightGray;
-            chatButtonRight2.Image = null;
-            chatButtonRight2.ImageAlign = ContentAlignment.MiddleLeft;
-            chatButtonRight2.InactiveColorA = Color.FromArgb(0, 120, 0);
-            chatButtonRight2.InactiveColorB = Color.FromArgb(0, 120, 0);
-            chatButtonRight2.Location = new Point(396, 237);
-            chatButtonRight2.Name = "chatButtonRight2";
-            chatButtonRight2.PressedColorA = Color.FromArgb(0, 80, 0);
-            chatButtonRight2.PressedColorB = Color.FromArgb(0, 80, 0);
-            chatButtonRight2.PressedContourColorA = Color.FromArgb(0, 80, 0);
-            chatButtonRight2.PressedContourColorB = Color.FromArgb(0, 80, 0);
-            chatButtonRight2.Size = new Size(61, 22);
-            chatButtonRight2.TabIndex = 36;
-            chatButtonRight2.Text = "Remove";
-            chatButtonRight2.TextAlignment = StringAlignment.Center;
-            // 
-            // chatButtonRight3
-            // 
-            chatButtonRight3.BackColor = Color.Transparent;
-            chatButtonRight3.Font = new Font("Consolas", 9.75F, FontStyle.Bold, GraphicsUnit.Point);
-            chatButtonRight3.ForeColor = Color.LightGray;
-            chatButtonRight3.Image = null;
-            chatButtonRight3.ImageAlign = ContentAlignment.MiddleLeft;
-            chatButtonRight3.InactiveColorA = Color.FromArgb(0, 120, 0);
-            chatButtonRight3.InactiveColorB = Color.FromArgb(0, 120, 0);
-            chatButtonRight3.Location = new Point(396, 410);
-            chatButtonRight3.Name = "chatButtonRight3";
-            chatButtonRight3.PressedColorA = Color.FromArgb(0, 80, 0);
-            chatButtonRight3.PressedColorB = Color.FromArgb(0, 80, 0);
-            chatButtonRight3.PressedContourColorA = Color.FromArgb(0, 80, 0);
-            chatButtonRight3.PressedContourColorB = Color.FromArgb(0, 80, 0);
-            chatButtonRight3.Size = new Size(61, 22);
-            chatButtonRight3.TabIndex = 38;
-            chatButtonRight3.Text = "Remove";
-            chatButtonRight3.TextAlignment = StringAlignment.Center;
-            // 
-            // chatButtonRight4
-            // 
-            chatButtonRight4.BackColor = Color.Transparent;
-            chatButtonRight4.Font = new Font("Consolas", 9.75F, FontStyle.Bold, GraphicsUnit.Point);
-            chatButtonRight4.ForeColor = Color.LightGray;
-            chatButtonRight4.Image = null;
-            chatButtonRight4.ImageAlign = ContentAlignment.MiddleLeft;
-            chatButtonRight4.InactiveColorA = Color.FromArgb(0, 120, 0);
-            chatButtonRight4.InactiveColorB = Color.FromArgb(0, 120, 0);
-            chatButtonRight4.Location = new Point(325, 410);
-            chatButtonRight4.Name = "chatButtonRight4";
-            chatButtonRight4.PressedColorA = Color.FromArgb(0, 80, 0);
-            chatButtonRight4.PressedColorB = Color.FromArgb(0, 80, 0);
-            chatButtonRight4.PressedContourColorA = Color.FromArgb(0, 80, 0);
-            chatButtonRight4.PressedContourColorB = Color.FromArgb(0, 80, 0);
-            chatButtonRight4.Size = new Size(61, 22);
-            chatButtonRight4.TabIndex = 37;
-            chatButtonRight4.Text = "Add";
-            chatButtonRight4.TextAlignment = StringAlignment.Center;
             // 
             // chatButtonRight5
             // 
@@ -351,7 +255,103 @@
             chatButtonRight6.Text = "Close Without Saving";
             chatButtonRight6.TextAlignment = StringAlignment.Center;
             // 
-            // Form2
+            // chatButtonRight3
+            // 
+            chatButtonRight3.BackColor = Color.Transparent;
+            chatButtonRight3.Font = new Font("Consolas", 9.75F, FontStyle.Bold, GraphicsUnit.Point);
+            chatButtonRight3.ForeColor = Color.LightGray;
+            chatButtonRight3.Image = null;
+            chatButtonRight3.ImageAlign = ContentAlignment.MiddleLeft;
+            chatButtonRight3.InactiveColorA = Color.FromArgb(0, 120, 0);
+            chatButtonRight3.InactiveColorB = Color.FromArgb(0, 120, 0);
+            chatButtonRight3.Location = new Point(396, 410);
+            chatButtonRight3.Name = "chatButtonRight3";
+            chatButtonRight3.PressedColorA = Color.FromArgb(0, 80, 0);
+            chatButtonRight3.PressedColorB = Color.FromArgb(0, 80, 0);
+            chatButtonRight3.PressedContourColorA = Color.FromArgb(0, 80, 0);
+            chatButtonRight3.PressedContourColorB = Color.FromArgb(0, 80, 0);
+            chatButtonRight3.Size = new Size(61, 22);
+            chatButtonRight3.TabIndex = 38;
+            chatButtonRight3.Text = "Remove";
+            chatButtonRight3.TextAlignment = StringAlignment.Center;
+            // 
+            // chatButtonRight4
+            // 
+            chatButtonRight4.BackColor = Color.Transparent;
+            chatButtonRight4.Font = new Font("Consolas", 9.75F, FontStyle.Bold, GraphicsUnit.Point);
+            chatButtonRight4.ForeColor = Color.LightGray;
+            chatButtonRight4.Image = null;
+            chatButtonRight4.ImageAlign = ContentAlignment.MiddleLeft;
+            chatButtonRight4.InactiveColorA = Color.FromArgb(0, 120, 0);
+            chatButtonRight4.InactiveColorB = Color.FromArgb(0, 120, 0);
+            chatButtonRight4.Location = new Point(325, 410);
+            chatButtonRight4.Name = "chatButtonRight4";
+            chatButtonRight4.PressedColorA = Color.FromArgb(0, 80, 0);
+            chatButtonRight4.PressedColorB = Color.FromArgb(0, 80, 0);
+            chatButtonRight4.PressedContourColorA = Color.FromArgb(0, 80, 0);
+            chatButtonRight4.PressedContourColorB = Color.FromArgb(0, 80, 0);
+            chatButtonRight4.Size = new Size(61, 22);
+            chatButtonRight4.TabIndex = 37;
+            chatButtonRight4.Text = "Add";
+            chatButtonRight4.TextAlignment = StringAlignment.Center;
+            // 
+            // chatButtonRight2
+            // 
+            chatButtonRight2.BackColor = Color.Transparent;
+            chatButtonRight2.Font = new Font("Consolas", 9.75F, FontStyle.Bold, GraphicsUnit.Point);
+            chatButtonRight2.ForeColor = Color.LightGray;
+            chatButtonRight2.Image = null;
+            chatButtonRight2.ImageAlign = ContentAlignment.MiddleLeft;
+            chatButtonRight2.InactiveColorA = Color.FromArgb(0, 120, 0);
+            chatButtonRight2.InactiveColorB = Color.FromArgb(0, 120, 0);
+            chatButtonRight2.Location = new Point(396, 237);
+            chatButtonRight2.Name = "chatButtonRight2";
+            chatButtonRight2.PressedColorA = Color.FromArgb(0, 80, 0);
+            chatButtonRight2.PressedColorB = Color.FromArgb(0, 80, 0);
+            chatButtonRight2.PressedContourColorA = Color.FromArgb(0, 80, 0);
+            chatButtonRight2.PressedContourColorB = Color.FromArgb(0, 80, 0);
+            chatButtonRight2.Size = new Size(61, 22);
+            chatButtonRight2.TabIndex = 36;
+            chatButtonRight2.Text = "Remove";
+            chatButtonRight2.TextAlignment = StringAlignment.Center;
+            // 
+            // chatButtonRight1
+            // 
+            chatButtonRight1.BackColor = Color.Transparent;
+            chatButtonRight1.Font = new Font("Consolas", 9.75F, FontStyle.Bold, GraphicsUnit.Point);
+            chatButtonRight1.ForeColor = Color.LightGray;
+            chatButtonRight1.Image = null;
+            chatButtonRight1.ImageAlign = ContentAlignment.MiddleLeft;
+            chatButtonRight1.InactiveColorA = Color.FromArgb(0, 120, 0);
+            chatButtonRight1.InactiveColorB = Color.FromArgb(0, 120, 0);
+            chatButtonRight1.Location = new Point(325, 237);
+            chatButtonRight1.Name = "chatButtonRight1";
+            chatButtonRight1.PressedColorA = Color.FromArgb(0, 80, 0);
+            chatButtonRight1.PressedColorB = Color.FromArgb(0, 80, 0);
+            chatButtonRight1.PressedContourColorA = Color.FromArgb(0, 80, 0);
+            chatButtonRight1.PressedContourColorB = Color.FromArgb(0, 80, 0);
+            chatButtonRight1.Size = new Size(61, 22);
+            chatButtonRight1.TabIndex = 35;
+            chatButtonRight1.Text = "Add";
+            chatButtonRight1.TextAlignment = StringAlignment.Center;
+            // 
+            // foreverClose1
+            // 
+            foreverClose1.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            foreverClose1.BackColor = Color.White;
+            foreverClose1.BaseColor = Color.FromArgb(45, 47, 49);
+            foreverClose1.DefaultLocation = true;
+            foreverClose1.DownColor = Color.FromArgb(30, 0, 0, 0);
+            foreverClose1.Font = new Font("Marlett", 10F, FontStyle.Regular, GraphicsUnit.Point);
+            foreverClose1.Location = new Point(440, 16);
+            foreverClose1.Name = "foreverClose1";
+            foreverClose1.OverColor = Color.FromArgb(30, 255, 255, 255);
+            foreverClose1.Size = new Size(18, 18);
+            foreverClose1.TabIndex = 19;
+            foreverClose1.Text = "foreverClose1";
+            foreverClose1.TextColor = Color.FromArgb(243, 243, 243);
+            // 
+            // XMLEditor
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
@@ -360,7 +360,7 @@
             Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
             FormBorderStyle = FormBorderStyle.None;
             MinimumSize = new Size(261, 61);
-            Name = "Form2";
+            Name = "XMLEditor";
             Text = "Virtual Display Driver XML Editor";
             TransparencyKey = Color.Fuchsia;
             ((System.ComponentModel.ISupportInitialize)numericUpDown1).EndInit();
@@ -373,7 +373,7 @@
         #endregion
 
         private NumericUpDown numericUpDown1;
-        private Label label1;
+        private Label monitorCountLabel;
         private Label label2;
         private ListBox listBox1;
         private Label label3;

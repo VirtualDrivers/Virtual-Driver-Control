@@ -372,7 +372,7 @@ namespace VDD_Control
             // exitToolStripMenuItem
             // 
             exitToolStripMenuItem.Name = "exitToolStripMenuItem";
-            exitToolStripMenuItem.Size = new Size(92, 22);
+            exitToolStripMenuItem.Size = new Size(180, 22);
             exitToolStripMenuItem.Text = "Exit";
             exitToolStripMenuItem.Click += exitToolStripMenuItem_Click;
             // 
@@ -601,6 +601,8 @@ namespace VDD_Control
             mainConsole.ForeColor = Color.FromArgb(0, 192, 0);
             mainConsole.Location = new Point(13, 72);
             mainConsole.Name = "mainConsole";
+            mainConsole.ReadOnly = true;
+            mainConsole.ScrollBars = RichTextBoxScrollBars.ForcedVertical;
             mainConsole.Size = new Size(520, 382);
             mainConsole.TabIndex = 2;
             mainConsole.Text = "";
@@ -657,30 +659,30 @@ namespace VDD_Control
             // mttLabel
             // 
             mttLabel.AutoSize = true;
-            mttLabel.Font = new Font("Consolas", 8.25F, FontStyle.Regular, GraphicsUnit.Point);
+            mttLabel.Font = new Font("Consolas", 10F, FontStyle.Bold, GraphicsUnit.Point);
             mttLabel.Location = new Point(6, 22);
             mttLabel.Name = "mttLabel";
-            mttLabel.Size = new Size(85, 13);
+            mttLabel.Size = new Size(112, 17);
             mttLabel.TabIndex = 11;
             mttLabel.Text = "- MikeTheTech";
             // 
             // budLabel
             // 
             budLabel.AutoSize = true;
-            budLabel.Font = new Font("Consolas", 8.25F, FontStyle.Regular, GraphicsUnit.Point);
+            budLabel.Font = new Font("Consolas", 10F, FontStyle.Bold, GraphicsUnit.Point);
             budLabel.Location = new Point(6, 44);
             budLabel.Name = "budLabel";
-            budLabel.Size = new Size(37, 13);
+            budLabel.Size = new Size(48, 17);
             budLabel.TabIndex = 12;
             budLabel.Text = "- Bud";
             // 
             // jockeLabel
             // 
             jockeLabel.AutoSize = true;
-            jockeLabel.Font = new Font("Consolas", 8.25F, FontStyle.Regular, GraphicsUnit.Point);
+            jockeLabel.Font = new Font("Consolas", 10F, FontStyle.Bold, GraphicsUnit.Point);
             jockeLabel.Location = new Point(6, 65);
             jockeLabel.Name = "jockeLabel";
-            jockeLabel.Size = new Size(49, 13);
+            jockeLabel.Size = new Size(64, 17);
             jockeLabel.TabIndex = 13;
             jockeLabel.Text = "- Jocke";
             // 
@@ -689,7 +691,7 @@ namespace VDD_Control
             mttSupport.AutoSize = true;
             mttSupport.Font = new Font("Segoe UI", 7F, FontStyle.Regular, GraphicsUnit.Point);
             mttSupport.LinkColor = Color.White;
-            mttSupport.Location = new Point(158, 23);
+            mttSupport.Location = new Point(158, 27);
             mttSupport.Name = "mttSupport";
             mttSupport.Size = new Size(84, 12);
             mttSupport.TabIndex = 16;
@@ -713,7 +715,7 @@ namespace VDD_Control
             jockeSupport.AutoSize = true;
             jockeSupport.Font = new Font("Segoe UI", 7F, FontStyle.Regular, GraphicsUnit.Point);
             jockeSupport.LinkColor = Color.White;
-            jockeSupport.Location = new Point(158, 66);
+            jockeSupport.Location = new Point(158, 70);
             jockeSupport.Name = "jockeSupport";
             jockeSupport.Size = new Size(84, 12);
             jockeSupport.TabIndex = 23;
@@ -725,7 +727,7 @@ namespace VDD_Control
             budSupport.AutoSize = true;
             budSupport.Font = new Font("Segoe UI", 7F, FontStyle.Regular, GraphicsUnit.Point);
             budSupport.LinkColor = Color.White;
-            budSupport.Location = new Point(158, 45);
+            budSupport.Location = new Point(158, 49);
             budSupport.Name = "budSupport";
             budSupport.Size = new Size(84, 12);
             budSupport.TabIndex = 24;
@@ -736,7 +738,7 @@ namespace VDD_Control
             // 
             patreonGroupBox.Controls.Add(linkLabel6);
             patreonGroupBox.Controls.Add(patreonMembersListBox);
-            patreonGroupBox.Font = new Font("Consolas", 8.25F, FontStyle.Regular, GraphicsUnit.Point);
+            patreonGroupBox.Font = new Font("Consolas", 8.25F, FontStyle.Bold, GraphicsUnit.Point);
             patreonGroupBox.ForeColor = SystemColors.ButtonHighlight;
             patreonGroupBox.Location = new Point(555, 274);
             patreonGroupBox.Name = "patreonGroupBox";
@@ -766,7 +768,7 @@ namespace VDD_Control
             devsGroupBox.Controls.Add(jockeSupport);
             devsGroupBox.Controls.Add(budSupport);
             devsGroupBox.Controls.Add(mttSupport);
-            devsGroupBox.Font = new Font("Consolas", 8.25F, FontStyle.Regular, GraphicsUnit.Point);
+            devsGroupBox.Font = new Font("Consolas", 8.25F, FontStyle.Bold, GraphicsUnit.Point);
             devsGroupBox.ForeColor = SystemColors.ButtonHighlight;
             devsGroupBox.Location = new Point(555, 173);
             devsGroupBox.Name = "devsGroupBox";
@@ -781,7 +783,7 @@ namespace VDD_Control
             resourcesGroupBox.Controls.Add(vddLink);
             resourcesGroupBox.Controls.Add(discordLabel);
             resourcesGroupBox.Controls.Add(discordLink);
-            resourcesGroupBox.Font = new Font("Consolas", 8.25F, FontStyle.Regular, GraphicsUnit.Point);
+            resourcesGroupBox.Font = new Font("Consolas", 8.25F, FontStyle.Bold, GraphicsUnit.Point);
             resourcesGroupBox.ForeColor = SystemColors.ButtonHighlight;
             resourcesGroupBox.Location = new Point(555, 72);
             resourcesGroupBox.Name = "resourcesGroupBox";
@@ -806,7 +808,7 @@ namespace VDD_Control
             // taskGroupBox
             // 
             taskGroupBox.Controls.Add(taskProgressBar);
-            taskGroupBox.Font = new Font("Consolas", 8.25F, FontStyle.Regular, GraphicsUnit.Point);
+            taskGroupBox.Font = new Font("Consolas", 8.25F, FontStyle.Bold, GraphicsUnit.Point);
             taskGroupBox.ForeColor = SystemColors.ButtonHighlight;
             taskGroupBox.Location = new Point(555, 395);
             taskGroupBox.Name = "taskGroupBox";
@@ -845,6 +847,7 @@ namespace VDD_Control
             // 
             // mainTheme
             // 
+            mainTheme.AutoScroll = true;
             mainTheme.BackColor = Color.FromArgb(32, 41, 50);
             mainTheme.Controls.Add(restartAllButton);
             mainTheme.Controls.Add(enterButton);
