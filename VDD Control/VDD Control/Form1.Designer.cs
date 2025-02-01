@@ -33,8 +33,8 @@ namespace VDD_Control
         {
             components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
-            notifyIcon1 = new NotifyIcon(components);
-            contextMenuStrip1 = new ContextMenuStrip(components);
+            notificationIcon = new NotifyIcon(components);
+            trayMenu = new ContextMenuStrip(components);
             menuToolStripMenuItem1 = new ToolStripMenuItem();
             exitToolStripMenuItem1 = new ToolStripMenuItem();
             toolsToolStripMenuItem1 = new ToolStripMenuItem();
@@ -91,58 +91,58 @@ namespace VDD_Control
             disableDriverToolStripMenuItem1 = new ToolStripMenuItem();
             restartDriverToolStripMenuItem1 = new ToolStripMenuItem();
             aboutToolStripMenuItem = new ToolStripMenuItem();
-            menuStrip1 = new MenuStrip();
+            mainVisibleMenuStrip = new MenuStrip();
             toolsToolStripMenuItem = new ToolStripMenuItem();
             getGPUInformationToolStripMenuItem = new ToolStripMenuItem();
             getCPUInformationToolStripMenuItem = new ToolStripMenuItem();
             getDisplayInformationToolStripMenuItem2 = new ToolStripMenuItem();
             getAudioInformationToolStripMenuItem = new ToolStripMenuItem();
-            richTextBox1 = new RichTextBox();
-            label1 = new Label();
-            linkLabel1 = new LinkLabel();
-            label2 = new Label();
-            linkLabel2 = new LinkLabel();
-            label4 = new Label();
-            label5 = new Label();
-            label6 = new Label();
-            linkLabel3 = new LinkLabel();
+            mainConsole = new RichTextBox();
+            gitLabel = new Label();
+            discordLink = new LinkLabel();
+            discordLabel = new Label();
+            vddLink = new LinkLabel();
+            mttLabel = new Label();
+            budLabel = new Label();
+            jockeLabel = new Label();
+            mttSupport = new LinkLabel();
             linkLabel6 = new LinkLabel();
-            linkLabel4 = new LinkLabel();
-            linkLabel5 = new LinkLabel();
-            groupBox1 = new GroupBox();
-            listBox1 = new ListBox();
-            groupBox2 = new GroupBox();
-            groupBox3 = new GroupBox();
-            textBox1 = new TextBox();
-            groupBox4 = new GroupBox();
-            ribbonProgressBarCenter1 = new ReaLTaiizor.Controls.RibbonProgressBarCenter();
-            themeForm1 = new ReaLTaiizor.Forms.ThemeForm();
-            chatButtonRight2 = new ReaLTaiizor.Controls.ChatButtonRight();
-            chatButtonRight1 = new ReaLTaiizor.Controls.ChatButtonRight();
-            foreverMinimize1 = new ReaLTaiizor.Controls.ForeverMinimize();
-            foreverClose1 = new ReaLTaiizor.Controls.ForeverClose();
-            contextMenuStrip1.SuspendLayout();
-            menuStrip1.SuspendLayout();
-            groupBox1.SuspendLayout();
-            groupBox2.SuspendLayout();
-            groupBox3.SuspendLayout();
-            groupBox4.SuspendLayout();
-            themeForm1.SuspendLayout();
+            jockeSupport = new LinkLabel();
+            budSupport = new LinkLabel();
+            patreonGroupBox = new GroupBox();
+            patreonMembersListBox = new ListBox();
+            devsGroupBox = new GroupBox();
+            resourcesGroupBox = new GroupBox();
+            userInput = new TextBox();
+            taskGroupBox = new GroupBox();
+            taskProgressBar = new ReaLTaiizor.Controls.RibbonProgressBarCenter();
+            mainTheme = new ReaLTaiizor.Forms.ThemeForm();
+            restartAllButton = new ReaLTaiizor.Controls.ChatButtonRight();
+            enterButton = new ReaLTaiizor.Controls.ChatButtonRight();
+            minButton = new ReaLTaiizor.Controls.ForeverMinimize();
+            closeButton = new ReaLTaiizor.Controls.ForeverClose();
+            trayMenu.SuspendLayout();
+            mainVisibleMenuStrip.SuspendLayout();
+            patreonGroupBox.SuspendLayout();
+            devsGroupBox.SuspendLayout();
+            resourcesGroupBox.SuspendLayout();
+            taskGroupBox.SuspendLayout();
+            mainTheme.SuspendLayout();
             SuspendLayout();
             // 
-            // notifyIcon1
+            // notificationIcon
             // 
-            notifyIcon1.ContextMenuStrip = contextMenuStrip1;
-            notifyIcon1.Icon = (Icon)resources.GetObject("notifyIcon1.Icon");
-            notifyIcon1.Text = "notifyIcon1";
-            notifyIcon1.Visible = true;
+            notificationIcon.ContextMenuStrip = trayMenu;
+            notificationIcon.Icon = (Icon)resources.GetObject("notificationIcon.Icon");
+            notificationIcon.Text = "notifyIcon1";
+            notificationIcon.Visible = true;
             // 
-            // contextMenuStrip1
+            // trayMenu
             // 
-            contextMenuStrip1.Items.AddRange(new ToolStripItem[] { menuToolStripMenuItem1, toolsToolStripMenuItem1, virtualDisplayDriverToolStripMenuItem1, virtualAudioDriverToolStripMenuItem1, aboutToolStripMenuItem1, exitToolStripMenuItem2 });
-            contextMenuStrip1.Name = "contextMenuStrip1";
-            contextMenuStrip1.Size = new Size(184, 136);
-            contextMenuStrip1.Text = "Menu";
+            trayMenu.Items.AddRange(new ToolStripItem[] { menuToolStripMenuItem1, toolsToolStripMenuItem1, virtualDisplayDriverToolStripMenuItem1, virtualAudioDriverToolStripMenuItem1, aboutToolStripMenuItem1, exitToolStripMenuItem2 });
+            trayMenu.Name = "contextMenuStrip1";
+            trayMenu.Size = new Size(184, 136);
+            trayMenu.Text = "Menu";
             // 
             // menuToolStripMenuItem1
             // 
@@ -372,7 +372,7 @@ namespace VDD_Control
             // exitToolStripMenuItem
             // 
             exitToolStripMenuItem.Name = "exitToolStripMenuItem";
-            exitToolStripMenuItem.Size = new Size(180, 22);
+            exitToolStripMenuItem.Size = new Size(92, 22);
             exitToolStripMenuItem.Text = "Exit";
             exitToolStripMenuItem.Click += exitToolStripMenuItem_Click;
             // 
@@ -539,16 +539,16 @@ namespace VDD_Control
             aboutToolStripMenuItem.Text = "About";
             aboutToolStripMenuItem.Click += aboutToolStripMenuItem_Click;
             // 
-            // menuStrip1
+            // mainVisibleMenuStrip
             // 
-            menuStrip1.BackColor = Color.FromArgb(32, 34, 37);
-            menuStrip1.Dock = DockStyle.None;
-            menuStrip1.Items.AddRange(new ToolStripItem[] { menuToolStripMenuItem, toolsToolStripMenuItem, virtualDisplayDriverToolStripMenuItem, virtualAudioDriverToolStripMenuItem, aboutToolStripMenuItem });
-            menuStrip1.Location = new Point(255, 22);
-            menuStrip1.Name = "menuStrip1";
-            menuStrip1.Size = new Size(527, 24);
-            menuStrip1.TabIndex = 1;
-            menuStrip1.Text = "menuStrip1";
+            mainVisibleMenuStrip.BackColor = Color.FromArgb(32, 34, 37);
+            mainVisibleMenuStrip.Dock = DockStyle.None;
+            mainVisibleMenuStrip.Items.AddRange(new ToolStripItem[] { menuToolStripMenuItem, toolsToolStripMenuItem, virtualDisplayDriverToolStripMenuItem, virtualAudioDriverToolStripMenuItem, aboutToolStripMenuItem });
+            mainVisibleMenuStrip.Location = new Point(255, 22);
+            mainVisibleMenuStrip.Name = "mainVisibleMenuStrip";
+            mainVisibleMenuStrip.Size = new Size(407, 24);
+            mainVisibleMenuStrip.TabIndex = 1;
+            mainVisibleMenuStrip.Text = "mainVisibleToolstrip";
             // 
             // toolsToolStripMenuItem
             // 
@@ -594,107 +594,107 @@ namespace VDD_Control
             getAudioInformationToolStripMenuItem.Text = "Get Audio Information";
             getAudioInformationToolStripMenuItem.Click += getAudioInformationToolStripMenuItem_Click;
             // 
-            // richTextBox1
+            // mainConsole
             // 
-            richTextBox1.BackColor = Color.FromArgb(32, 32, 32);
-            richTextBox1.Font = new Font("Consolas", 9F, FontStyle.Regular, GraphicsUnit.Point);
-            richTextBox1.ForeColor = Color.FromArgb(0, 192, 0);
-            richTextBox1.Location = new Point(13, 72);
-            richTextBox1.Name = "richTextBox1";
-            richTextBox1.Size = new Size(520, 382);
-            richTextBox1.TabIndex = 2;
-            richTextBox1.Text = "";
-            richTextBox1.WordWrap = false;
-            richTextBox1.ZoomFactor = 0.85F;
-            richTextBox1.TextChanged += richTextBox1_TextChanged;
+            mainConsole.BackColor = Color.FromArgb(32, 32, 32);
+            mainConsole.Font = new Font("Consolas", 9F, FontStyle.Regular, GraphicsUnit.Point);
+            mainConsole.ForeColor = Color.FromArgb(0, 192, 0);
+            mainConsole.Location = new Point(13, 72);
+            mainConsole.Name = "mainConsole";
+            mainConsole.Size = new Size(520, 382);
+            mainConsole.TabIndex = 2;
+            mainConsole.Text = "";
+            mainConsole.WordWrap = false;
+            mainConsole.ZoomFactor = 0.85F;
+            mainConsole.TextChanged += richTextBox1_TextChanged;
             // 
-            // label1
+            // gitLabel
             // 
-            label1.AutoSize = true;
-            label1.Font = new Font("Consolas", 8.25F, FontStyle.Regular, GraphicsUnit.Point);
-            label1.Location = new Point(6, 19);
-            label1.Name = "label1";
-            label1.Size = new Size(43, 13);
-            label1.TabIndex = 4;
-            label1.Text = "GitHub";
+            gitLabel.AutoSize = true;
+            gitLabel.Font = new Font("Consolas", 8.25F, FontStyle.Regular, GraphicsUnit.Point);
+            gitLabel.Location = new Point(6, 19);
+            gitLabel.Name = "gitLabel";
+            gitLabel.Size = new Size(43, 13);
+            gitLabel.TabIndex = 4;
+            gitLabel.Text = "GitHub";
             // 
-            // linkLabel1
+            // discordLink
             // 
-            linkLabel1.AutoSize = true;
-            linkLabel1.Font = new Font("Consolas", 8.25F, FontStyle.Regular, GraphicsUnit.Point);
-            linkLabel1.LinkColor = Color.White;
-            linkLabel1.Location = new Point(6, 73);
-            linkLabel1.Name = "linkLabel1";
-            linkLabel1.Size = new Size(199, 13);
-            linkLabel1.TabIndex = 5;
-            linkLabel1.TabStop = true;
-            linkLabel1.Text = "https://discord.mikethetech.com/";
-            linkLabel1.LinkClicked += linkLabel1_LinkClicked;
+            discordLink.AutoSize = true;
+            discordLink.Font = new Font("Consolas", 8.25F, FontStyle.Regular, GraphicsUnit.Point);
+            discordLink.LinkColor = Color.White;
+            discordLink.Location = new Point(6, 73);
+            discordLink.Name = "discordLink";
+            discordLink.Size = new Size(199, 13);
+            discordLink.TabIndex = 5;
+            discordLink.TabStop = true;
+            discordLink.Text = "https://discord.mikethetech.com/";
+            discordLink.LinkClicked += linkLabel1_LinkClicked;
             // 
-            // label2
+            // discordLabel
             // 
-            label2.AutoSize = true;
-            label2.Font = new Font("Consolas", 8.25F, FontStyle.Regular, GraphicsUnit.Point);
-            label2.Location = new Point(6, 58);
-            label2.Name = "label2";
-            label2.Size = new Size(49, 13);
-            label2.TabIndex = 6;
-            label2.Text = "Discord";
+            discordLabel.AutoSize = true;
+            discordLabel.Font = new Font("Consolas", 8.25F, FontStyle.Regular, GraphicsUnit.Point);
+            discordLabel.Location = new Point(6, 58);
+            discordLabel.Name = "discordLabel";
+            discordLabel.Size = new Size(49, 13);
+            discordLabel.TabIndex = 6;
+            discordLabel.Text = "Discord";
             // 
-            // linkLabel2
+            // vddLink
             // 
-            linkLabel2.AutoSize = true;
-            linkLabel2.Font = new Font("Consolas", 8.25F, FontStyle.Regular, GraphicsUnit.Point);
-            linkLabel2.LinkColor = Color.White;
-            linkLabel2.Location = new Point(6, 34);
-            linkLabel2.Name = "linkLabel2";
-            linkLabel2.Size = new Size(211, 13);
-            linkLabel2.TabIndex = 7;
-            linkLabel2.TabStop = true;
-            linkLabel2.Text = "https://github.com/VirtualDisplay/";
-            linkLabel2.LinkClicked += linkLabel2_LinkClicked;
+            vddLink.AutoSize = true;
+            vddLink.Font = new Font("Consolas", 8.25F, FontStyle.Regular, GraphicsUnit.Point);
+            vddLink.LinkColor = Color.White;
+            vddLink.Location = new Point(6, 34);
+            vddLink.Name = "vddLink";
+            vddLink.Size = new Size(211, 13);
+            vddLink.TabIndex = 7;
+            vddLink.TabStop = true;
+            vddLink.Text = "https://github.com/VirtualDisplay/";
+            vddLink.LinkClicked += linkLabel2_LinkClicked;
             // 
-            // label4
+            // mttLabel
             // 
-            label4.AutoSize = true;
-            label4.Font = new Font("Consolas", 8.25F, FontStyle.Regular, GraphicsUnit.Point);
-            label4.Location = new Point(6, 22);
-            label4.Name = "label4";
-            label4.Size = new Size(85, 13);
-            label4.TabIndex = 11;
-            label4.Text = "- MikeTheTech";
+            mttLabel.AutoSize = true;
+            mttLabel.Font = new Font("Consolas", 8.25F, FontStyle.Regular, GraphicsUnit.Point);
+            mttLabel.Location = new Point(6, 22);
+            mttLabel.Name = "mttLabel";
+            mttLabel.Size = new Size(85, 13);
+            mttLabel.TabIndex = 11;
+            mttLabel.Text = "- MikeTheTech";
             // 
-            // label5
+            // budLabel
             // 
-            label5.AutoSize = true;
-            label5.Font = new Font("Consolas", 8.25F, FontStyle.Regular, GraphicsUnit.Point);
-            label5.Location = new Point(6, 44);
-            label5.Name = "label5";
-            label5.Size = new Size(37, 13);
-            label5.TabIndex = 12;
-            label5.Text = "- Bud";
+            budLabel.AutoSize = true;
+            budLabel.Font = new Font("Consolas", 8.25F, FontStyle.Regular, GraphicsUnit.Point);
+            budLabel.Location = new Point(6, 44);
+            budLabel.Name = "budLabel";
+            budLabel.Size = new Size(37, 13);
+            budLabel.TabIndex = 12;
+            budLabel.Text = "- Bud";
             // 
-            // label6
+            // jockeLabel
             // 
-            label6.AutoSize = true;
-            label6.Font = new Font("Consolas", 8.25F, FontStyle.Regular, GraphicsUnit.Point);
-            label6.Location = new Point(6, 65);
-            label6.Name = "label6";
-            label6.Size = new Size(49, 13);
-            label6.TabIndex = 13;
-            label6.Text = "- Jocke";
+            jockeLabel.AutoSize = true;
+            jockeLabel.Font = new Font("Consolas", 8.25F, FontStyle.Regular, GraphicsUnit.Point);
+            jockeLabel.Location = new Point(6, 65);
+            jockeLabel.Name = "jockeLabel";
+            jockeLabel.Size = new Size(49, 13);
+            jockeLabel.TabIndex = 13;
+            jockeLabel.Text = "- Jocke";
             // 
-            // linkLabel3
+            // mttSupport
             // 
-            linkLabel3.AutoSize = true;
-            linkLabel3.Font = new Font("Segoe UI", 7F, FontStyle.Regular, GraphicsUnit.Point);
-            linkLabel3.LinkColor = Color.White;
-            linkLabel3.Location = new Point(158, 23);
-            linkLabel3.Name = "linkLabel3";
-            linkLabel3.Size = new Size(84, 12);
-            linkLabel3.TabIndex = 16;
-            linkLabel3.TabStop = true;
-            linkLabel3.Text = "(Support this Dev)";
+            mttSupport.AutoSize = true;
+            mttSupport.Font = new Font("Segoe UI", 7F, FontStyle.Regular, GraphicsUnit.Point);
+            mttSupport.LinkColor = Color.White;
+            mttSupport.Location = new Point(158, 23);
+            mttSupport.Name = "mttSupport";
+            mttSupport.Size = new Size(84, 12);
+            mttSupport.TabIndex = 16;
+            mttSupport.TabStop = true;
+            mttSupport.Text = "(Support this Dev)";
             // 
             // linkLabel6
             // 
@@ -708,242 +708,242 @@ namespace VDD_Control
             linkLabel6.TabStop = true;
             linkLabel6.Text = "Patreon";
             // 
-            // linkLabel4
+            // jockeSupport
             // 
-            linkLabel4.AutoSize = true;
-            linkLabel4.Font = new Font("Segoe UI", 7F, FontStyle.Regular, GraphicsUnit.Point);
-            linkLabel4.LinkColor = Color.White;
-            linkLabel4.Location = new Point(158, 66);
-            linkLabel4.Name = "linkLabel4";
-            linkLabel4.Size = new Size(84, 12);
-            linkLabel4.TabIndex = 23;
-            linkLabel4.TabStop = true;
-            linkLabel4.Text = "(Support this Dev)";
+            jockeSupport.AutoSize = true;
+            jockeSupport.Font = new Font("Segoe UI", 7F, FontStyle.Regular, GraphicsUnit.Point);
+            jockeSupport.LinkColor = Color.White;
+            jockeSupport.Location = new Point(158, 66);
+            jockeSupport.Name = "jockeSupport";
+            jockeSupport.Size = new Size(84, 12);
+            jockeSupport.TabIndex = 23;
+            jockeSupport.TabStop = true;
+            jockeSupport.Text = "(Support this Dev)";
             // 
-            // linkLabel5
+            // budSupport
             // 
-            linkLabel5.AutoSize = true;
-            linkLabel5.Font = new Font("Segoe UI", 7F, FontStyle.Regular, GraphicsUnit.Point);
-            linkLabel5.LinkColor = Color.White;
-            linkLabel5.Location = new Point(158, 45);
-            linkLabel5.Name = "linkLabel5";
-            linkLabel5.Size = new Size(84, 12);
-            linkLabel5.TabIndex = 24;
-            linkLabel5.TabStop = true;
-            linkLabel5.Text = "(Support this Dev)";
+            budSupport.AutoSize = true;
+            budSupport.Font = new Font("Segoe UI", 7F, FontStyle.Regular, GraphicsUnit.Point);
+            budSupport.LinkColor = Color.White;
+            budSupport.Location = new Point(158, 45);
+            budSupport.Name = "budSupport";
+            budSupport.Size = new Size(84, 12);
+            budSupport.TabIndex = 24;
+            budSupport.TabStop = true;
+            budSupport.Text = "(Support this Dev)";
             // 
-            // groupBox1
+            // patreonGroupBox
             // 
-            groupBox1.Controls.Add(linkLabel6);
-            groupBox1.Controls.Add(listBox1);
-            groupBox1.Font = new Font("Consolas", 8.25F, FontStyle.Regular, GraphicsUnit.Point);
-            groupBox1.ForeColor = SystemColors.ButtonHighlight;
-            groupBox1.Location = new Point(555, 274);
-            groupBox1.Name = "groupBox1";
-            groupBox1.Size = new Size(248, 115);
-            groupBox1.TabIndex = 25;
-            groupBox1.TabStop = false;
-            groupBox1.Text = "Patreon Supporters";
+            patreonGroupBox.Controls.Add(linkLabel6);
+            patreonGroupBox.Controls.Add(patreonMembersListBox);
+            patreonGroupBox.Font = new Font("Consolas", 8.25F, FontStyle.Regular, GraphicsUnit.Point);
+            patreonGroupBox.ForeColor = SystemColors.ButtonHighlight;
+            patreonGroupBox.Location = new Point(555, 274);
+            patreonGroupBox.Name = "patreonGroupBox";
+            patreonGroupBox.Size = new Size(248, 115);
+            patreonGroupBox.TabIndex = 25;
+            patreonGroupBox.TabStop = false;
+            patreonGroupBox.Text = "Patreon Supporters";
             // 
-            // listBox1
+            // patreonMembersListBox
             // 
-            listBox1.BackColor = Color.FromArgb(32, 41, 50);
-            listBox1.BorderStyle = BorderStyle.None;
-            listBox1.Font = new Font("Consolas", 8.25F, FontStyle.Regular, GraphicsUnit.Point);
-            listBox1.ForeColor = SystemColors.Window;
-            listBox1.FormattingEnabled = true;
-            listBox1.Items.AddRange(new object[] { "- Gabriel Posso" });
-            listBox1.Location = new Point(6, 22);
-            listBox1.Name = "listBox1";
-            listBox1.Size = new Size(236, 78);
-            listBox1.TabIndex = 23;
+            patreonMembersListBox.BackColor = Color.FromArgb(32, 41, 50);
+            patreonMembersListBox.BorderStyle = BorderStyle.None;
+            patreonMembersListBox.Font = new Font("Consolas", 8.25F, FontStyle.Regular, GraphicsUnit.Point);
+            patreonMembersListBox.ForeColor = SystemColors.Window;
+            patreonMembersListBox.FormattingEnabled = true;
+            patreonMembersListBox.Items.AddRange(new object[] { "- Gabriel Posso" });
+            patreonMembersListBox.Location = new Point(6, 22);
+            patreonMembersListBox.Name = "patreonMembersListBox";
+            patreonMembersListBox.Size = new Size(236, 78);
+            patreonMembersListBox.TabIndex = 23;
             // 
-            // groupBox2
+            // devsGroupBox
             // 
-            groupBox2.Controls.Add(label4);
-            groupBox2.Controls.Add(label5);
-            groupBox2.Controls.Add(label6);
-            groupBox2.Controls.Add(linkLabel4);
-            groupBox2.Controls.Add(linkLabel5);
-            groupBox2.Controls.Add(linkLabel3);
-            groupBox2.Font = new Font("Consolas", 8.25F, FontStyle.Regular, GraphicsUnit.Point);
-            groupBox2.ForeColor = SystemColors.ButtonHighlight;
-            groupBox2.Location = new Point(555, 173);
-            groupBox2.Name = "groupBox2";
-            groupBox2.Size = new Size(248, 95);
-            groupBox2.TabIndex = 26;
-            groupBox2.TabStop = false;
-            groupBox2.Text = "Developers";
+            devsGroupBox.Controls.Add(mttLabel);
+            devsGroupBox.Controls.Add(budLabel);
+            devsGroupBox.Controls.Add(jockeLabel);
+            devsGroupBox.Controls.Add(jockeSupport);
+            devsGroupBox.Controls.Add(budSupport);
+            devsGroupBox.Controls.Add(mttSupport);
+            devsGroupBox.Font = new Font("Consolas", 8.25F, FontStyle.Regular, GraphicsUnit.Point);
+            devsGroupBox.ForeColor = SystemColors.ButtonHighlight;
+            devsGroupBox.Location = new Point(555, 173);
+            devsGroupBox.Name = "devsGroupBox";
+            devsGroupBox.Size = new Size(248, 95);
+            devsGroupBox.TabIndex = 26;
+            devsGroupBox.TabStop = false;
+            devsGroupBox.Text = "Developers";
             // 
-            // groupBox3
+            // resourcesGroupBox
             // 
-            groupBox3.Controls.Add(label1);
-            groupBox3.Controls.Add(linkLabel2);
-            groupBox3.Controls.Add(label2);
-            groupBox3.Controls.Add(linkLabel1);
-            groupBox3.Font = new Font("Consolas", 8.25F, FontStyle.Regular, GraphicsUnit.Point);
-            groupBox3.ForeColor = SystemColors.ButtonHighlight;
-            groupBox3.Location = new Point(555, 72);
-            groupBox3.Name = "groupBox3";
-            groupBox3.Size = new Size(248, 95);
-            groupBox3.TabIndex = 27;
-            groupBox3.TabStop = false;
-            groupBox3.Text = "Resources";
+            resourcesGroupBox.Controls.Add(gitLabel);
+            resourcesGroupBox.Controls.Add(vddLink);
+            resourcesGroupBox.Controls.Add(discordLabel);
+            resourcesGroupBox.Controls.Add(discordLink);
+            resourcesGroupBox.Font = new Font("Consolas", 8.25F, FontStyle.Regular, GraphicsUnit.Point);
+            resourcesGroupBox.ForeColor = SystemColors.ButtonHighlight;
+            resourcesGroupBox.Location = new Point(555, 72);
+            resourcesGroupBox.Name = "resourcesGroupBox";
+            resourcesGroupBox.Size = new Size(248, 95);
+            resourcesGroupBox.TabIndex = 27;
+            resourcesGroupBox.TabStop = false;
+            resourcesGroupBox.Text = "Resources";
             // 
-            // textBox1
+            // userInput
             // 
-            textBox1.BackColor = Color.FromArgb(32, 32, 32);
-            textBox1.BorderStyle = BorderStyle.FixedSingle;
-            textBox1.ForeColor = Color.White;
-            textBox1.Location = new Point(13, 461);
-            textBox1.Name = "textBox1";
-            textBox1.Size = new Size(453, 21);
-            textBox1.TabIndex = 29;
-            textBox1.Text = "Command Console";
-            textBox1.WordWrap = false;
-            textBox1.TextChanged += textBox1_TextChanged;
+            userInput.BackColor = Color.FromArgb(32, 32, 32);
+            userInput.BorderStyle = BorderStyle.FixedSingle;
+            userInput.ForeColor = Color.White;
+            userInput.Location = new Point(13, 461);
+            userInput.Name = "userInput";
+            userInput.Size = new Size(453, 21);
+            userInput.TabIndex = 29;
+            userInput.Text = "Command Console";
+            userInput.WordWrap = false;
+            userInput.TextChanged += textBox1_TextChanged;
             // 
-            // groupBox4
+            // taskGroupBox
             // 
-            groupBox4.Controls.Add(ribbonProgressBarCenter1);
-            groupBox4.Font = new Font("Consolas", 8.25F, FontStyle.Regular, GraphicsUnit.Point);
-            groupBox4.ForeColor = SystemColors.ButtonHighlight;
-            groupBox4.Location = new Point(555, 395);
-            groupBox4.Name = "groupBox4";
-            groupBox4.Size = new Size(248, 59);
-            groupBox4.TabIndex = 32;
-            groupBox4.TabStop = false;
-            groupBox4.Text = "Task Progress";
+            taskGroupBox.Controls.Add(taskProgressBar);
+            taskGroupBox.Font = new Font("Consolas", 8.25F, FontStyle.Regular, GraphicsUnit.Point);
+            taskGroupBox.ForeColor = SystemColors.ButtonHighlight;
+            taskGroupBox.Location = new Point(555, 395);
+            taskGroupBox.Name = "taskGroupBox";
+            taskGroupBox.Size = new Size(248, 59);
+            taskGroupBox.TabIndex = 32;
+            taskGroupBox.TabStop = false;
+            taskGroupBox.Text = "Task Progress";
             // 
-            // ribbonProgressBarCenter1
+            // taskProgressBar
             // 
-            ribbonProgressBarCenter1.BackColor = Color.Transparent;
-            ribbonProgressBarCenter1.BaseColor = Color.FromArgb(75, 255, 255, 255);
-            ribbonProgressBarCenter1.BorderColor = Color.FromArgb(117, 120, 117);
-            ribbonProgressBarCenter1.ColorA = Color.FromArgb(203, 201, 205);
-            ribbonProgressBarCenter1.ColorB = Color.FromArgb(188, 186, 190);
-            ribbonProgressBarCenter1.EdgeColor = Color.FromArgb(125, 97, 94, 90);
-            ribbonProgressBarCenter1.ForeColor = Color.Black;
-            ribbonProgressBarCenter1.HatchType = System.Drawing.Drawing2D.HatchStyle.DarkUpwardDiagonal;
-            ribbonProgressBarCenter1.Location = new Point(6, 19);
-            ribbonProgressBarCenter1.Maximum = 100;
-            ribbonProgressBarCenter1.Name = "ribbonProgressBarCenter1";
-            ribbonProgressBarCenter1.PercentageText = "%";
-            ribbonProgressBarCenter1.ProgressBorderColorA = Color.FromArgb(150, 97, 94, 90);
-            ribbonProgressBarCenter1.ProgressBorderColorB = Color.FromArgb(0, 120, 0);
-            ribbonProgressBarCenter1.ProgressColorA = Color.FromArgb(0, 120, 0);
-            ribbonProgressBarCenter1.ProgressColorB = Color.FromArgb(0, 120, 0);
-            ribbonProgressBarCenter1.ProgressLineColorA = Color.FromArgb(40, 255, 255, 255);
-            ribbonProgressBarCenter1.ProgressLineColorB = Color.FromArgb(20, 255, 255, 255);
-            ribbonProgressBarCenter1.ShowEdge = false;
-            ribbonProgressBarCenter1.ShowPercentage = false;
-            ribbonProgressBarCenter1.Size = new Size(236, 34);
-            ribbonProgressBarCenter1.SmoothingType = System.Drawing.Drawing2D.SmoothingMode.HighQuality;
-            ribbonProgressBarCenter1.TabIndex = 0;
-            ribbonProgressBarCenter1.Text = "ribbonProgressBarCenter1";
-            ribbonProgressBarCenter1.Value = 37;
+            taskProgressBar.BackColor = Color.Transparent;
+            taskProgressBar.BaseColor = Color.FromArgb(75, 255, 255, 255);
+            taskProgressBar.BorderColor = Color.FromArgb(117, 120, 117);
+            taskProgressBar.ColorA = Color.FromArgb(203, 201, 205);
+            taskProgressBar.ColorB = Color.FromArgb(188, 186, 190);
+            taskProgressBar.EdgeColor = Color.FromArgb(125, 97, 94, 90);
+            taskProgressBar.ForeColor = Color.Black;
+            taskProgressBar.HatchType = System.Drawing.Drawing2D.HatchStyle.DarkUpwardDiagonal;
+            taskProgressBar.Location = new Point(6, 19);
+            taskProgressBar.Maximum = 100;
+            taskProgressBar.Name = "taskProgressBar";
+            taskProgressBar.PercentageText = "%";
+            taskProgressBar.ProgressBorderColorA = Color.FromArgb(150, 97, 94, 90);
+            taskProgressBar.ProgressBorderColorB = Color.FromArgb(0, 120, 0);
+            taskProgressBar.ProgressColorA = Color.FromArgb(0, 120, 0);
+            taskProgressBar.ProgressColorB = Color.FromArgb(0, 120, 0);
+            taskProgressBar.ProgressLineColorA = Color.FromArgb(40, 255, 255, 255);
+            taskProgressBar.ProgressLineColorB = Color.FromArgb(20, 255, 255, 255);
+            taskProgressBar.ShowEdge = false;
+            taskProgressBar.ShowPercentage = false;
+            taskProgressBar.Size = new Size(236, 34);
+            taskProgressBar.SmoothingType = System.Drawing.Drawing2D.SmoothingMode.HighQuality;
+            taskProgressBar.TabIndex = 0;
+            taskProgressBar.Text = "ribbonProgressBarCenter1";
+            taskProgressBar.Value = 37;
             // 
-            // themeForm1
+            // mainTheme
             // 
-            themeForm1.BackColor = Color.FromArgb(32, 41, 50);
-            themeForm1.Controls.Add(chatButtonRight2);
-            themeForm1.Controls.Add(chatButtonRight1);
-            themeForm1.Controls.Add(foreverMinimize1);
-            themeForm1.Controls.Add(foreverClose1);
-            themeForm1.Controls.Add(richTextBox1);
-            themeForm1.Controls.Add(groupBox3);
-            themeForm1.Controls.Add(groupBox4);
-            themeForm1.Controls.Add(groupBox2);
-            themeForm1.Controls.Add(menuStrip1);
-            themeForm1.Controls.Add(groupBox1);
-            themeForm1.Controls.Add(textBox1);
-            themeForm1.Dock = DockStyle.Fill;
-            themeForm1.Font = new Font("Arial Rounded MT Bold", 9F, FontStyle.Regular, GraphicsUnit.Point);
-            themeForm1.ForeColor = Color.FromArgb(32, 41, 50);
-            themeForm1.Image = (Image)resources.GetObject("themeForm1.Image");
-            themeForm1.Location = new Point(0, 0);
-            themeForm1.Name = "themeForm1";
-            themeForm1.Padding = new Padding(10, 70, 10, 9);
-            themeForm1.RoundCorners = true;
-            themeForm1.Sizable = true;
-            themeForm1.Size = new Size(816, 489);
-            themeForm1.SmartBounds = true;
-            themeForm1.StartPosition = FormStartPosition.WindowsDefaultLocation;
-            themeForm1.TabIndex = 33;
-            themeForm1.Text = "Virtual Driver Control";
-            themeForm1.Click += themeForm1_Click;
+            mainTheme.BackColor = Color.FromArgb(32, 41, 50);
+            mainTheme.Controls.Add(restartAllButton);
+            mainTheme.Controls.Add(enterButton);
+            mainTheme.Controls.Add(minButton);
+            mainTheme.Controls.Add(closeButton);
+            mainTheme.Controls.Add(mainConsole);
+            mainTheme.Controls.Add(resourcesGroupBox);
+            mainTheme.Controls.Add(taskGroupBox);
+            mainTheme.Controls.Add(devsGroupBox);
+            mainTheme.Controls.Add(mainVisibleMenuStrip);
+            mainTheme.Controls.Add(patreonGroupBox);
+            mainTheme.Controls.Add(userInput);
+            mainTheme.Dock = DockStyle.Fill;
+            mainTheme.Font = new Font("Arial Rounded MT Bold", 9F, FontStyle.Regular, GraphicsUnit.Point);
+            mainTheme.ForeColor = Color.FromArgb(32, 41, 50);
+            mainTheme.Image = (Image)resources.GetObject("mainTheme.Image");
+            mainTheme.Location = new Point(0, 0);
+            mainTheme.Name = "mainTheme";
+            mainTheme.Padding = new Padding(10, 70, 10, 9);
+            mainTheme.RoundCorners = true;
+            mainTheme.Sizable = true;
+            mainTheme.Size = new Size(816, 489);
+            mainTheme.SmartBounds = true;
+            mainTheme.StartPosition = FormStartPosition.WindowsDefaultLocation;
+            mainTheme.TabIndex = 33;
+            mainTheme.Text = "Virtual Driver Control";
+            mainTheme.Click += themeForm1_Click;
             // 
-            // chatButtonRight2
+            // restartAllButton
             // 
-            chatButtonRight2.BackColor = Color.Transparent;
-            chatButtonRight2.Font = new Font("Consolas", 9.75F, FontStyle.Bold, GraphicsUnit.Point);
-            chatButtonRight2.ForeColor = Color.LightGray;
-            chatButtonRight2.Image = null;
-            chatButtonRight2.ImageAlign = ContentAlignment.MiddleLeft;
-            chatButtonRight2.InactiveColorA = Color.FromArgb(0, 120, 0);
-            chatButtonRight2.InactiveColorB = Color.FromArgb(0, 120, 0);
-            chatButtonRight2.Location = new Point(650, 460);
-            chatButtonRight2.Name = "chatButtonRight2";
-            chatButtonRight2.PressedColorA = Color.FromArgb(0, 80, 0);
-            chatButtonRight2.PressedColorB = Color.FromArgb(0, 80, 0);
-            chatButtonRight2.PressedContourColorA = Color.FromArgb(0, 80, 0);
-            chatButtonRight2.PressedContourColorB = Color.FromArgb(0, 80, 0);
-            chatButtonRight2.Size = new Size(154, 22);
-            chatButtonRight2.TabIndex = 35;
-            chatButtonRight2.Text = "Restart All Drivers";
-            chatButtonRight2.TextAlignment = StringAlignment.Center;
+            restartAllButton.BackColor = Color.Transparent;
+            restartAllButton.Font = new Font("Consolas", 9.75F, FontStyle.Bold, GraphicsUnit.Point);
+            restartAllButton.ForeColor = Color.LightGray;
+            restartAllButton.Image = null;
+            restartAllButton.ImageAlign = ContentAlignment.MiddleLeft;
+            restartAllButton.InactiveColorA = Color.FromArgb(0, 120, 0);
+            restartAllButton.InactiveColorB = Color.FromArgb(0, 120, 0);
+            restartAllButton.Location = new Point(650, 460);
+            restartAllButton.Name = "restartAllButton";
+            restartAllButton.PressedColorA = Color.FromArgb(0, 80, 0);
+            restartAllButton.PressedColorB = Color.FromArgb(0, 80, 0);
+            restartAllButton.PressedContourColorA = Color.FromArgb(0, 80, 0);
+            restartAllButton.PressedContourColorB = Color.FromArgb(0, 80, 0);
+            restartAllButton.Size = new Size(154, 22);
+            restartAllButton.TabIndex = 35;
+            restartAllButton.Text = "Restart All Drivers";
+            restartAllButton.TextAlignment = StringAlignment.Center;
             // 
-            // chatButtonRight1
+            // enterButton
             // 
-            chatButtonRight1.BackColor = Color.Transparent;
-            chatButtonRight1.Font = new Font("Consolas", 9.75F, FontStyle.Bold, GraphicsUnit.Point);
-            chatButtonRight1.ForeColor = Color.LightGray;
-            chatButtonRight1.Image = null;
-            chatButtonRight1.ImageAlign = ContentAlignment.MiddleLeft;
-            chatButtonRight1.InactiveColorA = Color.FromArgb(0, 120, 0);
-            chatButtonRight1.InactiveColorB = Color.FromArgb(0, 120, 0);
-            chatButtonRight1.Location = new Point(472, 460);
-            chatButtonRight1.Name = "chatButtonRight1";
-            chatButtonRight1.PressedColorA = Color.FromArgb(0, 80, 0);
-            chatButtonRight1.PressedColorB = Color.FromArgb(0, 80, 0);
-            chatButtonRight1.PressedContourColorA = Color.FromArgb(0, 80, 0);
-            chatButtonRight1.PressedContourColorB = Color.FromArgb(0, 80, 0);
-            chatButtonRight1.Size = new Size(61, 22);
-            chatButtonRight1.TabIndex = 34;
-            chatButtonRight1.Text = "Enter";
-            chatButtonRight1.TextAlignment = StringAlignment.Center;
+            enterButton.BackColor = Color.Transparent;
+            enterButton.Font = new Font("Consolas", 9.75F, FontStyle.Bold, GraphicsUnit.Point);
+            enterButton.ForeColor = Color.LightGray;
+            enterButton.Image = null;
+            enterButton.ImageAlign = ContentAlignment.MiddleLeft;
+            enterButton.InactiveColorA = Color.FromArgb(0, 120, 0);
+            enterButton.InactiveColorB = Color.FromArgb(0, 120, 0);
+            enterButton.Location = new Point(472, 460);
+            enterButton.Name = "enterButton";
+            enterButton.PressedColorA = Color.FromArgb(0, 80, 0);
+            enterButton.PressedColorB = Color.FromArgb(0, 80, 0);
+            enterButton.PressedContourColorA = Color.FromArgb(0, 80, 0);
+            enterButton.PressedContourColorB = Color.FromArgb(0, 80, 0);
+            enterButton.Size = new Size(61, 22);
+            enterButton.TabIndex = 34;
+            enterButton.Text = "Enter";
+            enterButton.TextAlignment = StringAlignment.Center;
             // 
-            // foreverMinimize1
+            // minButton
             // 
-            foreverMinimize1.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            foreverMinimize1.BackColor = Color.White;
-            foreverMinimize1.BaseColor = Color.FromArgb(45, 47, 49);
-            foreverMinimize1.DefaultLocation = true;
-            foreverMinimize1.DownColor = Color.FromArgb(30, 0, 0, 0);
-            foreverMinimize1.Font = new Font("Marlett", 12F, FontStyle.Regular, GraphicsUnit.Point);
-            foreverMinimize1.Location = new Point(738, 16);
-            foreverMinimize1.Name = "foreverMinimize1";
-            foreverMinimize1.OverColor = Color.FromArgb(30, 255, 255, 255);
-            foreverMinimize1.Size = new Size(18, 18);
-            foreverMinimize1.TabIndex = 33;
-            foreverMinimize1.Text = "foreverMinimize1";
-            foreverMinimize1.TextColor = Color.FromArgb(243, 243, 243);
+            minButton.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            minButton.BackColor = Color.White;
+            minButton.BaseColor = Color.FromArgb(45, 47, 49);
+            minButton.DefaultLocation = true;
+            minButton.DownColor = Color.FromArgb(30, 0, 0, 0);
+            minButton.Font = new Font("Marlett", 12F, FontStyle.Regular, GraphicsUnit.Point);
+            minButton.Location = new Point(738, 16);
+            minButton.Name = "minButton";
+            minButton.OverColor = Color.FromArgb(30, 255, 255, 255);
+            minButton.Size = new Size(18, 18);
+            minButton.TabIndex = 33;
+            minButton.Text = "foreverMinimize1";
+            minButton.TextColor = Color.FromArgb(243, 243, 243);
             // 
-            // foreverClose1
+            // closeButton
             // 
-            foreverClose1.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            foreverClose1.BackColor = Color.White;
-            foreverClose1.BaseColor = Color.FromArgb(45, 47, 49);
-            foreverClose1.DefaultLocation = true;
-            foreverClose1.DownColor = Color.FromArgb(30, 0, 0, 0);
-            foreverClose1.Font = new Font("Marlett", 10F, FontStyle.Regular, GraphicsUnit.Point);
-            foreverClose1.Location = new Point(786, 16);
-            foreverClose1.Name = "foreverClose1";
-            foreverClose1.OverColor = Color.FromArgb(30, 255, 255, 255);
-            foreverClose1.Size = new Size(18, 18);
-            foreverClose1.TabIndex = 3;
-            foreverClose1.Text = "foreverClose1";
-            foreverClose1.TextColor = Color.FromArgb(243, 243, 243);
+            closeButton.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            closeButton.BackColor = Color.White;
+            closeButton.BaseColor = Color.FromArgb(45, 47, 49);
+            closeButton.DefaultLocation = true;
+            closeButton.DownColor = Color.FromArgb(30, 0, 0, 0);
+            closeButton.Font = new Font("Marlett", 10F, FontStyle.Regular, GraphicsUnit.Point);
+            closeButton.Location = new Point(786, 16);
+            closeButton.Name = "closeButton";
+            closeButton.OverColor = Color.FromArgb(30, 255, 255, 255);
+            closeButton.Size = new Size(18, 18);
+            closeButton.TabIndex = 3;
+            closeButton.Text = "foreverClose1";
+            closeButton.TextColor = Color.FromArgb(243, 243, 243);
             // 
             // Form1
             // 
@@ -952,12 +952,12 @@ namespace VDD_Control
             AutoScaleMode = AutoScaleMode.Font;
             AutoSizeMode = AutoSizeMode.GrowAndShrink;
             ClientSize = new Size(816, 489);
-            ContextMenuStrip = contextMenuStrip1;
-            Controls.Add(themeForm1);
+            ContextMenuStrip = trayMenu;
+            Controls.Add(mainTheme);
             ForeColor = SystemColors.ControlLightLight;
             FormBorderStyle = FormBorderStyle.None;
             Icon = (Icon)resources.GetObject("$this.Icon");
-            MainMenuStrip = menuStrip1;
+            MainMenuStrip = mainVisibleMenuStrip;
             MaximizeBox = false;
             MaximumSize = new Size(816, 489);
             MinimumSize = new Size(261, 61);
@@ -966,32 +966,32 @@ namespace VDD_Control
             Text = "Virtual Driver Control";
             TransparencyKey = Color.Fuchsia;
             Load += Form1_Load;
-            contextMenuStrip1.ResumeLayout(false);
-            menuStrip1.ResumeLayout(false);
-            menuStrip1.PerformLayout();
-            groupBox1.ResumeLayout(false);
-            groupBox1.PerformLayout();
-            groupBox2.ResumeLayout(false);
-            groupBox2.PerformLayout();
-            groupBox3.ResumeLayout(false);
-            groupBox3.PerformLayout();
-            groupBox4.ResumeLayout(false);
-            themeForm1.ResumeLayout(false);
-            themeForm1.PerformLayout();
+            trayMenu.ResumeLayout(false);
+            mainVisibleMenuStrip.ResumeLayout(false);
+            mainVisibleMenuStrip.PerformLayout();
+            patreonGroupBox.ResumeLayout(false);
+            patreonGroupBox.PerformLayout();
+            devsGroupBox.ResumeLayout(false);
+            devsGroupBox.PerformLayout();
+            resourcesGroupBox.ResumeLayout(false);
+            resourcesGroupBox.PerformLayout();
+            taskGroupBox.ResumeLayout(false);
+            mainTheme.ResumeLayout(false);
+            mainTheme.PerformLayout();
             ResumeLayout(false);
         }
 
 
 
         #endregion
-        private NotifyIcon notifyIcon1;
+        private NotifyIcon notificationIcon;
         private ToolStripMenuItem menuToolStripMenuItem;
         private ToolStripMenuItem exitToolStripMenuItem;
         private ToolStripMenuItem virtualDisplayDriverToolStripMenuItem;
         private ToolStripMenuItem virtualAudioDriverToolStripMenuItem;
         private ToolStripMenuItem aboutToolStripMenuItem;
-        private MenuStrip menuStrip1;
-        private ContextMenuStrip contextMenuStrip1;
+        private MenuStrip mainVisibleMenuStrip;
+        private ContextMenuStrip trayMenu;
         private ToolStripMenuItem menuToolStripMenuItem1;
         private ToolStripMenuItem virtualDisplayDriverToolStripMenuItem1;
         private ToolStripMenuItem virtualAudioDriverToolStripMenuItem1;
@@ -1030,16 +1030,16 @@ namespace VDD_Control
         private ToolStripMenuItem disableDriverToolStripMenuItem3;
         private ToolStripMenuItem restartDriverToolStripMenuItem3;
         private ToolStripMenuItem exitToolStripMenuItem2;
-        private RichTextBox richTextBox1;
+        private RichTextBox mainConsole;
         private ToolStripMenuItem toolsToolStripMenuItem1;
         private ToolStripMenuItem getDisplayInformationToolStripMenuItem1;
         private ToolStripMenuItem getGPUInformationToolStripMenuItem1;
         private ToolStripMenuItem toolsToolStripMenuItem;
         private ToolStripMenuItem getGPUInformationToolStripMenuItem;
-        private Label label1;
-        private LinkLabel linkLabel1;
-        private Label label2;
-        private LinkLabel linkLabel2;
+        private Label gitLabel;
+        private LinkLabel discordLink;
+        private Label discordLabel;
+        private LinkLabel vddLink;
         private ToolStripMenuItem loggingToolStripMenuItem1;
         private ToolStripMenuItem userModeLoggingToolStripMenuItem;
         private ToolStripMenuItem devModeLoggingToolStripMenuItem;
@@ -1051,26 +1051,26 @@ namespace VDD_Control
         private ToolStripMenuItem getAudioInformationToolStripMenuItem;
         private ToolStripMenuItem getCPUInformationToolStripMenuItem1;
         private ToolStripMenuItem getAudioInformationToolStripMenuItem1;
-        private Label label4;
-        private Label label5;
-        private Label label6;
-        private LinkLabel linkLabel3;
+        private Label mttLabel;
+        private Label budLabel;
+        private Label jockeLabel;
+        private LinkLabel mttSupport;
         private LinkLabel linkLabel6;
-        private LinkLabel linkLabel4;
-        private LinkLabel linkLabel5;
+        private LinkLabel jockeSupport;
+        private LinkLabel budSupport;
         private ToolStripMenuItem xMLOptionsEditorToolStripMenuItem;
         private ToolStripMenuItem toolStripMenuItem1;
-        private GroupBox groupBox1;
-        private ListBox listBox1;
-        private GroupBox groupBox2;
-        private GroupBox groupBox3;
-        private TextBox textBox1;
-        private GroupBox groupBox4;
-        private ReaLTaiizor.Forms.ThemeForm themeForm1;
-        private ReaLTaiizor.Controls.ForeverClose foreverClose1;
-        private ReaLTaiizor.Controls.ForeverMinimize foreverMinimize1;
-        private ReaLTaiizor.Controls.ChatButtonRight chatButtonRight1;
-        private ReaLTaiizor.Controls.ChatButtonRight chatButtonRight2;
-        private ReaLTaiizor.Controls.RibbonProgressBarCenter ribbonProgressBarCenter1;
+        private GroupBox patreonGroupBox;
+        private ListBox patreonMembersListBox;
+        private GroupBox devsGroupBox;
+        private GroupBox resourcesGroupBox;
+        private TextBox userInput;
+        private GroupBox taskGroupBox;
+        private ReaLTaiizor.Forms.ThemeForm mainTheme;
+        private ReaLTaiizor.Controls.ForeverClose closeButton;
+        private ReaLTaiizor.Controls.ForeverMinimize minButton;
+        private ReaLTaiizor.Controls.ChatButtonRight enterButton;
+        private ReaLTaiizor.Controls.ChatButtonRight restartAllButton;
+        private ReaLTaiizor.Controls.RibbonProgressBarCenter taskProgressBar;
     }
 }

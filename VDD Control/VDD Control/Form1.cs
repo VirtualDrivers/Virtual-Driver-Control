@@ -43,43 +43,43 @@ namespace VDD_Control
         }
         private async void Form1_Load(object sender, EventArgs e)
         {
-            menuStrip1.Renderer = new ToolStripProfessionalRenderer(new CustomColorTable());
+            mainVisibleMenuStrip.Renderer = new ToolStripProfessionalRenderer(new CustomColorTable());
 
             // Set text color for all menu items
-            foreach (ToolStripMenuItem item in menuStrip1.Items)
+            foreach (ToolStripMenuItem item in mainVisibleMenuStrip.Items)
             {
                 SetMenuItemStyle(item);
             }
-            richTextBox1.AppendText("           ////////      ///////(/////////        //////////////(//     ////////\n");
-            richTextBox1.AppendText("           ////                                                             ////\n");
-            richTextBox1.AppendText("           ////                                                             ////\n");
-            richTextBox1.AppendText("                                                                                \n");
-            richTextBox1.AppendText("                                                                                \n");
-            richTextBox1.AppendText("                                                                                \n");
-            richTextBox1.AppendText("           ////                                                             ////\n");
-            richTextBox1.AppendText(" ///(///(///(///(///(///(///(///(///(///(///(///(///(///(///(///(/          (///\n");
-            richTextBox1.AppendText(" ///////////////////////////////(///////////////////////////////(/          ////\n");
-            richTextBox1.AppendText(" ///      .............................................        /(/          ////\n");
-            richTextBox1.AppendText(" ///     .......................,........................      /(/          ////\n");
-            richTextBox1.AppendText(" ///   .................,,,,,,,,,,,,,,,,,.................     /(/          ////\n");
-            richTextBox1.AppendText(" ///  ...............,,,,,,,,,,,,,,,,,,,,,,,...............    /(/              \n");
-            richTextBox1.AppendText(" /// ..............,,,,,,,,,,,,,,,,,,,,,,,,.................   /(/              \n");
-            richTextBox1.AppendText(" /// ....... @@@@.,,,, @@@.@@@@@@@@@@@,,.@@@@@@@@@@@........   /(/          ////\n");
-            richTextBox1.AppendText(" /(/......... @@@.,,,.@@@.,@@@@,,,, @@@,.@@@.,,.. @@@........  /(/          (/(/\n");
-            richTextBox1.AppendText(" ///.......... @@@,,.@@@%,,@@@@,,,,,@@@@.@@@.,,,..@@@(.......  /(/          ////\n");
-            richTextBox1.AppendText(" ///........... @@@.@@@@,,,@@@@,,,,,@@@@.@@@.,,,..@@@........  /(/      ////////\n");
-            richTextBox1.AppendText(" /// ........... @@@@@@,,,.@@@@,,,,@@@@,.@@@.,,..@@@@.......   /(/              \n");
-            richTextBox1.AppendText(" /// ............@@@@@,,,,.@@@@@@@@@@.,,.@@@@@@@@@@.........   /(/              \n");
-            richTextBox1.AppendText(" ///  ................,,,,,,..,,,,,,,,,,,..................    /(/              \n");
-            richTextBox1.AppendText(" ///   .................,,,,,,,,,,,,,,,,,.................     /(/              \n");
-            richTextBox1.AppendText(" ///    ......................,,,,,,.....................      /(/              \n");
-            richTextBox1.AppendText(" ///      .............................................        /(/              \n");
-            richTextBox1.AppendText(" ///        .........................................          /(/              \n");
-            richTextBox1.AppendText(" /////////////((MIKETHETECH))//(BUD)//(JOCKE)///////////////////(/              \n");
-            richTextBox1.AppendText("                              //(///                                            \n");
-            richTextBox1.AppendText("                              //(///                                            \n");
-            richTextBox1.AppendText("                *///////////////(////////////////                               \n");
-            richTextBox1.AppendText("                *///////////////(///////////////(\n\n");
+            mainConsole.AppendText("           ////////      ///////(/////////        //////////////(//     ////////\n");
+            mainConsole.AppendText("           ////                                                             ////\n");
+            mainConsole.AppendText("           ////                                                             ////\n");
+            mainConsole.AppendText("                                                                                \n");
+            mainConsole.AppendText("                                                                                \n");
+            mainConsole.AppendText("                                                                                \n");
+            mainConsole.AppendText("           ////                                                             ////\n");
+            mainConsole.AppendText(" ///(///(///(///(///(///(///(///(///(///(///(///(///(///(///(///(/          (///\n");
+            mainConsole.AppendText(" ///////////////////////////////(///////////////////////////////(/          ////\n");
+            mainConsole.AppendText(" ///      .............................................        /(/          ////\n");
+            mainConsole.AppendText(" ///     .......................,........................      /(/          ////\n");
+            mainConsole.AppendText(" ///   .................,,,,,,,,,,,,,,,,,.................     /(/          ////\n");
+            mainConsole.AppendText(" ///  ...............,,,,,,,,,,,,,,,,,,,,,,,...............    /(/              \n");
+            mainConsole.AppendText(" /// ..............,,,,,,,,,,,,,,,,,,,,,,,,.................   /(/              \n");
+            mainConsole.AppendText(" /// ....... @@@@.,,,, @@@.@@@@@@@@@@@,,.@@@@@@@@@@@........   /(/          ////\n");
+            mainConsole.AppendText(" /(/......... @@@.,,,.@@@.,@@@@,,,, @@@,.@@@.,,.. @@@........  /(/          (/(/\n");
+            mainConsole.AppendText(" ///.......... @@@,,.@@@%,,@@@@,,,,,@@@@.@@@.,,,..@@@(.......  /(/          ////\n");
+            mainConsole.AppendText(" ///........... @@@.@@@@,,,@@@@,,,,,@@@@.@@@.,,,..@@@........  /(/      ////////\n");
+            mainConsole.AppendText(" /// ........... @@@@@@,,,.@@@@,,,,@@@@,.@@@.,,..@@@@.......   /(/              \n");
+            mainConsole.AppendText(" /// ............@@@@@,,,,.@@@@@@@@@@.,,.@@@@@@@@@@.........   /(/              \n");
+            mainConsole.AppendText(" ///  ................,,,,,,..,,,,,,,,,,,..................    /(/              \n");
+            mainConsole.AppendText(" ///   .................,,,,,,,,,,,,,,,,,.................     /(/              \n");
+            mainConsole.AppendText(" ///    ......................,,,,,,.....................      /(/              \n");
+            mainConsole.AppendText(" ///      .............................................        /(/              \n");
+            mainConsole.AppendText(" ///        .........................................          /(/              \n");
+            mainConsole.AppendText(" /////////////((MIKETHETECH))//(BUD)//(JOCKE)///////////////////(/              \n");
+            mainConsole.AppendText("                              //(///                                            \n");
+            mainConsole.AppendText("                              //(///                                            \n");
+            mainConsole.AppendText("                *///////////////(////////////////                               \n");
+            mainConsole.AppendText("                *///////////////(///////////////(\n\n");
 
             try
             {
@@ -136,20 +136,20 @@ namespace VDD_Control
                 systemInfo += LocateSettingsFile();
 
                 // Display the information in richTextBox1
-                richTextBox1.AppendText(systemInfo);
-                richTextBox1.Refresh(); // Ensure the UI is updated
+                mainConsole.AppendText(systemInfo);
+                mainConsole.Refresh(); // Ensure the UI is updated
             }
             catch (Exception ex)
             {
                 // Display error details in richTextBox1
-                richTextBox1.AppendText("An error occurred while retrieving system information:\n" + ex.Message); // This really shouldn't happen. But probably will.
+                mainConsole.AppendText("An error occurred while retrieving system information:\n" + ex.Message); // This really shouldn't happen. But probably will.
             }
 
-            richTextBox1.AppendText("Virtual Display Driver Control Initialized.\n");
+            mainConsole.AppendText("Virtual Display Driver Control Initialized.\n");
 
             if (!await TryConnectToDriver())
             {
-                richTextBox1.AppendText("[WARNING] Could not verify driver connection. Ensure the driver is running.\n");
+                mainConsole.AppendText("[WARNING] Could not verify driver connection. Ensure the driver is running.\n");
             }
         }
 
@@ -246,19 +246,19 @@ namespace VDD_Control
                     using (var pipeClient = new NamedPipeClientStream(".", PIPE_NAME, PipeDirection.InOut))
                     {
                         await pipeClient.ConnectAsync(2000);
-                        richTextBox1.AppendText("[SUCCESS] Connected to the driver.\n");
+                        mainConsole.AppendText("[SUCCESS] Connected to the driver.\n");
                         return true;
                     }
                 }
                 catch (Exception ex)
                 {
                     attempt++;
-                    richTextBox1.AppendText($"[ERROR] Connection failed: {ex.Message} (Attempt {attempt}/{maxAttempts})\n");
-                    richTextBox1.AppendText("Note: This may also occur if the driver is off or restarting.\n");
+                    mainConsole.AppendText($"[ERROR] Connection failed: {ex.Message} (Attempt {attempt}/{maxAttempts})\n");
+                    mainConsole.AppendText("Note: This may also occur if the driver is off or restarting.\n");
 
                     if (attempt >= maxAttempts)
                     {
-                        richTextBox1.AppendText("[ERROR] Unable to connect after multiple attempts.\n");
+                        mainConsole.AppendText("[ERROR] Unable to connect after multiple attempts.\n");
                         return false;
                     }
 
@@ -290,7 +290,7 @@ namespace VDD_Control
 
                         string response = await reader.ReadLineAsync();
 
-                        richTextBox1.AppendText($"[{command}] Response: {response}\n");
+                        mainConsole.AppendText($"[{command}] Response: {response}\n");
 
                         return response;
                     }
@@ -309,7 +309,7 @@ namespace VDD_Control
 
         private async Task restartDriverToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            richTextBox1.AppendText("[ACTION] Restarting driver...\n");
+            mainConsole.AppendText("[ACTION] Restarting driver...\n");
 
             string response;
             try
@@ -321,19 +321,19 @@ namespace VDD_Control
                 response = $"[ERROR] Could not send restart command: {ex.Message}";
             }
 
-            richTextBox1.AppendText(response + "\n");
+            mainConsole.AppendText(response + "\n");
 
             await Task.Delay(5000);  // Wait for the restart process
 
-            richTextBox1.AppendText("[INFO] Attempting to reconnect...\n");
+            mainConsole.AppendText("[INFO] Attempting to reconnect...\n");
 
             if (await TryConnectToDriver())
             {
-                richTextBox1.AppendText("[SUCCESS] Driver restarted and reconnected successfully.\n");
+                mainConsole.AppendText("[SUCCESS] Driver restarted and reconnected successfully.\n");
             }
             else
             {
-                richTextBox1.AppendText("[WARNING] Driver restart detected, but reconnection failed. Ensure the driver is running.\n");
+                mainConsole.AppendText("[WARNING] Driver restart detected, but reconnection failed. Ensure the driver is running.\n");
             }
         }
         private void getCPUInformationToolStripMenuItem_Click(object sender, EventArgs e)
@@ -351,15 +351,15 @@ namespace VDD_Control
                 if (processorInfo != null)
                 {
                     // Set bold font for the title
-                    Font boldFont = new Font(richTextBox1.Font, FontStyle.Bold);
-                    richTextBox1.SelectionFont = boldFont;
-                    richTextBox1.AppendText("CPU Info:\n\n");
+                    Font boldFont = new Font(mainConsole.Font, FontStyle.Bold);
+                    mainConsole.SelectionFont = boldFont;
+                    mainConsole.AppendText("CPU Info:\n\n");
 
                     // Add CPU information
-                    richTextBox1.AppendText("Vendor: " + processorInfo.GetValue("VendorIdentifier") + "\n\n");
-                    richTextBox1.AppendText("Processor: " + processorInfo.GetValue("ProcessorNameString") + "\n\n");
-                    richTextBox1.AppendText("Type: " + processorInfo.GetValue("Identifier") + "\n\n");
-                    richTextBox1.AppendText("Speed: " + processorInfo.GetValue("~Mhz") + " MHz\n");
+                    mainConsole.AppendText("Vendor: " + processorInfo.GetValue("VendorIdentifier") + "\n\n");
+                    mainConsole.AppendText("Processor: " + processorInfo.GetValue("ProcessorNameString") + "\n\n");
+                    mainConsole.AppendText("Type: " + processorInfo.GetValue("Identifier") + "\n\n");
+                    mainConsole.AppendText("Speed: " + processorInfo.GetValue("~Mhz") + " MHz\n");
                 }
                 else
                 {
@@ -402,21 +402,21 @@ namespace VDD_Control
                 // Display output in richTextBox1
                 if (!string.IsNullOrWhiteSpace(output))
                 {
-                    richTextBox1.AppendText("Display Information:\n\n" + output);
+                    mainConsole.AppendText("Display Information:\n\n" + output);
                 }
                 else if (!string.IsNullOrWhiteSpace(error))
                 {
-                    richTextBox1.AppendText("Error:\n\n" + error);
+                    mainConsole.AppendText("Error:\n\n" + error);
                 }
                 else
                 {
-                    richTextBox1.AppendText("No output received from the PowerShell command.");
+                    mainConsole.AppendText("No output received from the PowerShell command.");
                 }
             }
             catch (Exception ex)
             {
                 // Display error details in richTextBox1
-                richTextBox1.AppendText("An error occurred while retrieving display information:\n" + ex.Message);
+                mainConsole.AppendText("An error occurred while retrieving display information:\n" + ex.Message);
             }
 
         }
@@ -451,21 +451,21 @@ namespace VDD_Control
                 // Display output in richTextBox1
                 if (!string.IsNullOrWhiteSpace(output))
                 {
-                    richTextBox1.AppendText("Display Information:\n\n" + output);
+                    mainConsole.AppendText("Display Information:\n\n" + output);
                 }
                 else if (!string.IsNullOrWhiteSpace(error))
                 {
-                    richTextBox1.AppendText("Error:\n\n" + error);
+                    mainConsole.AppendText("Error:\n\n" + error);
                 }
                 else
                 {
-                    richTextBox1.AppendText("No output received from the PowerShell command.");
+                    mainConsole.AppendText("No output received from the PowerShell command.");
                 }
             }
             catch (Exception ex)
             {
                 // Display error details in richTextBox1
-                richTextBox1.AppendText("An error occurred while retrieving display information:\n" + ex.Message);
+                mainConsole.AppendText("An error occurred while retrieving display information:\n" + ex.Message);
             }
 
         }
@@ -501,21 +501,21 @@ namespace VDD_Control
                 // Display output in richTextBox1
                 if (!string.IsNullOrWhiteSpace(output))
                 {
-                    richTextBox1.AppendText("Display Information:\n\n" + output);
+                    mainConsole.AppendText("Display Information:\n\n" + output);
                 }
                 else if (!string.IsNullOrWhiteSpace(error))
                 {
-                    richTextBox1.AppendText("Error:\n\n" + error);
+                    mainConsole.AppendText("Error:\n\n" + error);
                 }
                 else
                 {
-                    richTextBox1.AppendText("No output received from the PowerShell command.");
+                    mainConsole.AppendText("No output received from the PowerShell command.");
                 }
             }
             catch (Exception ex)
             {
                 // Display error details in richTextBox1
-                richTextBox1.AppendText("An error occurred while retrieving display information:\n" + ex.Message);
+                mainConsole.AppendText("An error occurred while retrieving display information:\n" + ex.Message);
             }
 
         }
@@ -775,5 +775,7 @@ namespace VDD_Control
         {
 
         }
+
+
     }
 }
