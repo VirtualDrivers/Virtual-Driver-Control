@@ -121,6 +121,10 @@ namespace VDD_Control
             enterButton = new ReaLTaiizor.Controls.ChatButtonRight();
             minButton = new ReaLTaiizor.Controls.ForeverMinimize();
             closeButton = new ReaLTaiizor.Controls.ForeverClose();
+            scriptsToolStripMenuItem = new ToolStripMenuItem();
+            sunshineScriptsToolStripMenuItem = new ToolStripMenuItem();
+            communityScriptsToolStripMenuItem = new ToolStripMenuItem();
+            sunshineScriptsToolStripMenuItem1 = new ToolStripMenuItem();
             trayMenu.SuspendLayout();
             mainVisibleMenuStrip.SuspendLayout();
             patreonGroupBox.SuspendLayout();
@@ -141,7 +145,7 @@ namespace VDD_Control
             // 
             trayMenu.Items.AddRange(new ToolStripItem[] { menuToolStripMenuItem1, toolsToolStripMenuItem1, virtualDisplayDriverToolStripMenuItem1, virtualAudioDriverToolStripMenuItem1, aboutToolStripMenuItem1, exitToolStripMenuItem2 });
             trayMenu.Name = "contextMenuStrip1";
-            trayMenu.Size = new Size(184, 136);
+            trayMenu.Size = new Size(184, 158);
             trayMenu.Text = "Menu";
             // 
             // menuToolStripMenuItem1
@@ -160,7 +164,7 @@ namespace VDD_Control
             // 
             // toolsToolStripMenuItem1
             // 
-            toolsToolStripMenuItem1.DropDownItems.AddRange(new ToolStripItem[] { getDisplayInformationToolStripMenuItem1, getGPUInformationToolStripMenuItem1, getCPUInformationToolStripMenuItem1, getAudioInformationToolStripMenuItem1 });
+            toolsToolStripMenuItem1.DropDownItems.AddRange(new ToolStripItem[] { communityScriptsToolStripMenuItem, sunshineScriptsToolStripMenuItem1, getDisplayInformationToolStripMenuItem1, getGPUInformationToolStripMenuItem1, getCPUInformationToolStripMenuItem1, getAudioInformationToolStripMenuItem1 });
             toolsToolStripMenuItem1.Name = "toolsToolStripMenuItem1";
             toolsToolStripMenuItem1.Size = new Size(183, 22);
             toolsToolStripMenuItem1.Text = "Tools";
@@ -372,7 +376,7 @@ namespace VDD_Control
             // exitToolStripMenuItem
             // 
             exitToolStripMenuItem.Name = "exitToolStripMenuItem";
-            exitToolStripMenuItem.Size = new Size(180, 22);
+            exitToolStripMenuItem.Size = new Size(92, 22);
             exitToolStripMenuItem.Text = "Exit";
             exitToolStripMenuItem.Click += exitToolStripMenuItem_Click;
             // 
@@ -552,7 +556,7 @@ namespace VDD_Control
             // 
             // toolsToolStripMenuItem
             // 
-            toolsToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { getGPUInformationToolStripMenuItem, getCPUInformationToolStripMenuItem, getDisplayInformationToolStripMenuItem2, getAudioInformationToolStripMenuItem });
+            toolsToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { scriptsToolStripMenuItem, sunshineScriptsToolStripMenuItem, getGPUInformationToolStripMenuItem, getCPUInformationToolStripMenuItem, getDisplayInformationToolStripMenuItem2, getAudioInformationToolStripMenuItem });
             toolsToolStripMenuItem.ForeColor = SystemColors.ButtonFace;
             toolsToolStripMenuItem.Name = "toolsToolStripMenuItem";
             toolsToolStripMenuItem.Size = new Size(47, 20);
@@ -949,6 +953,30 @@ namespace VDD_Control
             closeButton.Text = "foreverClose1";
             closeButton.TextColor = Color.FromArgb(243, 243, 243);
             // 
+            // scriptsToolStripMenuItem
+            // 
+            scriptsToolStripMenuItem.Name = "scriptsToolStripMenuItem";
+            scriptsToolStripMenuItem.Size = new Size(199, 22);
+            scriptsToolStripMenuItem.Text = "Community Scripts";
+            // 
+            // sunshineScriptsToolStripMenuItem
+            // 
+            sunshineScriptsToolStripMenuItem.Name = "sunshineScriptsToolStripMenuItem";
+            sunshineScriptsToolStripMenuItem.Size = new Size(199, 22);
+            sunshineScriptsToolStripMenuItem.Text = "Sunshine Scripts";
+            // 
+            // communityScriptsToolStripMenuItem
+            // 
+            communityScriptsToolStripMenuItem.Name = "communityScriptsToolStripMenuItem";
+            communityScriptsToolStripMenuItem.Size = new Size(199, 22);
+            communityScriptsToolStripMenuItem.Text = "Community Scripts";
+            // 
+            // sunshineScriptsToolStripMenuItem1
+            // 
+            sunshineScriptsToolStripMenuItem1.Name = "sunshineScriptsToolStripMenuItem1";
+            sunshineScriptsToolStripMenuItem1.Size = new Size(199, 22);
+            sunshineScriptsToolStripMenuItem1.Text = "Sunshine Scripts";
+            // 
             // mainWindow
             // 
             AllowDrop = true;
@@ -1076,5 +1104,9 @@ namespace VDD_Control
         private ReaLTaiizor.Controls.ChatButtonRight enterButton;
         private ReaLTaiizor.Controls.ChatButtonRight restartAllButton;
         private ReaLTaiizor.Controls.RibbonProgressBarCenter taskProgressBar;
+        private ToolStripMenuItem communityScriptsToolStripMenuItem;
+        private ToolStripMenuItem sunshineScriptsToolStripMenuItem1;
+        private ToolStripMenuItem scriptsToolStripMenuItem;
+        private ToolStripMenuItem sunshineScriptsToolStripMenuItem;
     }
 }
