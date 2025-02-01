@@ -892,6 +892,7 @@ namespace VDD_Control
             restartAllButton.TabIndex = 35;
             restartAllButton.Text = "Restart All Drivers";
             restartAllButton.TextAlignment = StringAlignment.Center;
+            restartAllButton.Click += restartAllButton_Click;
             // 
             // enterButton
             // 

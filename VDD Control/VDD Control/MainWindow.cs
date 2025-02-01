@@ -51,35 +51,65 @@ namespace VDD_Control
                 SetMenuItemStyle(item);
             }
             mainConsole.AppendText("           ////////      ///////(/////////        //////////////(//     ////////\n");
+            await Task.Delay(40);
             mainConsole.AppendText("           ////                                                             ////\n");
+            await Task.Delay(40);
             mainConsole.AppendText("           ////                                                             ////\n");
+            await Task.Delay(40);
             mainConsole.AppendText("                                                                                \n");
+            await Task.Delay(40);
             mainConsole.AppendText("                                                                                \n");
+            await Task.Delay(40);
             mainConsole.AppendText("                                                                                \n");
+            await Task.Delay(40);
             mainConsole.AppendText("           ////                                                             ////\n");
+            await Task.Delay(40);
             mainConsole.AppendText(" ///(///(///(///(///(///(///(///(///(///(///(///(///(///(///(///(/          (///\n");
+            await Task.Delay(40);
             mainConsole.AppendText(" ///////////////////////////////(///////////////////////////////(/          ////\n");
+            await Task.Delay(40);
             mainConsole.AppendText(" ///      .............................................        /(/          ////\n");
+            await Task.Delay(40);
             mainConsole.AppendText(" ///     .......................,........................      /(/          ////\n");
+            await Task.Delay(40);
             mainConsole.AppendText(" ///   .................,,,,,,,,,,,,,,,,,.................     /(/          ////\n");
+            await Task.Delay(40);
             mainConsole.AppendText(" ///  ...............,,,,,,,,,,,,,,,,,,,,,,,...............    /(/              \n");
+            await Task.Delay(40);
             mainConsole.AppendText(" /// ..............,,,,,,,,,,,,,,,,,,,,,,,,.................   /(/              \n");
+            await Task.Delay(40);
             mainConsole.AppendText(" /// ....... @@@@.,,,, @@@.@@@@@@@@@@@,,.@@@@@@@@@@@........   /(/          ////\n");
+            await Task.Delay(40);
             mainConsole.AppendText(" /(/......... @@@.,,,.@@@.,@@@@,,,, @@@,.@@@.,,.. @@@........  /(/          (/(/\n");
+            await Task.Delay(40);
             mainConsole.AppendText(" ///.......... @@@,,.@@@%,,@@@@,,,,,@@@@.@@@.,,,..@@@(.......  /(/          ////\n");
+            await Task.Delay(40);
             mainConsole.AppendText(" ///........... @@@.@@@@,,,@@@@,,,,,@@@@.@@@.,,,..@@@........  /(/      ////////\n");
+            await Task.Delay(40);
             mainConsole.AppendText(" /// ........... @@@@@@,,,.@@@@,,,,@@@@,.@@@.,,..@@@@.......   /(/              \n");
+            await Task.Delay(40);
             mainConsole.AppendText(" /// ............@@@@@,,,,.@@@@@@@@@@.,,.@@@@@@@@@@.........   /(/              \n");
+            await Task.Delay(40);
             mainConsole.AppendText(" ///  ................,,,,,,..,,,,,,,,,,,..................    /(/              \n");
+            await Task.Delay(40);
             mainConsole.AppendText(" ///   .................,,,,,,,,,,,,,,,,,.................     /(/              \n");
+            await Task.Delay(40);
             mainConsole.AppendText(" ///    ......................,,,,,,.....................      /(/              \n");
+            await Task.Delay(40);
             mainConsole.AppendText(" ///      .............................................        /(/              \n");
+            await Task.Delay(40);
             mainConsole.AppendText(" ///        .........................................          /(/              \n");
+            await Task.Delay(40);
             mainConsole.AppendText(" /////////////((MIKETHETECH))//(BUD)//(JOCKE)///////////////////(/              \n");
+            await Task.Delay(40);
             mainConsole.AppendText("                              //(///                                            \n");
+            await Task.Delay(40);
             mainConsole.AppendText("                              //(///                                            \n");
+            await Task.Delay(40);
             mainConsole.AppendText("                *///////////////(////////////////                               \n");
+            await Task.Delay(40);
             mainConsole.AppendText("                *///////////////(///////////////(\n\n");
+            await Task.Delay(40);
 
             try
             {
@@ -776,6 +806,34 @@ namespace VDD_Control
 
         }
 
+        private async void restartAllButton_Click(object sender, EventArgs e)
+        {
+            mainConsole.AppendText("[ACTION] Restarting driver...\n");
 
+            string response;
+            try
+            {
+                response = await SendCommandToDriver("RESTART_DRIVER");
+            }
+            catch (Exception ex)
+            {
+                response = $"[ERROR] Could not send restart command: {ex.Message}";
+            }
+
+            mainConsole.AppendText(response + "\n");
+
+            await Task.Delay(5000);  // Wait for the restart process
+
+            mainConsole.AppendText("[INFO] Attempting to reconnect...\n");
+
+            if (await TryConnectToDriver())
+            {
+                mainConsole.AppendText("[SUCCESS] Driver restarted and reconnected successfully.\n");
+            }
+            else
+            {
+                mainConsole.AppendText("[WARNING] Driver restart detected, but reconnection failed. Ensure the driver is running.\n");
+            }
+        }
     }
 }
