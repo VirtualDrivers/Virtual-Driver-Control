@@ -35,8 +35,10 @@ pip install pywin32
 1. **Clone this repository** (or download the script):
 
    ```sh
-   git clone https://github.com/yourusername/VirtualDisplayDriverGUI.git
-   cd VirtualDisplayDriverGUI
+   git clone https://github.com/VirtualDisplay/Virtual-Driver-Control.git
+   cd Virtual-Driver-Control
+   cd Scripts
+   cd VDDPipe GUI (Python)
    ```
 
 2. **Ensure dependencies are installed** (see prerequisites).
@@ -44,7 +46,7 @@ pip install pywin32
 3. **Run the script**:
 
    ```sh
-   python pipe_client_gui.py
+   python MTTVirtualDisplayPipe.py
    ```
 
 ---
