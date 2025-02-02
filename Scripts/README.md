@@ -85,16 +85,6 @@ If the connection is lost:
 
 ---
 
-## Code Overview
-
-### Main Components:
-- `connect_pipe()`: Establishes a connection to the named pipe.
-- `reconnect_pipe()`: Tries to reconnect if the connection is lost.
-- `send_command()`: Sends a command to the driver via the pipe.
-- `receive_response()`: Reads and displays responses from the driver.
-
----
-
 ## Troubleshooting
 
 - **Not connected to pipe error**
