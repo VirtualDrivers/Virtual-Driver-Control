@@ -109,16 +109,5 @@ If the connection is lost:
   - Verify that the named pipe exists and is accessible.
   - Restart the Virtual Display Driver service.
 
----
-
-## License
-
-This project is licensed under the MIT License. See `LICENSE` for details.
-
----
-
-## Author
-
-Developed by [Mike Rodriguez (MikeTheTech)](https://github.com/MikeTheTech).
 
 
