@@ -13,6 +13,16 @@ namespace VDD_Control
     public partial class mainWindow : Form
     {
         private const string PIPE_NAME = "MTTVirtualDisplayPipe";
+        private bool SDR10_STATE = false;
+        private bool CUSTOMEDID_STATE = false;
+        private bool EDIDCEAOVERRRIDE_STATE = false;
+        private bool PREVENTEDIDSPOOF_STATE = false;
+        private bool HARDWARECURSOR_STATE = false;
+        private bool HDR10PLUS_STATE = false;
+        private bool LOGGING_STATE = false;
+        private bool DEVLOGGING_STATE = false;
+        //Above can be changed when the reading logic is implemented, Perhaps have a call function to dynamically retrieve each function based off input parameter 
+
 
         public mainWindow()
         {
@@ -266,6 +276,7 @@ namespace VDD_Control
         }
         private async Task<bool> TryConnectToDriver()
         {
+            // we should change this to check if it exists, not if it can be connected to to save on overhead in the driver
             const int maxAttempts = 5;
             int attempt = 0;
 
@@ -301,7 +312,7 @@ namespace VDD_Control
 
         private async Task<string> SendCommandToDriver(string command)
         {
-            if (command != "RESTART_DRIVER" && !await TryConnectToDriver())
+            if (!await TryConnectToDriver()) // No need to check if command sent is not equal to restart driver 
             {
                 return "[ERROR] Connection failed: The driver may be off or restarting.";
             }
@@ -312,14 +323,33 @@ namespace VDD_Control
                 {
                     await pipeClient.ConnectAsync(2000);
 
-                    using (var writer = new StreamWriter(pipeClient, Encoding.UTF8, leaveOpen: true))
-                    using (var reader = new StreamReader(pipeClient, Encoding.UTF8))
+                    var utf16LeEncoding = new UnicodeEncoding(bigEndian: false, byteOrderMark: false);
+                    using (var writer = new StreamWriter(pipeClient, utf16LeEncoding, leaveOpen: true))
                     {
                         await writer.WriteLineAsync(command);
                         await writer.FlushAsync();
-
-                        string response = await reader.ReadLineAsync();
-
+                    }
+                    using (var reader = new StreamReader(pipeClient, Encoding.UTF8))
+                    {
+                        var startTime = DateTime.UtcNow;
+                        string response;
+                        // We loop here due to the driver being able to send its logs through the pipe, after 5 seconds we nullify to handle any unexpected errors
+                        // Responses cant be returned if logging is off unless the pipe functions specifically specifies a return containing `[Companion]` to allow for context filtering
+                        // This means every other command other than PING, will not return a response to the companion without logging being on. This has to be changed within the driver itself
+                        do
+                        {
+                            if ((DateTime.UtcNow - startTime).TotalSeconds > 5)
+                            {
+                                return null; // Handle whatever error handling here, I've just returned null for now
+                            }
+                            response = await reader.ReadLineAsync();
+                        }
+                        while (response != null && (!response.Contains("[COMPANION]")));
+                        if (response != null)
+                        {
+                            int index = response.IndexOf("[COMPANION]") + 11;
+                            response = response.Substring(index).Trim();
+                        }
                         mainConsole.AppendText($"[{command}] Response: {response}\n");
 
                         return response;
@@ -596,34 +626,125 @@ namespace VDD_Control
             form2.Show();
         }
 
-        private void sDR10bitToolStripMenuItem_Click(object sender, EventArgs e)
+        private async void sDR10bitToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            SDR10_STATE = !SDR10_STATE;                          //Flip current state
+            sDR10bitToolStripMenuItem.Checked = SDR10_STATE;     //Sync Checked state in menu
 
+            string action = SDR10_STATE ? "ON" : "OFF";          //Switch based off state
+            mainConsole.AppendText($"[ACTION] Toggling SDR 10 bit state to {action}...\n");
+
+            string response;
+            try
+            {
+                string command = SDR10_STATE ? "SDR10 true" : "SDR10 false";
+                response = await SendCommandToDriver(command); // Send state based off bool
+            }
+            catch (Exception ex)
+            {
+                response = $"[ERROR] Could not send toggle SDR command: {ex.Message}";
+            }
         }
 
-        private void hDRToolStripMenuItem_Click(object sender, EventArgs e)
-        {
 
+        private async void hDRToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            HDR10PLUS_STATE = !HDR10PLUS_STATE;
+            hDRToolStripMenuItem.Checked = HDR10PLUS_STATE;
+
+            string action = HDR10PLUS_STATE ? "ON" : "OFF";
+            mainConsole.AppendText($"[ACTION] Toggling HDR-10+ state to {action}...\n");
+
+            string response;
+            try
+            {
+                string command = HDR10PLUS_STATE ? "HDRPLUS true" : "HDRPLUS false";
+                response = await SendCommandToDriver(command);
+            }
+            catch (Exception ex)
+            {
+                response = $"[ERROR] Could not send toggle HDR-10+ command: {ex.Message}";
+            }
         }
 
-        private void customEDIDToolStripMenuItem_Click(object sender, EventArgs e)
+        private async void customEDIDToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            CUSTOMEDID_STATE = !CUSTOMEDID_STATE;
+            customEDIDToolStripMenuItem.Checked = CUSTOMEDID_STATE;
 
+            string action = CUSTOMEDID_STATE ? "ON" : "OFF";
+            mainConsole.AppendText($"[ACTION] Toggling Custom Edid state to {action}...\n");
+
+            string response;
+            try
+            {
+                string command = CUSTOMEDID_STATE ? "CUSTOMEDID true" : "CUSTOMEDID false";
+                response = await SendCommandToDriver(command);
+            }
+            catch (Exception ex)
+            {
+                response = $"[ERROR] Could not send toggle Custom Edid command: {ex.Message}";
+            }
         }
 
-        private void hardwareCursorToolStripMenuItem_Click(object sender, EventArgs e)
+        private async void hardwareCursorToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            HARDWARECURSOR_STATE = !HARDWARECURSOR_STATE;
+            hardwareCursorToolStripMenuItem.Checked = HARDWARECURSOR_STATE;
 
+            string action = HARDWARECURSOR_STATE ? "ON" : "OFF";
+            mainConsole.AppendText($"[ACTION] Toggling Hardware cursor state to {action}...\n");
+
+            string response;
+            try
+            {
+                string command = HARDWARECURSOR_STATE ? "HARDWARECURSOR true" : "HARDWARECURSOR false";
+                response = await SendCommandToDriver(command);
+            }
+            catch (Exception ex)
+            {
+                response = $"[ERROR] Could not send toggle Hardware cursor command: {ex.Message}";
+            }
         }
 
-        private void preventMonitorSpoofToolStripMenuItem_Click(object sender, EventArgs e)
+        private async void preventMonitorSpoofToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            PREVENTEDIDSPOOF_STATE = !PREVENTEDIDSPOOF_STATE;
+            preventMonitorSpoofToolStripMenuItem.Checked = PREVENTEDIDSPOOF_STATE;
 
+            string action = PREVENTEDIDSPOOF_STATE ? "ON" : "OFF";
+            mainConsole.AppendText($"[ACTION] Toggling Prevent Monitor Spoof state to {action}...\n");
+
+            string response;
+            try
+            {
+                string command = PREVENTEDIDSPOOF_STATE ? "PREVENTSPOOF true" : "PREVENTSPOOF false";
+                response = await SendCommandToDriver(command);
+            }
+            catch (Exception ex)
+            {
+                response = $"[ERROR] Could not send toggle Prevent Monitor Spoof command: {ex.Message}";
+            }
         }
 
-        private void eDIDCEAOverrideToolStripMenuItem_Click(object sender, EventArgs e)
+        private async void eDIDCEAOverrideToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            EDIDCEAOVERRRIDE_STATE = !EDIDCEAOVERRRIDE_STATE;
+            eDIDCEAOverrideToolStripMenuItem.Checked = EDIDCEAOVERRRIDE_STATE;
 
+            string action = EDIDCEAOVERRRIDE_STATE ? "ON" : "OFF";
+            mainConsole.AppendText($"[ACTION] Toggling Edid Cea Override state to {action}...\n");
+
+            string response;
+            try
+            {
+                string command = EDIDCEAOVERRRIDE_STATE ? "CEAOVERRIDE true" : "CEAOVERRIDE false";
+                response = await SendCommandToDriver(command);
+            }
+            catch (Exception ex)
+            {
+                response = $"[ERROR] Could not send toggle Edid Cea Override command: {ex.Message}";
+            }
         }
 
         private void selectGPUToolStripMenuItem_Click(object sender, EventArgs e)
