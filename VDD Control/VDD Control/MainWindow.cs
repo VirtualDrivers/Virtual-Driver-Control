@@ -13,6 +13,10 @@ namespace VDD_Control
     public partial class mainWindow : Form
     {
         private const string PIPE_NAME = "MTTVirtualDisplayPipe";
+        string registryFilePath = "C:\\VirtualDisplayDriver"; //Lets not use null, just in case
+
+        private XMLController IXCLI; 
+
         private bool SDR10_STATE = false;
         private bool CUSTOMEDID_STATE = false;
         private bool EDIDCEAOVERRRIDE_STATE = false;
@@ -21,6 +25,7 @@ namespace VDD_Control
         private bool HDR10PLUS_STATE = false;
         private bool LOGGING_STATE = false;
         private bool DEVLOGGING_STATE = false;
+
         //Above can be changed when the reading logic is implemented, Perhaps have a call function to dynamically retrieve each function based off input parameter 
 
 
@@ -28,7 +33,17 @@ namespace VDD_Control
         {
             InitializeComponent();
             ToolStripMenuItem restartItem = GetRestartDriverToolStripMenuItem(); // This is now safe
+            LocateSettingsFile();
+            IXCLI = new XMLController(registryFilePath);
+            SDR10_STATE = IXCLI.SDR10bit;
+            CUSTOMEDID_STATE = IXCLI.CustomEdid;
+            EDIDCEAOVERRRIDE_STATE = IXCLI.EdidCeaOverride;
+            PREVENTEDIDSPOOF_STATE = IXCLI.PreventSpoof;
+            HARDWARECURSOR_STATE = IXCLI.HardwareCursor;
+            LOGGING_STATE = IXCLI.Logging;
+            DEVLOGGING_STATE = IXCLI.DebugLogging;
 
+            sDR10bitToolStripMenuItem.Checked = SDR10_STATE;
         }
 
         private ToolStripMenuItem GetRestartDriverToolStripMenuItem()
@@ -54,6 +69,7 @@ namespace VDD_Control
         private async void Form1_Load(object sender, EventArgs e)
         {
             mainVisibleMenuStrip.Renderer = new ToolStripProfessionalRenderer(new CustomColorTable());
+            IXCLI.LoadFromXml(registryFilePath);
 
             // Set text color for all menu items
             foreach (ToolStripMenuItem item in mainVisibleMenuStrip.Items)
@@ -222,7 +238,6 @@ namespace VDD_Control
             // Yo XML. Where u at?
             string settingsInfo = "Settings File Information:\n--------------------------\n";
             string registryKeyPath = @"SOFTWARE\MikeTheTech\VirtualDisplayDriver";
-            string registryFilePath = null;
 
             try
             {
