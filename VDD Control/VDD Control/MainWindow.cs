@@ -424,33 +424,59 @@ namespace VDD_Control
             _ = restartDriverToolStripMenuItem_Click(sender, e); // Fire and forget (safe async call)
         }
 
+        // Helper method to update task progress bar in a thread-safe way
+        private void UpdateTaskProgress(string taskName, int progressValue, int maxValue = 100)
+        {
+            if (this.InvokeRequired)
+            {
+                this.BeginInvoke(new Action(() => UpdateTaskProgress(taskName, progressValue, maxValue)));
+                return;
+            }
+
+            // We're now on the UI thread
+            taskGroupBox.Text = $"Task Progress: {taskName}";
+            taskProgressBar.Maximum = maxValue;
+            taskProgressBar.Value = progressValue;
+            Application.DoEvents(); // Ensure UI updates
+        }
+        
         private async Task restartDriverToolStripMenuItem_Click(object sender, EventArgs e)
         {
             mainConsole.AppendText("[ACTION] Restarting driver...\n");
+            UpdateTaskProgress("Restarting Driver", 10);
 
             string response;
             try
             {
                 response = await SendCommandToDriver("RESTART_DRIVER");
+                UpdateTaskProgress("Restarting Driver", 40);
             }
             catch (Exception ex)
             {
                 response = $"[ERROR] Could not send restart command: {ex.Message}";
+                UpdateTaskProgress("Restarting Driver", 0); // Reset progress bar on error
+                return;
             }
 
             mainConsole.AppendText(response + "\n");
+            UpdateTaskProgress("Restarting Driver", 60);
 
             await Task.Delay(5000);  // Wait for the restart process
+            UpdateTaskProgress("Restarting Driver", 80);
 
             mainConsole.AppendText("[INFO] Attempting to reconnect...\n");
 
             if (await TryConnectToDriver())
             {
                 mainConsole.AppendText("[SUCCESS] Driver restarted and reconnected successfully.\n");
+                UpdateTaskProgress("Restarting Driver", 100);
+                await Task.Delay(1000); // Show 100% for a moment
+                this.BeginInvoke(new Action(() => UpdateTaskProgress("", 0))); // Clear task progress
             }
             else
             {
                 mainConsole.AppendText("[WARNING] Driver restart detected, but reconnection failed. Ensure the driver is running.\n");
+                UpdateTaskProgress("Restarting Driver", 0); // Reset progress bar on warning
             }
         }
         private void getCPUInformationToolStripMenuItem_Click(object sender, EventArgs e)
@@ -587,13 +613,14 @@ namespace VDD_Control
 
         }
 
-        private void getGPUInformationToolStripMenuItem_Click(object sender, EventArgs e)
+        private async void getGPUInformationToolStripMenuItem_Click(object sender, EventArgs e)
         {
             try
             {
+                UpdateTaskProgress("Getting GPU Information", 10);
+                mainConsole.AppendText("Gathering GPU information...\n");
+                
                 // Initialize a process to execute PowerShell
-                // This needs to be changed to just run the script directly.
-                // I'm just lazy.
                 Process process = new Process
                 {
                     StartInfo = new ProcessStartInfo
@@ -607,18 +634,27 @@ namespace VDD_Control
                     }
                 };
 
+                UpdateTaskProgress("Getting GPU Information", 30);
+                
                 // Start the process and capture output
                 process.Start();
+                
+                UpdateTaskProgress("Getting GPU Information", 50);
+                
+                string output = await process.StandardOutput.ReadToEndAsync();
+                string error = await process.StandardError.ReadToEndAsync();
 
-                string output = process.StandardOutput.ReadToEnd();
-                string error = process.StandardError.ReadToEnd();
-
-                process.WaitForExit();
+                UpdateTaskProgress("Getting GPU Information", 80);
+                
+                await Task.Run(() => process.WaitForExit());
+                
+                // Use BeginInvoke to update progress on UI thread
+                this.BeginInvoke(new Action(() => UpdateTaskProgress("Getting GPU Information", 90)));
 
                 // Display output in richTextBox1
                 if (!string.IsNullOrWhiteSpace(output))
                 {
-                    mainConsole.AppendText("Display Information:\n\n" + output);
+                    mainConsole.AppendText("GPU Information:\n\n" + output);
                 }
                 else if (!string.IsNullOrWhiteSpace(error))
                 {
@@ -628,11 +664,16 @@ namespace VDD_Control
                 {
                     mainConsole.AppendText("No output received from the PowerShell command.");
                 }
+                
+                UpdateTaskProgress("Getting GPU Information", 100);
+                await Task.Delay(500); // Show 100% for a moment
+                this.BeginInvoke(new Action(() => UpdateTaskProgress("", 0))); // Clear task progress
             }
             catch (Exception ex)
             {
                 // Display error details in richTextBox1
-                mainConsole.AppendText("An error occurred while retrieving display information:\n" + ex.Message);
+                mainConsole.AppendText("An error occurred while retrieving GPU information:\n" + ex.Message);
+                UpdateTaskProgress("Getting GPU Information", 0); // Reset progress bar on error
             }
 
         }
@@ -673,14 +714,25 @@ namespace VDD_Control
 
         private void xMLOptionsEditorToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            // Show progress in task bar
+            UpdateTaskProgress("Opening XML Editor", 50);
+            
+            // Launch XML Editor
             XMLEditor form2 = new XMLEditor();
             form2.Show();
+            
+            // Complete progress
+            UpdateTaskProgress("Opening XML Editor", 100);
+            Task.Delay(500).ContinueWith(_ => {
+                // Reset progress bar after a delay
+                this.BeginInvoke(new Action(() => UpdateTaskProgress("", 0)));
+            });
         }
 
         private void toolStripMenuItem1_Click(object sender, EventArgs e)
         {
-            XMLEditor form2 = new XMLEditor();
-            form2.Show();
+            // Use the same method as the main menu XML editor option
+            xMLOptionsEditorToolStripMenuItem_Click(sender, e);
         }
 
         private async void sDR10bitToolStripMenuItem_Click(object sender, EventArgs e)
@@ -946,12 +998,100 @@ namespace VDD_Control
 
         private void textBox1_TextChanged(object sender, EventArgs e) // Command Console
         {
-
+            // Clear the default text when user first clicks the textbox
+            if (userInput.Text == "Type HELP for a list of commands")
+            {
+                userInput.Text = string.Empty;
+            }
+        }
+        
+        // Add a method to clear the text box when it gets focus
+        private void userInput_Enter(object sender, EventArgs e)
+        {
+            if (userInput.Text == "Type HELP for a list of commands")
+            {
+                userInput.Text = string.Empty;
+            }
+        }
+        
+        // Add a method to handle the Enter key press in the userInput textBox
+        protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
+        {
+            if (keyData == Keys.Enter && userInput.Focused)
+            {
+                _ = SendCommandFromInput();
+                return true;
+            }
+            return base.ProcessCmdKey(ref msg, keyData);
         }
 
-        private void button3_Click(object sender, EventArgs e) // Enter command from command console
+        private async void button3_Click(object sender, EventArgs e) // Enter command from command console
         {
-
+            await SendCommandFromInput();
+        }
+        
+        // Displays help information for available commands
+        private void DisplayHelpCommand()
+        {
+            StringBuilder helpText = new StringBuilder();
+            
+            helpText.AppendLine("Available Commands:");
+            helpText.AppendLine("------------------");
+            helpText.AppendLine("HELP                   - Displays this help information");
+            helpText.AppendLine("RESTART_DRIVER         - Restarts the virtual display driver");
+            helpText.AppendLine("SDR10 [true/false]     - Enable/disable SDR 10-bit mode");
+            helpText.AppendLine("HDRPLUS [true/false]   - Enable/disable HDR+ mode");
+            helpText.AppendLine("CUSTOMEDID [true/false]- Enable/disable custom EDID");
+            helpText.AppendLine("HARDWARECURSOR [true/false] - Enable/disable hardware cursor");
+            helpText.AppendLine("PREVENTSPOOF [true/false] - Enable/disable EDID spoofing prevention");
+            helpText.AppendLine("CEAOVERRIDE [true/false] - Enable/disable EDID CEA Override");
+            helpText.AppendLine("SETGPU [gpu_name]      - Set the GPU to use for virtual displays");
+            helpText.AppendLine("SETCOUNT [number]      - Set the number of virtual displays");
+            helpText.AppendLine("STATUS                 - Get current driver status");
+            helpText.AppendLine("VERSION                - Get driver version information");
+            helpText.AppendLine("LOGGING [true/false]   - Enable/disable logging");
+            helpText.AppendLine("DEBUGLOGGING [true/false] - Enable/disable debug level logging");
+            
+            mainConsole.AppendText(helpText.ToString());
+        }
+        
+        private async Task SendCommandFromInput()
+        {
+            if (string.IsNullOrWhiteSpace(userInput.Text))
+                return;
+                
+            string command = userInput.Text.Trim();
+            mainConsole.AppendText($"[COMMAND] {command}\n");
+            
+            // Handle special commands
+            if (command.Equals("HELP", StringComparison.OrdinalIgnoreCase))
+            {
+                DisplayHelpCommand();
+                // Clear input after sending
+                userInput.Text = string.Empty;
+                return;
+            }
+            
+            UpdateTaskProgress("Sending Command", 25);
+            
+            try
+            {
+                string response = await SendCommandToDriver(command);
+                mainConsole.AppendText($"[RESPONSE] {response}\n");
+                UpdateTaskProgress("Sending Command", 100);
+            }
+            catch (Exception ex)
+            {
+                mainConsole.AppendText($"[ERROR] {ex.Message}\n");
+                UpdateTaskProgress("Sending Command", 0);
+            }
+            finally
+            {
+                // Clear input after sending
+                userInput.Text = string.Empty;
+                await Task.Delay(500);
+                UpdateTaskProgress("", 0);
+            }
         }
 
         private void linkLabel2_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
@@ -986,32 +1126,8 @@ namespace VDD_Control
 
         private async void restartAllButton_Click(object sender, EventArgs e)
         {
-            mainConsole.AppendText("[ACTION] Restarting driver...\n");
-
-            string response;
-            try
-            {
-                response = await SendCommandToDriver("RESTART_DRIVER");
-            }
-            catch (Exception ex)
-            {
-                response = $"[ERROR] Could not send restart command: {ex.Message}";
-            }
-
-            mainConsole.AppendText(response + "\n");
-
-            await Task.Delay(5000);  // Wait for the restart process
-
-            mainConsole.AppendText("[INFO] Attempting to reconnect...\n");
-
-            if (await TryConnectToDriver())
-            {
-                mainConsole.AppendText("[SUCCESS] Driver restarted and reconnected successfully.\n");
-            }
-            else
-            {
-                mainConsole.AppendText("[WARNING] Driver restart detected, but reconnection failed. Ensure the driver is running.\n");
-            }
+            // Use the existing restart method but as a Task
+            await restartDriverToolStripMenuItem_Click(sender, e);
         }
 
         private void jockeSupport_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)

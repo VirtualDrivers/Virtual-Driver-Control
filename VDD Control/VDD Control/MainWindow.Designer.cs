@@ -42,6 +42,7 @@ namespace VDD_Control
             getGPUInformationToolStripMenuItem1 = new ToolStripMenuItem();
             getCPUInformationToolStripMenuItem1 = new ToolStripMenuItem();
             getAudioInformationToolStripMenuItem1 = new ToolStripMenuItem();
+            toolStripMenuItem1 = new ToolStripMenuItem();
             virtualDisplayDriverToolStripMenuItem1 = new ToolStripMenuItem();
             sDR10bitToolStripMenuItem1 = new ToolStripMenuItem();
             hDRToolStripMenuItem1 = new ToolStripMenuItem();
@@ -58,7 +59,6 @@ namespace VDD_Control
             loggingToolStripMenuItem1 = new ToolStripMenuItem();
             userModeLoggingToolStripMenuItem = new ToolStripMenuItem();
             devModeLoggingToolStripMenuItem = new ToolStripMenuItem();
-            toolStripMenuItem1 = new ToolStripMenuItem();
             aboutToolStripMenuItem1 = new ToolStripMenuItem();
             exitToolStripMenuItem2 = new ToolStripMenuItem();
             virtualAudioDriverToolStripMenuItem1 = new ToolStripMenuItem();
@@ -103,12 +103,10 @@ namespace VDD_Control
             discordLabel = new Label();
             vddLink = new LinkLabel();
             mttLabel = new Label();
-            // budLabel removed
             jockeLabel = new Label();
             mttSupport = new LinkLabel();
             linkLabel6 = new LinkLabel();
             jockeSupport = new LinkLabel();
-            // budSupport removed
             patreonGroupBox = new GroupBox();
             patreonMembersListBox = new ListBox();
             devsGroupBox = new GroupBox();
@@ -164,7 +162,7 @@ namespace VDD_Control
             // 
             // toolsToolStripMenuItem1
             // 
-            toolsToolStripMenuItem1.DropDownItems.AddRange(new ToolStripItem[] { getDisplayInformationToolStripMenuItem1, getGPUInformationToolStripMenuItem1, getCPUInformationToolStripMenuItem1, getAudioInformationToolStripMenuItem1 });
+            toolsToolStripMenuItem1.DropDownItems.AddRange(new ToolStripItem[] { getDisplayInformationToolStripMenuItem1, getGPUInformationToolStripMenuItem1, getCPUInformationToolStripMenuItem1, getAudioInformationToolStripMenuItem1, toolStripMenuItem1 });
             toolsToolStripMenuItem1.Name = "toolsToolStripMenuItem1";
             toolsToolStripMenuItem1.Size = new Size(183, 22);
             toolsToolStripMenuItem1.Text = "Tools";
@@ -197,9 +195,16 @@ namespace VDD_Control
             getAudioInformationToolStripMenuItem1.Text = "Get Audio Information";
             getAudioInformationToolStripMenuItem1.Click += getAudioInformationToolStripMenuItem1_Click_1;
             // 
+            // toolStripMenuItem1
+            // 
+            toolStripMenuItem1.Name = "toolStripMenuItem1";
+            toolStripMenuItem1.Size = new Size(199, 22);
+            toolStripMenuItem1.Text = "XML/Options Editor";
+            toolStripMenuItem1.Click += toolStripMenuItem1_Click;
+            // 
             // virtualDisplayDriverToolStripMenuItem1
             // 
-            virtualDisplayDriverToolStripMenuItem1.DropDownItems.AddRange(new ToolStripItem[] { sDR10bitToolStripMenuItem1, hDRToolStripMenuItem1, customEDIDToolStripMenuItem1, hardwareCursorToolStripMenuItem1, preventMonitorSpoofToolStripMenuItem1, eDIDCEAOverrideToolStripMenuItem1, selectGPUToolStripMenuItem1, displayCountToolStripMenuItem1, systemToolStripMenuItem1, loggingToolStripMenuItem1, toolStripMenuItem1 });
+            virtualDisplayDriverToolStripMenuItem1.DropDownItems.AddRange(new ToolStripItem[] { sDR10bitToolStripMenuItem1, hDRToolStripMenuItem1, customEDIDToolStripMenuItem1, hardwareCursorToolStripMenuItem1, preventMonitorSpoofToolStripMenuItem1, eDIDCEAOverrideToolStripMenuItem1, selectGPUToolStripMenuItem1, displayCountToolStripMenuItem1, systemToolStripMenuItem1, loggingToolStripMenuItem1 });
             virtualDisplayDriverToolStripMenuItem1.Name = "virtualDisplayDriverToolStripMenuItem1";
             virtualDisplayDriverToolStripMenuItem1.Size = new Size(183, 22);
             virtualDisplayDriverToolStripMenuItem1.Text = "Virtual Display Driver";
@@ -309,13 +314,6 @@ namespace VDD_Control
             devModeLoggingToolStripMenuItem.Text = "Dev-Mode Logging";
             devModeLoggingToolStripMenuItem.Click += devModeLoggingToolStripMenuItem_Click;
             // 
-            // toolStripMenuItem1
-            // 
-            toolStripMenuItem1.Name = "toolStripMenuItem1";
-            toolStripMenuItem1.Size = new Size(194, 22);
-            toolStripMenuItem1.Text = "XML/Options Editor";
-            toolStripMenuItem1.Click += toolStripMenuItem1_Click;
-            // 
             // aboutToolStripMenuItem1
             // 
             aboutToolStripMenuItem1.Name = "aboutToolStripMenuItem1";
@@ -383,7 +381,7 @@ namespace VDD_Control
             // virtualDisplayDriverToolStripMenuItem
             // 
             virtualDisplayDriverToolStripMenuItem.DisplayStyle = ToolStripItemDisplayStyle.Text;
-            virtualDisplayDriverToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { sDR10bitToolStripMenuItem, hDRToolStripMenuItem, customEDIDToolStripMenuItem, hardwareCursorToolStripMenuItem, preventMonitorSpoofToolStripMenuItem, eDIDCEAOverrideToolStripMenuItem, selectGPUToolStripMenuItem, displayCountToolStripMenuItem, enableToolStripMenuItem, loggingToolStripMenuItem, xMLOptionsEditorToolStripMenuItem });
+            virtualDisplayDriverToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { sDR10bitToolStripMenuItem, hDRToolStripMenuItem, customEDIDToolStripMenuItem, hardwareCursorToolStripMenuItem, preventMonitorSpoofToolStripMenuItem, eDIDCEAOverrideToolStripMenuItem, selectGPUToolStripMenuItem, displayCountToolStripMenuItem, enableToolStripMenuItem, loggingToolStripMenuItem });
             virtualDisplayDriverToolStripMenuItem.ForeColor = SystemColors.ButtonFace;
             virtualDisplayDriverToolStripMenuItem.Name = "virtualDisplayDriverToolStripMenuItem";
             virtualDisplayDriverToolStripMenuItem.Size = new Size(128, 20);
@@ -497,7 +495,7 @@ namespace VDD_Control
             // xMLOptionsEditorToolStripMenuItem
             // 
             xMLOptionsEditorToolStripMenuItem.Name = "xMLOptionsEditorToolStripMenuItem";
-            xMLOptionsEditorToolStripMenuItem.Size = new Size(194, 22);
+            xMLOptionsEditorToolStripMenuItem.Size = new Size(199, 22);
             xMLOptionsEditorToolStripMenuItem.Text = "XML/Options Editor";
             xMLOptionsEditorToolStripMenuItem.Click += xMLOptionsEditorToolStripMenuItem_Click;
             // 
@@ -556,7 +554,7 @@ namespace VDD_Control
             // 
             // toolsToolStripMenuItem
             // 
-            toolsToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { getGPUInformationToolStripMenuItem, getCPUInformationToolStripMenuItem, getDisplayInformationToolStripMenuItem2, getAudioInformationToolStripMenuItem });
+            toolsToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { getGPUInformationToolStripMenuItem, getCPUInformationToolStripMenuItem, getDisplayInformationToolStripMenuItem2, getAudioInformationToolStripMenuItem, xMLOptionsEditorToolStripMenuItem });
             toolsToolStripMenuItem.ForeColor = SystemColors.ButtonFace;
             toolsToolStripMenuItem.Name = "toolsToolStripMenuItem";
             toolsToolStripMenuItem.Size = new Size(47, 20);
@@ -669,7 +667,6 @@ namespace VDD_Control
             mttLabel.Size = new Size(112, 17);
             mttLabel.TabIndex = 11;
             mttLabel.Text = "- MikeTheTech";
-
             // 
             // jockeLabel
             // 
@@ -699,7 +696,7 @@ namespace VDD_Control
             linkLabel6.AutoSize = true;
             linkLabel6.Font = new Font("Segoe UI", 7F, FontStyle.Regular, GraphicsUnit.Point);
             linkLabel6.LinkColor = Color.White;
-            linkLabel6.Location = new Point(203, 94);
+            linkLabel6.Location = new Point(203, 122);
             linkLabel6.Name = "linkLabel6";
             linkLabel6.Size = new Size(39, 12);
             linkLabel6.TabIndex = 22;
@@ -748,10 +745,8 @@ namespace VDD_Control
             // devsGroupBox
             // 
             devsGroupBox.Controls.Add(mttLabel);
-            // budLabel removed
             devsGroupBox.Controls.Add(jockeLabel);
             devsGroupBox.Controls.Add(jockeSupport);
-            // budSupport removed
             devsGroupBox.Controls.Add(mttSupport);
             devsGroupBox.Font = new Font("Consolas", 8.25F, FontStyle.Bold, GraphicsUnit.Point);
             devsGroupBox.ForeColor = SystemColors.ButtonHighlight;
@@ -786,9 +781,10 @@ namespace VDD_Control
             userInput.Name = "userInput";
             userInput.Size = new Size(453, 21);
             userInput.TabIndex = 29;
-            userInput.Text = "Command Console";
+            userInput.Text = "Type HELP for a list of commands";
             userInput.WordWrap = false;
             userInput.TextChanged += textBox1_TextChanged;
+            userInput.Enter += userInput_Enter;
             // 
             // taskGroupBox
             // 
@@ -878,7 +874,7 @@ namespace VDD_Control
             restartAllButton.PressedContourColorB = Color.FromArgb(0, 80, 0);
             restartAllButton.Size = new Size(154, 22);
             restartAllButton.TabIndex = 35;
-            restartAllButton.Text = "Restart All Drivers";
+            restartAllButton.Text = "Restart Driver(s)";
             restartAllButton.TextAlignment = StringAlignment.Center;
             restartAllButton.Click += restartAllButton_Click;
             // 
@@ -901,6 +897,7 @@ namespace VDD_Control
             enterButton.TabIndex = 34;
             enterButton.Text = "Enter";
             enterButton.TextAlignment = StringAlignment.Center;
+            enterButton.Click += button3_Click;
             // 
             // minButton
             // 
