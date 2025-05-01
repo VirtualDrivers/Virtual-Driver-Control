@@ -599,7 +599,7 @@ namespace VDD_Control
             // mainConsole
             // 
             mainConsole.BackColor = Color.FromArgb(32, 32, 32);
-            mainConsole.Font = new Font("Consolas", 9F, FontStyle.Regular, GraphicsUnit.Point);
+            mainConsole.Font = new Font("Consolas", 8F, FontStyle.Regular, GraphicsUnit.Point);
             mainConsole.ForeColor = Color.FromArgb(0, 192, 0);
             mainConsole.Location = new Point(13, 72);
             mainConsole.Name = "mainConsole";

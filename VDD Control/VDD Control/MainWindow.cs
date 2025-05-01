@@ -15,7 +15,8 @@ namespace VDD_Control
         private const string PIPE_NAME = "MTTVirtualDisplayPipe";
         string registryFilePath = "C:\\VirtualDisplayDriver"; //Lets not use null, just in case
 
-        private XMLController IXCLI;
+        // Make IXCLI nullable to fix null safety warnings
+        private XMLController? IXCLI;
 
         private bool SDR10_STATE = false;
         private bool CUSTOMEDID_STATE = false;
@@ -41,6 +42,9 @@ namespace VDD_Control
                 if (!string.IsNullOrEmpty(settingsPath))
                 {
                     IXCLI = new XMLController(settingsPath);
+                    
+                    // Load initial values from XML, but don't set menu checked state yet
+                    // We'll sync with actual driver status in Form1_Load
                     SDR10_STATE = IXCLI.SDR10bit;
                     CUSTOMEDID_STATE = IXCLI.CustomEdid;
                     EDIDCEAOVERRRIDE_STATE = IXCLI.EdidCeaOverride;
@@ -48,8 +52,10 @@ namespace VDD_Control
                     HARDWARECURSOR_STATE = IXCLI.HardwareCursor;
                     LOGGING_STATE = IXCLI.Logging;
                     DEVLOGGING_STATE = IXCLI.DebugLogging;
-
-                    sDR10bitToolStripMenuItem.Checked = SDR10_STATE;
+                    HDR10PLUS_STATE = IXCLI.HDRPlus;
+                    
+                    // Initial menu state set to unchecked by default
+                    // Actual state will be updated in Form1_Load by SyncMenuItemsWithDriverStatus
                 }
                 else
                 {
@@ -90,6 +96,16 @@ namespace VDD_Control
         {
             mainVisibleMenuStrip.Renderer = new ToolStripProfessionalRenderer(new CustomColorTable());
 
+            // Set text color for all menu items
+            foreach (ToolStripMenuItem item in mainVisibleMenuStrip.Items)
+            {
+                SetMenuItemStyle(item);
+            }
+            
+            // Display ASCII art animation with proper delays and scrolling first
+            // before any other operations to ensure it's visible
+            await DisplayAsciiArtAnimation();
+            
             // Only try to load XML if IXCLI was successfully initialized
             if (IXCLI != null)
             {
@@ -99,75 +115,12 @@ namespace VDD_Control
                 }
                 catch (Exception ex)
                 {
-                    mainConsole.AppendText($"[ERROR] Failed to load settings: {ex.Message}\n");
+                    AppendToConsole($"[ERROR] Failed to load settings: {ex.Message}\n");
                 }
             }
-
-            // Set text color for all menu items
-            foreach (ToolStripMenuItem item in mainVisibleMenuStrip.Items)
-            {
-                SetMenuItemStyle(item);
-            }
-            mainConsole.AppendText("           ////////      ///////(/////////        //////////////(//     ////////\n");
-            await Task.Delay(40);
-            mainConsole.AppendText("           ////                                                             ////\n");
-            await Task.Delay(40);
-            mainConsole.AppendText("           ////                                                             ////\n");
-            await Task.Delay(40);
-            mainConsole.AppendText("                                                                                \n");
-            await Task.Delay(40);
-            mainConsole.AppendText("                                                                                \n");
-            await Task.Delay(40);
-            mainConsole.AppendText("                                                                                \n");
-            await Task.Delay(40);
-            mainConsole.AppendText("           ////                                                             ////\n");
-            await Task.Delay(40);
-            mainConsole.AppendText(" ///(///(///(///(///(///(///(///(///(///(///(///(///(///(///(///(/          (///\n");
-            await Task.Delay(40);
-            mainConsole.AppendText(" ///////////////////////////////(///////////////////////////////(/          ////\n");
-            await Task.Delay(40);
-            mainConsole.AppendText(" ///      .............................................        /(/          ////\n");
-            await Task.Delay(40);
-            mainConsole.AppendText(" ///     .......................,........................      /(/          ////\n");
-            await Task.Delay(40);
-            mainConsole.AppendText(" ///   .................,,,,,,,,,,,,,,,,,.................     /(/          ////\n");
-            await Task.Delay(40);
-            mainConsole.AppendText(" ///  ...............,,,,,,,,,,,,,,,,,,,,,,,...............    /(/              \n");
-            await Task.Delay(40);
-            mainConsole.AppendText(" /// ..............,,,,,,,,,,,,,,,,,,,,,,,,.................   /(/              \n");
-            await Task.Delay(40);
-            mainConsole.AppendText(" /// ....... @@@@.,,,, @@@.@@@@@@@@@@@,,.@@@@@@@@@@@........   /(/          ////\n");
-            await Task.Delay(40);
-            mainConsole.AppendText(" /(/......... @@@.,,,.@@@.,@@@@,,,, @@@,.@@@.,,.. @@@........  /(/          (/(/\n");
-            await Task.Delay(40);
-            mainConsole.AppendText(" ///.......... @@@,,.@@@%,,@@@@,,,,,@@@@.@@@.,,,..@@@(.......  /(/          ////\n");
-            await Task.Delay(40);
-            mainConsole.AppendText(" ///........... @@@.@@@@,,,@@@@,,,,,@@@@.@@@.,,,..@@@........  /(/      ////////\n");
-            await Task.Delay(40);
-            mainConsole.AppendText(" /// ........... @@@@@@,,,.@@@@,,,,@@@@,.@@@.,,..@@@@.......   /(/              \n");
-            await Task.Delay(40);
-            mainConsole.AppendText(" /// ............@@@@@,,,,.@@@@@@@@@@.,,.@@@@@@@@@@.........   /(/              \n");
-            await Task.Delay(40);
-            mainConsole.AppendText(" ///  ................,,,,,,..,,,,,,,,,,,..................    /(/              \n");
-            await Task.Delay(40);
-            mainConsole.AppendText(" ///   .................,,,,,,,,,,,,,,,,,.................     /(/              \n");
-            await Task.Delay(40);
-            mainConsole.AppendText(" ///    ......................,,,,,,.....................      /(/              \n");
-            await Task.Delay(40);
-            mainConsole.AppendText(" ///      .............................................        /(/              \n");
-            await Task.Delay(40);
-            mainConsole.AppendText(" ///        .........................................          /(/              \n");
-            await Task.Delay(40);
-            mainConsole.AppendText(" /////////////((MIKETHETECH))//(BUD)//(JOCKE)///////////////////(/              \n");
-            await Task.Delay(40);
-            mainConsole.AppendText("                              //(///                                            \n");
-            await Task.Delay(40);
-            mainConsole.AppendText("                              //(///                                            \n");
-            await Task.Delay(40);
-            mainConsole.AppendText("                *///////////////(////////////////                               \n");
-            await Task.Delay(40);
-            mainConsole.AppendText("                *///////////////(///////////////(\n\n");
-            await Task.Delay(40);
+            
+            // After ASCII art display, sync menu items with actual driver status
+            await SyncMenuItemsWithDriverStatus();
 
             try
             {
@@ -225,20 +178,19 @@ namespace VDD_Control
                 systemInfo += settingsPath ?? "Could not locate settings file";
 
                 // Display the information in richTextBox1
-                mainConsole.AppendText(systemInfo);
-                mainConsole.Refresh(); // Ensure the UI is updated
+                AppendToConsole(systemInfo + "\n");
             }
             catch (Exception ex)
             {
                 // Display error details in richTextBox1
-                mainConsole.AppendText("An error occurred while retrieving system information:\n" + ex.Message); // This really shouldn't happen. But probably will.
+                AppendToConsole("An error occurred while retrieving system information:\n" + ex.Message + "\n"); // This really shouldn't happen. But probably will.
             }
 
-            mainConsole.AppendText("Virtual Display Driver Control Initialized.\n");
+            AppendToConsole("Virtual Display Driver Control Initialized.\n");
 
             if (!await TryConnectToDriver())
             {
-                mainConsole.AppendText("[WARNING] Could not verify driver connection. Ensure the driver is running.\n");
+                AppendToConsole("[WARNING] Could not verify driver connection. Ensure the driver is running.\n");
             }
         }
 
@@ -344,19 +296,19 @@ namespace VDD_Control
                     using (var pipeClient = new NamedPipeClientStream(".", PIPE_NAME, PipeDirection.InOut))
                     {
                         await pipeClient.ConnectAsync(2000);
-                        mainConsole.AppendText("[SUCCESS] Connected to the driver.\n");
+                        AppendToConsole("[SUCCESS] Connected to the driver.\n");
                         return true;
                     }
                 }
                 catch (Exception ex)
                 {
                     attempt++;
-                    mainConsole.AppendText($"[ERROR] Connection failed: {ex.Message} (Attempt {attempt}/{maxAttempts})\n");
-                    mainConsole.AppendText("Note: This may also occur if the driver is off or restarting.\n");
+                    AppendToConsole($"[ERROR] Connection failed: {ex.Message} (Attempt {attempt}/{maxAttempts})\n");
+                    AppendToConsole("Note: This may also occur if the driver is off or restarting.\n");
 
                     if (attempt >= maxAttempts)
                     {
-                        mainConsole.AppendText("[ERROR] Unable to connect after multiple attempts.\n");
+                        AppendToConsole("[ERROR] Unable to connect after multiple attempts.\n");
                         return false;
                     }
 
@@ -367,7 +319,7 @@ namespace VDD_Control
             return false;
         }
 
-        private async Task<string> SendCommandToDriver(string command)
+        private async Task<string?> SendCommandToDriver(string command)
         {
             if (!await TryConnectToDriver()) // No need to check if command sent is not equal to restart driver 
             {
@@ -389,7 +341,7 @@ namespace VDD_Control
                     using (var reader = new StreamReader(pipeClient, Encoding.UTF8))
                     {
                         var startTime = DateTime.UtcNow;
-                        string response;
+                        string? response;
                         // We loop here due to the driver being able to send its logs through the pipe, after 5 seconds we nullify to handle any unexpected errors
                         // Responses cant be returned if logging is off unless the pipe functions specifically specifies a return containing `[Companion]` to allow for context filtering
                         // This means every other command other than PING, will not return a response to the companion without logging being on. This has to be changed within the driver itself
@@ -407,7 +359,7 @@ namespace VDD_Control
                             int index = response.IndexOf("[COMPANION]") + 11;
                             response = response.Substring(index).Trim();
                         }
-                        mainConsole.AppendText($"[{command}] Response: {response}\n");
+                        AppendToConsole($"[{command}] Response: {response}\n");
 
                         return response;
                     }
@@ -416,6 +368,138 @@ namespace VDD_Control
             catch (Exception ex)
             {
                 return $"[ERROR] Sending command failed: {ex.Message}";
+            }
+        }
+        
+        // Query the driver for the current status of a feature
+        private async Task<bool> GetDriverFeatureStatus(string featureName)
+        {
+            try
+            {
+                // Send a STATUS command to the driver to get current settings
+                string? response = await SendCommandToDriver("STATUS");
+                
+                if (string.IsNullOrEmpty(response) || response.StartsWith("[ERROR]"))
+                {
+                    // If there's an error or no response, fall back to XML settings
+                    AppendToConsole($"[INFO] Could not get driver status for {featureName}, using XML settings.\n");
+                    
+                    // Get the status from XML based on feature name
+                    if (IXCLI != null)
+                    {
+                        switch (featureName.ToUpper())
+                        {
+                            case "SDR10": return IXCLI.SDR10bit;
+                            case "HDRPLUS": return IXCLI.HDRPlus;
+                            case "CUSTOMEDID": return IXCLI.CustomEdid;
+                            case "HARDWARECURSOR": return IXCLI.HardwareCursor;
+                            case "PREVENTSPOOF": return IXCLI.PreventSpoof;
+                            case "CEAOVERRIDE": return IXCLI.EdidCeaOverride;
+                            default: return false;
+                        }
+                    }
+                    return false; // No XML controller available
+                }
+                
+                // Parse the response looking for the feature's status
+                // Expected format: "Feature1=true|Feature2=false|..." or similar
+                if (response.Contains(featureName + "="))
+                {
+                    int startIndex = response.IndexOf(featureName + "=") + featureName.Length + 1;
+                    int endIndex = response.IndexOf('|', startIndex);
+                    if (endIndex == -1) endIndex = response.Length;
+                    
+                    string statusValue = response.Substring(startIndex, endIndex - startIndex).Trim().ToLower();
+                    return statusValue == "true" || statusValue == "1" || statusValue == "on";
+                }
+                
+                // If feature not found in response, fall back to XML settings
+                AppendToConsole($"[INFO] Feature {featureName} not found in driver status, using XML settings.\n");
+                
+                // Get the status from XML based on feature name
+                if (IXCLI != null)
+                {
+                    switch (featureName.ToUpper())
+                    {
+                        case "SDR10": return IXCLI.SDR10bit;
+                        case "HDRPLUS": return IXCLI.HDRPlus;
+                        case "CUSTOMEDID": return IXCLI.CustomEdid;
+                        case "HARDWARECURSOR": return IXCLI.HardwareCursor;
+                        case "PREVENTSPOOF": return IXCLI.PreventSpoof;
+                        case "CEAOVERRIDE": return IXCLI.EdidCeaOverride;
+                        default: return false;
+                    }
+                }
+                return false; // No XML controller available
+            }
+            catch (Exception ex)
+            {
+                AppendToConsole($"[ERROR] Failed to get status for {featureName}: {ex.Message}\n");
+                return false;
+            }
+        }
+        
+        private async Task SyncMenuItemsWithDriverStatus()
+        {
+            try
+            {
+                // Check if we can connect to the driver
+                bool isDriverConnected = await TryConnectToDriver();
+                if (!isDriverConnected)
+                {
+                    // Driver not connected, set all menu items to unchecked
+                    AppendToConsole("[INFO] Driver not connected. All feature menu items set to unchecked.\n");
+                    
+                    sDR10bitToolStripMenuItem.Checked = false;
+                    hDRToolStripMenuItem.Checked = false;
+                    customEDIDToolStripMenuItem.Checked = false;
+                    hardwareCursorToolStripMenuItem.Checked = false;
+                    preventMonitorSpoofToolStripMenuItem.Checked = false;
+                    eDIDCEAOverrideToolStripMenuItem.Checked = false;
+                    
+                    // Update state variables too
+                    SDR10_STATE = false;
+                    HDR10PLUS_STATE = false;
+                    CUSTOMEDID_STATE = false;
+                    HARDWARECURSOR_STATE = false;
+                    PREVENTEDIDSPOOF_STATE = false;
+                    EDIDCEAOVERRRIDE_STATE = false;
+                    
+                    return;
+                }
+                
+                // Driver is connected, query the status of each feature and update menu items accordingly
+                AppendToConsole("[INFO] Syncing menu items with actual driver status...\n");
+                
+                // Query and update SDR10 status
+                SDR10_STATE = await GetDriverFeatureStatus("SDR10");
+                sDR10bitToolStripMenuItem.Checked = SDR10_STATE;
+                
+                // Query and update HDR Plus status
+                HDR10PLUS_STATE = await GetDriverFeatureStatus("HDRPLUS");
+                hDRToolStripMenuItem.Checked = HDR10PLUS_STATE;
+                
+                // Query and update Custom EDID status
+                CUSTOMEDID_STATE = await GetDriverFeatureStatus("CUSTOMEDID");
+                customEDIDToolStripMenuItem.Checked = CUSTOMEDID_STATE;
+                
+                // Query and update Hardware Cursor status
+                HARDWARECURSOR_STATE = await GetDriverFeatureStatus("HARDWARECURSOR");
+                hardwareCursorToolStripMenuItem.Checked = HARDWARECURSOR_STATE;
+                
+                // Query and update Prevent Spoof status
+                PREVENTEDIDSPOOF_STATE = await GetDriverFeatureStatus("PREVENTSPOOF");
+                preventMonitorSpoofToolStripMenuItem.Checked = PREVENTEDIDSPOOF_STATE;
+                
+                // Query and update CEA Override status
+                EDIDCEAOVERRRIDE_STATE = await GetDriverFeatureStatus("CEAOVERRIDE");
+                eDIDCEAOverrideToolStripMenuItem.Checked = EDIDCEAOVERRRIDE_STATE;
+                
+                AppendToConsole("[SUCCESS] Menu items synced with driver status.\n");
+            }
+            catch (Exception ex)
+            {
+                AppendToConsole($"[ERROR] Failed to sync menu items with driver status: {ex.Message}\n");
             }
         }
 
@@ -741,17 +825,32 @@ namespace VDD_Control
             sDR10bitToolStripMenuItem.Checked = SDR10_STATE;     //Sync Checked state in menu
 
             string action = SDR10_STATE ? "ON" : "OFF";          //Switch based off state
-            mainConsole.AppendText($"[ACTION] Toggling SDR 10 bit state to {action}...\n");
+            AppendToConsole($"[ACTION] Toggling SDR 10 bit state to {action}...\n");
 
-            string response;
             try
             {
                 string command = SDR10_STATE ? "SDR10 true" : "SDR10 false";
-                response = await SendCommandToDriver(command); // Send state based off bool
+                string? response = await SendCommandToDriver(command); // Send state based off bool
+                
+                // After sending the command, get actual status from driver to ensure the UI is in sync
+                bool actualStatus = await GetDriverFeatureStatus("SDR10");
+                if (SDR10_STATE != actualStatus)
+                {
+                    // If there's a mismatch, update UI to match actual driver state
+                    SDR10_STATE = actualStatus;
+                    sDR10bitToolStripMenuItem.Checked = actualStatus;
+                    AppendToConsole($"[INFO] SDR 10 bit setting changed to {(actualStatus ? "ON" : "OFF")} based on driver status.\n");
+                }
             }
             catch (Exception ex)
             {
-                response = $"[ERROR] Could not send toggle SDR command: {ex.Message}";
+                string errorMsg = $"[ERROR] Could not send toggle SDR command: {ex.Message}";
+                AppendToConsole(errorMsg + "\n");
+                
+                // On error, revert UI state to match actual driver state
+                bool actualStatus = await GetDriverFeatureStatus("SDR10");
+                SDR10_STATE = actualStatus;
+                sDR10bitToolStripMenuItem.Checked = actualStatus;
             }
         }
 
@@ -762,17 +861,32 @@ namespace VDD_Control
             hDRToolStripMenuItem.Checked = HDR10PLUS_STATE;
 
             string action = HDR10PLUS_STATE ? "ON" : "OFF";
-            mainConsole.AppendText($"[ACTION] Toggling HDR-10+ state to {action}...\n");
+            AppendToConsole($"[ACTION] Toggling HDR-10+ state to {action}...\n");
 
-            string response;
             try
             {
                 string command = HDR10PLUS_STATE ? "HDRPLUS true" : "HDRPLUS false";
-                response = await SendCommandToDriver(command);
+                string? response = await SendCommandToDriver(command);
+                
+                // After sending the command, get actual status from driver to ensure the UI is in sync
+                bool actualStatus = await GetDriverFeatureStatus("HDRPLUS");
+                if (HDR10PLUS_STATE != actualStatus)
+                {
+                    // If there's a mismatch, update UI to match actual driver state
+                    HDR10PLUS_STATE = actualStatus;
+                    hDRToolStripMenuItem.Checked = actualStatus;
+                    AppendToConsole($"[INFO] HDR-10+ setting changed to {(actualStatus ? "ON" : "OFF")} based on driver status.\n");
+                }
             }
             catch (Exception ex)
             {
-                response = $"[ERROR] Could not send toggle HDR-10+ command: {ex.Message}";
+                string errorMsg = $"[ERROR] Could not send toggle HDR-10+ command: {ex.Message}";
+                AppendToConsole(errorMsg + "\n");
+                
+                // On error, revert UI state to match actual driver state
+                bool actualStatus = await GetDriverFeatureStatus("HDRPLUS");
+                HDR10PLUS_STATE = actualStatus;
+                hDRToolStripMenuItem.Checked = actualStatus;
             }
         }
 
@@ -1061,7 +1175,7 @@ namespace VDD_Control
                 return;
                 
             string command = userInput.Text.Trim();
-            mainConsole.AppendText($"[COMMAND] {command}\n");
+            AppendToConsole($"[COMMAND] {command}\n");
             
             // Handle special commands
             if (command.Equals("HELP", StringComparison.OrdinalIgnoreCase))
@@ -1076,13 +1190,20 @@ namespace VDD_Control
             
             try
             {
-                string response = await SendCommandToDriver(command);
-                mainConsole.AppendText($"[RESPONSE] {response}\n");
+                string? response = await SendCommandToDriver(command);
+                if (response != null)
+                {
+                    AppendToConsole($"[RESPONSE] {response}\n");
+                }
+                else
+                {
+                    AppendToConsole("[RESPONSE] No response received from driver.\n");
+                }
                 UpdateTaskProgress("Sending Command", 100);
             }
             catch (Exception ex)
             {
-                mainConsole.AppendText($"[ERROR] {ex.Message}\n");
+                AppendToConsole($"[ERROR] {ex.Message}\n");
                 UpdateTaskProgress("Sending Command", 0);
             }
             finally
@@ -1106,7 +1227,101 @@ namespace VDD_Control
 
         private void richTextBox1_TextChanged(object sender, EventArgs e)
         {
-
+            // Auto-scroll to the bottom when text changes
+            mainConsole.SelectionStart = mainConsole.Text.Length;
+            mainConsole.ScrollToCaret();
+        }
+        
+        // Helper method to append text to console and ensure scrolling
+        private void AppendToConsole(string text)
+        {
+            // Append the text to the console
+            mainConsole.AppendText(text);
+            
+            // Ensure the console scrolls to show the latest text
+            mainConsole.SelectionStart = mainConsole.Text.Length;
+            mainConsole.ScrollToCaret();
+            mainConsole.Refresh(); // Force a UI refresh to ensure scrolling happens immediately
+        }
+        
+        // Method to display ASCII art animation with proper line-by-line delay
+        private async Task DisplayAsciiArtAnimation()
+        {
+            // Clear the console first
+            mainConsole.Clear();
+            
+            const int lineDelay = 40; // milliseconds between lines
+            
+            // Array of ASCII art lines for animation with explicit line-by-line display
+            string[] asciiArtLines = new string[]
+            {
+                "           ////////      ///////(/////////        //////////////(//     ////////",
+                "           ////                                                             ////",
+                "           ////                                                             ////",
+                "                                                                                ",
+                "                                                                                ",
+                "                                                                                ",
+                "           ////                                                             ////",
+                " ///(///(///(///(///(///(///(///(///(///(///(///(///(///(///(///(/          (///",
+                " ///////////////////////////////(///////////////////////////////(/          ////",
+                " ///      .............................................        /(/          ////",
+                " ///     .......................,........................      /(/          ////",
+                " ///   .................,,,,,,,,,,,,,,,,,.................     /(/          ////",
+                " ///  ...............,,,,,,,,,,,,,,,,,,,,,,,...............    /(/              ",
+                " /// ..............,,,,,,,,,,,,,,,,,,,,,,,,.................   /(/              ",
+                " /// ....... @@@@.,,,, @@@.@@@@@@@@@@@,,.@@@@@@@@@@@........   /(/          ////",
+                " /(/......... @@@.,,,.@@@.,@@@@,,,, @@@,.@@@.,,.. @@@........  /(/          (/(/",
+                " ///.......... @@@,,.@@@%,,@@@@,,,,,@@@@.@@@.,,,..@@@(.......  /(/          ////",
+                " ///........... @@@.@@@@,,,@@@@,,,,,@@@@.@@@.,,,..@@@........  /(/      ////////",
+                " /// ........... @@@@@@,,,.@@@@,,,,@@@@,.@@@.,,..@@@@.......   /(/              ",
+                " /// ............@@@@@,,,,.@@@@@@@@@@.,,.@@@@@@@@@@.........   /(/              ",
+                " ///  ................,,,,,,..,,,,,,,,,,,..................    /(/              ",
+                " ///   .................,,,,,,,,,,,,,,,,,.................     /(/              ",
+                " ///    ......................,,,,,,.....................      /(/              ",
+                " ///      .............................................        /(/              ",
+                " ///        .........................................          /(/              ",
+                " /////////////((MIKETHETECH))//(BUD)//(JOCKE)///////////////////(/              ",
+                "                              //(///                                            ",
+                "                              //(///                                            ",
+                "                *///////////////(////////////////                               ",
+                "                *///////////////(///////////////(                               "
+            };
+            
+            // Use a separate StringBuilder to build the console contents line by line
+            StringBuilder consoleContent = new StringBuilder();
+            
+            // Display each line with a delay for animation effect
+            for (int i = 0; i < asciiArtLines.Length; i++)
+            {
+                // Add this line to the console
+                if (i > 0)
+                {
+                    consoleContent.AppendLine(); // Add a newline before each line except the first
+                }
+                consoleContent.Append(asciiArtLines[i]);
+                
+                // Update the console with all content so far
+                mainConsole.Text = consoleContent.ToString();
+                
+                // Manually scroll to ensure each line is visible
+                mainConsole.SelectionStart = mainConsole.Text.Length;
+                mainConsole.ScrollToCaret();
+                
+                // Force UI update
+                mainConsole.Update();
+                Application.DoEvents(); // Process any pending messages to ensure UI updates
+                
+                // Wait before showing the next line
+                await Task.Delay(lineDelay);
+            }
+            
+            // Add a couple of blank lines after the ASCII art
+            consoleContent.AppendLine();
+            consoleContent.AppendLine();
+            mainConsole.Text = consoleContent.ToString();
+            mainConsole.SelectionStart = mainConsole.Text.Length;
+            mainConsole.ScrollToCaret();
+            mainConsole.Update();
         }
 
         private void royalMenuStrip1_ItemClicked(object sender, ToolStripItemClickedEventArgs e)
