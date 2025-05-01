@@ -32,6 +32,32 @@ namespace VDD_Control
 
         public XMLController(string FilePath)
         {
+            // Handle null or empty file path by checking common locations
+            if (string.IsNullOrEmpty(FilePath))
+            {
+                string[] commonLocations = 
+                {
+                    @"C:\VirtualDisplayDriver\vdd_settings.xml",
+                    @"C:\IddSampleDriver\vdd_settings.xml",
+                    Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "vdd_settings.xml")
+                };
+                
+                foreach (string path in commonLocations)
+                {
+                    if (File.Exists(path))
+                    {
+                        FilePath = path;
+                        break;
+                    }
+                }
+                
+                // If still null, default to the application directory
+                if (string.IsNullOrEmpty(FilePath))
+                {
+                    FilePath = AppDomain.CurrentDomain.BaseDirectory;
+                }
+            }
+            
             LoadFromXml(FilePath);
         }
 
@@ -39,9 +65,16 @@ namespace VDD_Control
         public void LoadFromXml(string filePath)
         {
             string xmlfile = filePath;
-            if (!xmlfile.EndsWith("vdd_settings.xml"))
+            
+            // If the provided path doesn't end with the expected file name
+            if (!string.IsNullOrEmpty(xmlfile) && !xmlfile.EndsWith("vdd_settings.xml", StringComparison.OrdinalIgnoreCase))
             {
-                xmlfile = Path.Combine(filePath, "vdd_settings.xml");
+                if (Directory.Exists(filePath))
+                {
+                    // It's a directory path, append the filename
+                    xmlfile = Path.Combine(filePath, "vdd_settings.xml");
+                }
+                // Otherwise, assume it's a file path that just doesn't end with vdd_settings.xml
             }
             
             // Check if the file exists
@@ -51,7 +84,9 @@ namespace VDD_Control
                 string[] fallbackPaths =
                 {
                     @"C:\VirtualDisplayDriver\vdd_settings.xml",
-                    @"C:\IddSampleDriver\vdd_settings.xml"
+                    @"C:\IddSampleDriver\vdd_settings.xml",
+                    // Try the XML file in the project root directory
+                    Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "vdd_settings.xml")
                 };
 
                 foreach (string path in fallbackPaths)
@@ -70,14 +105,29 @@ namespace VDD_Control
                 }
             }
 
+            // Log the file path we're trying to load
+            Console.WriteLine($"[DEBUG] Attempting to load XML from: {xmlfile}");
+            
             string xmlContent;
             using (StreamReader reader = new StreamReader(xmlfile))
             {
                 xmlContent = reader.ReadToEnd();
             }
+            
+            // Log successful file read
+            Console.WriteLine($"[DEBUG] Successfully read XML content, length: {xmlContent.Length}");
 
             XmlDocument xmlDoc = new XmlDocument();
-            xmlDoc.LoadXml(xmlContent);
+            try
+            {
+                xmlDoc.LoadXml(xmlContent);
+                Console.WriteLine("[DEBUG] Successfully parsed XML document");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[ERROR] Failed to parse XML: {ex.Message}");
+                throw; // Re-throw to maintain original behavior
+            }
 
             XmlNode countNode = xmlDoc.SelectSingleNode("//monitors/count");
             if (countNode != null)

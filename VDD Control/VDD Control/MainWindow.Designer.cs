@@ -347,6 +347,7 @@ namespace VDD_Control
             enableDriverToolStripMenuItem3.Name = "enableDriverToolStripMenuItem3";
             enableDriverToolStripMenuItem3.Size = new Size(146, 22);
             enableDriverToolStripMenuItem3.Text = "Enable Driver";
+            enableDriverToolStripMenuItem3.Click += enableDriverToolStripMenuItem2_Click;
             // 
             // disableDriverToolStripMenuItem3
             // 
@@ -456,6 +457,7 @@ namespace VDD_Control
             enableDriverToolStripMenuItem.Name = "enableDriverToolStripMenuItem";
             enableDriverToolStripMenuItem.Size = new Size(146, 22);
             enableDriverToolStripMenuItem.Text = "Enable Driver";
+            enableDriverToolStripMenuItem.Click += enableDriverToolStripMenuItem2_Click;
             // 
             // disableDriverToolStripMenuItem
             // 
@@ -519,6 +521,7 @@ namespace VDD_Control
             enableDriverToolStripMenuItem1.Name = "enableDriverToolStripMenuItem1";
             enableDriverToolStripMenuItem1.Size = new Size(146, 22);
             enableDriverToolStripMenuItem1.Text = "Enable Driver";
+            enableDriverToolStripMenuItem1.Click += enableDriverToolStripMenuItem2_Click;
             // 
             // disableDriverToolStripMenuItem1
             // 
