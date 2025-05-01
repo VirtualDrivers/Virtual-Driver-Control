@@ -43,17 +43,17 @@ namespace VDD_Control
                 if (!string.IsNullOrEmpty(settingsPath))
                 {
                     mainConsole.AppendText($"[INFO] Initializing XMLController with path: {settingsPath}\n");
-                    try 
+                    try
                     {
                         IXCLI = new XMLController(settingsPath);
                         mainConsole.AppendText("[SUCCESS] XMLController initialized successfully\n");
-                        
+
                         // Load initial values from XML and set menu checked state immediately from XML
                         LoadSettingsFromXML();
-                        
+
                         mainConsole.AppendText($"[INFO] XML Settings loaded: SDR10={SDR10_STATE}, HDR+={HDR10PLUS_STATE}, CustomEDID={CUSTOMEDID_STATE}\n");
                     }
-                    catch (Exception ex) 
+                    catch (Exception ex)
                     {
                         mainConsole.AppendText($"[ERROR] Failed to initialize XMLController: {ex.Message}\n");
                         if (ex.InnerException != null)
@@ -73,7 +73,7 @@ namespace VDD_Control
                         {
                             IXCLI = new XMLController(localXmlPath);
                             mainConsole.AppendText("[SUCCESS] XMLController initialized with local XML file\n");
-                            
+
                             // Load values from XML and update menu state
                             LoadSettingsFromXML();
                         }
@@ -87,16 +87,16 @@ namespace VDD_Control
                         mainConsole.AppendText("[ERROR] Could not locate settings file in any expected location.\n");
                     }
                 }
-                
+
                 // Set the state of other feature menus not directly tied to XML options
                 // Skip SetupMinimizeToTrayMenu(); as it's being hidden
-                
+
                 // Hide GPU selection menu as requested
                 selectGPUToolStripMenuItem.Visible = false;
                 if (selectGPUToolStripMenuItem1 != null) selectGPUToolStripMenuItem1.Visible = false;
-                
+
                 // Skip PopulateGpuSelectionMenu(); as it's being hidden
-                
+
                 // Setup Display Count menu
                 SetupDisplayCountMenu();
             }
@@ -109,12 +109,12 @@ namespace VDD_Control
                 mainConsole.AppendText($"[ERROR] Error initializing settings: {ex.Message}\n");
             }
         }
-        
+
         // Helper method to load settings from XML and update menu state
         private void LoadSettingsFromXML()
         {
             if (IXCLI == null) return;
-            
+
             // Load state variables from XML
             SDR10_STATE = IXCLI.SDR10bit;
             CUSTOMEDID_STATE = IXCLI.CustomEdid;
@@ -124,7 +124,7 @@ namespace VDD_Control
             LOGGING_STATE = IXCLI.Logging;
             DEVLOGGING_STATE = IXCLI.DebugLogging;
             HDR10PLUS_STATE = IXCLI.HDRPlus;
-            
+
             // Update menu checked state to match XML values
             sDR10bitToolStripMenuItem.Checked = SDR10_STATE;
             hDRToolStripMenuItem.Checked = HDR10PLUS_STATE;
@@ -132,7 +132,7 @@ namespace VDD_Control
             hardwareCursorToolStripMenuItem.Checked = HARDWARECURSOR_STATE;
             preventMonitorSpoofToolStripMenuItem.Checked = PREVENTEDIDSPOOF_STATE;
             eDIDCEAOverrideToolStripMenuItem.Checked = EDIDCEAOVERRRIDE_STATE;
-            
+
             // Also update any duplicate menu items in different menus
             if (sDR10bitToolStripMenuItem1 != null) sDR10bitToolStripMenuItem1.Checked = SDR10_STATE;
             if (hDRToolStripMenuItem1 != null) hDRToolStripMenuItem1.Checked = HDR10PLUS_STATE;
@@ -140,16 +140,16 @@ namespace VDD_Control
             if (hardwareCursorToolStripMenuItem1 != null) hardwareCursorToolStripMenuItem1.Checked = HARDWARECURSOR_STATE;
             if (preventMonitorSpoofToolStripMenuItem1 != null) preventMonitorSpoofToolStripMenuItem1.Checked = PREVENTEDIDSPOOF_STATE;
             if (eDIDCEAOverrideToolStripMenuItem1 != null) eDIDCEAOverrideToolStripMenuItem1.Checked = EDIDCEAOVERRRIDE_STATE;
-            
+
             // Hide the Select GPU option as requested
             selectGPUToolStripMenuItem.Visible = false;
             if (selectGPUToolStripMenuItem1 != null) selectGPUToolStripMenuItem1.Visible = false;
         }
-        
+
         // Fields for system tray functionality
         private NotifyIcon? trayIcon;
         private bool minimizeToTray = false; // Default to disabled - feature currently hidden
-        
+
         // Set up minimize to tray functionality
         private void SetupMinimizeToTrayMenu()
         {
@@ -158,7 +158,7 @@ namespace VDD_Control
             {
                 // Use the existing notificationIcon control from the form
                 notificationIcon.Text = "Virtual Display Driver Control";
-                
+
                 // Make sure the context menu has Show option
                 bool hasShowOption = false;
                 foreach (ToolStripItem item in trayMenu.Items)
@@ -169,7 +169,7 @@ namespace VDD_Control
                         break;
                     }
                 }
-                
+
                 if (!hasShowOption)
                 {
                     // Add Show option as the first item
@@ -177,10 +177,10 @@ namespace VDD_Control
                     // Add separator after Show
                     trayMenu.Items.Insert(1, new ToolStripSeparator());
                 }
-                
+
                 // Double-click behavior
                 notificationIcon.DoubleClick += (s, e) => ShowFromTray();
-                
+
                 // Handle form
                 // closing
                 this.FormClosing += (s, e) =>
@@ -192,7 +192,7 @@ namespace VDD_Control
                     }
                 };
             }
-            
+
             // Add Minimize to Tray option to menuToolStripMenuItem (Menu)
             bool hasMinimizeOption = false;
             foreach (ToolStripItem item in menuToolStripMenuItem.DropDownItems)
@@ -203,7 +203,7 @@ namespace VDD_Control
                     break;
                 }
             }
-            
+
             if (!hasMinimizeOption)
             {
                 // Create the minimize to tray menu item
@@ -212,7 +212,7 @@ namespace VDD_Control
                     Checked = minimizeToTray,
                     CheckOnClick = true
                 };
-                
+
                 // Add to menu before Exit
                 int exitPosition = -1;
                 for (int i = 0; i < menuToolStripMenuItem.DropDownItems.Count; i++)
@@ -223,7 +223,7 @@ namespace VDD_Control
                         break;
                     }
                 }
-                
+
                 if (exitPosition >= 0)
                 {
                     menuToolStripMenuItem.DropDownItems.Insert(exitPosition, minToTrayItem);
@@ -233,7 +233,7 @@ namespace VDD_Control
                 {
                     menuToolStripMenuItem.DropDownItems.Add(minToTrayItem);
                 }
-                
+
                 // Also add to tray menu
                 bool hasTrayMinimizeOption = false;
                 foreach (ToolStripItem item in menuToolStripMenuItem1.DropDownItems)
@@ -244,7 +244,7 @@ namespace VDD_Control
                         break;
                     }
                 }
-                
+
                 if (!hasTrayMinimizeOption)
                 {
                     // Create another instance for the tray menu
@@ -253,7 +253,7 @@ namespace VDD_Control
                         Checked = minimizeToTray,
                         CheckOnClick = true
                     };
-                    
+
                     // Add to tray menu
                     exitPosition = -1;
                     for (int i = 0; i < menuToolStripMenuItem1.DropDownItems.Count; i++)
@@ -264,7 +264,7 @@ namespace VDD_Control
                             break;
                         }
                     }
-                    
+
                     if (exitPosition >= 0)
                     {
                         menuToolStripMenuItem1.DropDownItems.Insert(exitPosition, trayMinItem);
@@ -276,18 +276,18 @@ namespace VDD_Control
                     }
                 }
             }
-            
+
             // Setup minimize button on the form (using ForeverMinimize)
             minButton.Click += (s, e) => MinimizeToTray();
         }
-        
+
         // Handle minimize to tray menu click
         private void MinimizeToTrayMenuClick(object sender, EventArgs e)
         {
             if (sender is ToolStripMenuItem item)
             {
                 minimizeToTray = item.Checked;
-                
+
                 // Update all instances of this menu item to have the same checked state
                 // Main menu items
                 foreach (ToolStripItem menuItem in menuToolStripMenuItem.DropDownItems)
@@ -297,7 +297,7 @@ namespace VDD_Control
                         tsMenuItem.Checked = minimizeToTray;
                     }
                 }
-                
+
                 // Tray menu items
                 foreach (ToolStripItem menuItem in menuToolStripMenuItem1.DropDownItems)
                 {
@@ -306,31 +306,31 @@ namespace VDD_Control
                         tsMenuItem.Checked = minimizeToTray;
                     }
                 }
-                
+
                 AppendToConsole($"[INFO] Minimize to tray {(minimizeToTray ? "enabled" : "disabled")}\n");
             }
         }
-        
+
         // Minimize the application to the system tray
         private void MinimizeToTray()
         {
             // Hide form
             this.Hide();
-            
+
             // Show tray icon (it's already visible in the designer)
             notificationIcon.Visible = true;
-            
+
             // Display notification
             notificationIcon.ShowBalloonTip(
-                2000, 
-                "Virtual Display Driver Control", 
-                "Application minimized to tray. Double-click to restore.", 
+                2000,
+                "Virtual Display Driver Control",
+                "Application minimized to tray. Double-click to restore.",
                 ToolTipIcon.Info
             );
-            
+
             AppendToConsole("[INFO] Application minimized to tray\n");
         }
-        
+
         // Show the application from the system tray
         private void ShowFromTray()
         {
@@ -338,24 +338,24 @@ namespace VDD_Control
             this.Show();
             this.WindowState = FormWindowState.Normal;
             this.Activate();
-            
+
             AppendToConsole("[INFO] Application restored from tray\n");
         }
-        
+
         // Populate GPU selection menu
         private void PopulateGpuSelectionMenu()
         {
             // Clear existing items
             selectGPUToolStripMenuItem.DropDownItems.Clear();
-            
+
             try
             {
                 // Get current GPU from XML if available
                 string currentGpu = IXCLI != null ? IXCLI.Friendlyname : "default";
-                
+
                 // Get available GPUs from PowerShell (WMI)
                 AppendToConsole("[INFO] Retrieving available GPUs...\n");
-                
+
                 // Add "default" option always
                 var defaultItem = new ToolStripMenuItem("default")
                 {
@@ -364,22 +364,22 @@ namespace VDD_Control
                 };
                 defaultItem.Click += GpuMenuItem_Click;
                 selectGPUToolStripMenuItem.DropDownItems.Add(defaultItem);
-                
+
                 // Add a loading item that will be replaced with actual GPU data when found
                 var loadingItem = new ToolStripMenuItem("Loading GPUs...");
                 selectGPUToolStripMenuItem.DropDownItems.Add(loadingItem);
-                
+
                 // Load GPUs asynchronously
-                Task.Run(async () => 
+                Task.Run(async () =>
                 {
                     List<string> gpuList = await GetAvailableGPUs();
-                    
+
                     // Update UI on the UI thread
-                    this.BeginInvoke(new Action(() => 
+                    this.BeginInvoke(new Action(() =>
                     {
                         // Remove the loading item
                         selectGPUToolStripMenuItem.DropDownItems.Remove(loadingItem);
-                        
+
                         if (gpuList.Count == 0)
                         {
                             // No additional GPUs found
@@ -401,7 +401,7 @@ namespace VDD_Control
                                 selectGPUToolStripMenuItem.DropDownItems.Add(gpuItem);
                             }
                         }
-                        
+
                         // Also update the second menu if it exists
                         if (selectGPUToolStripMenuItem1 != null)
                         {
@@ -417,12 +417,12 @@ namespace VDD_Control
                                         Enabled = menuItem.Enabled,
                                         Tag = menuItem.Tag
                                     };
-                                    
+
                                     if (menuItem.Enabled)
                                     {
                                         newItem.Click += GpuMenuItem_Click;
                                     }
-                                    
+
                                     selectGPUToolStripMenuItem1.DropDownItems.Add(newItem);
                                 }
                             }
@@ -433,14 +433,14 @@ namespace VDD_Control
             catch (Exception ex)
             {
                 AppendToConsole($"[ERROR] Failed to populate GPU menu: {ex.Message}\n");
-                
+
                 // Add a default error item
                 var errorItem = new ToolStripMenuItem("Error loading GPUs");
                 errorItem.Enabled = false;
                 selectGPUToolStripMenuItem.DropDownItems.Add(errorItem);
             }
         }
-        
+
         // Handle GPU menu item click
         private async void GpuMenuItem_Click(object sender, EventArgs e)
         {
@@ -448,9 +448,9 @@ namespace VDD_Control
             {
                 string selectedGpu = item.Tag.ToString();
                 if (string.IsNullOrEmpty(selectedGpu)) return;
-                
+
                 AppendToConsole($"[ACTION] Changing selected GPU to: {selectedGpu}\n");
-                
+
                 try
                 {
                     // Update all menu items to set only the selected one as checked
@@ -461,7 +461,7 @@ namespace VDD_Control
                             gpuItem.Checked = (gpuItem.Tag?.ToString() == selectedGpu);
                         }
                     }
-                    
+
                     // Also update the second menu if it exists
                     if (selectGPUToolStripMenuItem1 != null)
                     {
@@ -473,12 +473,12 @@ namespace VDD_Control
                             }
                         }
                     }
-                    
+
                     // Update XML settings
                     if (IXCLI != null)
                     {
                         IXCLI.Friendlyname = selectedGpu;
-                        
+
                         // Save XML file
                         try
                         {
@@ -491,7 +491,7 @@ namespace VDD_Control
                             AppendToConsole($"[ERROR] Failed to save XML with new GPU: {ex.Message}\n");
                         }
                     }
-                    
+
                     // Send command to driver
                     string command = $"SETGPU {selectedGpu}";
                     string response = await SendCommandToDriver(command);
@@ -503,12 +503,12 @@ namespace VDD_Control
                 }
             }
         }
-        
+
         // Get available GPUs from system
         private async Task<List<string>> GetAvailableGPUs()
         {
             List<string> gpuList = new List<string>();
-            
+
             try
             {
                 // Initialize a process to execute PowerShell to get GPU info
@@ -524,14 +524,14 @@ namespace VDD_Control
                         CreateNoWindow = true
                     }
                 };
-                
+
                 // Start the process
                 process.Start();
-                
+
                 // Read output
                 string output = await process.StandardOutput.ReadToEndAsync();
                 await process.WaitForExitAsync();
-                
+
                 // Process the output - each line is a GPU
                 if (!string.IsNullOrWhiteSpace(output))
                 {
@@ -550,21 +550,21 @@ namespace VDD_Control
             {
                 AppendToConsole($"[ERROR] Failed to retrieve GPU list: {ex.Message}\n");
             }
-            
+
             return gpuList;
         }
-        
+
         // Set up display count menu
         private void SetupDisplayCountMenu()
         {
             // Clear existing items
             displayCountToolStripMenuItem.DropDownItems.Clear();
-            
+
             try
             {
                 // Get current display count from XML if available
                 int currentCount = IXCLI != null ? IXCLI.Count : 1;  // Default to 1 if not available
-                
+
                 // Create menu items for common display counts (1-4)
                 for (int i = 1; i <= 4; i++)
                 {
@@ -576,10 +576,10 @@ namespace VDD_Control
                     item.Click += DisplayCountMenuItem_Click;
                     displayCountToolStripMenuItem.DropDownItems.Add(item);
                 }
-                
+
                 // Add separator
                 displayCountToolStripMenuItem.DropDownItems.Add(new ToolStripSeparator());
-                
+
                 // Add custom count option
                 var customItem = new ToolStripMenuItem("Custom...")
                 {
@@ -587,7 +587,7 @@ namespace VDD_Control
                 };
                 customItem.Click += CustomDisplayCountMenuItem_Click;
                 displayCountToolStripMenuItem.DropDownItems.Add(customItem);
-                
+
                 // Sync with other menu if it exists
                 if (displayCountToolStripMenuItem1 != null)
                 {
@@ -602,7 +602,7 @@ namespace VDD_Control
                                 Checked = item.Checked,
                                 Tag = item.Tag
                             };
-                            
+
                             if (item.Tag is int)
                             {
                                 newItem.Click += DisplayCountMenuItem_Click;
@@ -611,7 +611,7 @@ namespace VDD_Control
                             {
                                 newItem.Click += CustomDisplayCountMenuItem_Click;
                             }
-                            
+
                             displayCountToolStripMenuItem1.DropDownItems.Add(newItem);
                         }
                         else if (menuItem is ToolStripSeparator)
@@ -624,14 +624,14 @@ namespace VDD_Control
             catch (Exception ex)
             {
                 AppendToConsole($"[ERROR] Failed to set up display count menu: {ex.Message}\n");
-                
+
                 // Add default option
                 var defaultItem = new ToolStripMenuItem("1");
                 defaultItem.Checked = true;
                 displayCountToolStripMenuItem.DropDownItems.Add(defaultItem);
             }
         }
-        
+
         // Handle display count menu item click
         private async void DisplayCountMenuItem_Click(object sender, EventArgs e)
         {
@@ -640,7 +640,7 @@ namespace VDD_Control
                 await SetDisplayCount(count);
             }
         }
-        
+
         // Handle custom display count menu item click
         private async void CustomDisplayCountMenuItem_Click(object sender, EventArgs e)
         {
@@ -657,7 +657,7 @@ namespace VDD_Control
                 BackColor = Color.FromArgb(32, 34, 37),
                 ForeColor = Color.White
             };
-            
+
             Label label = new Label
             {
                 Text = "Enter number of displays (1-99):",
@@ -667,7 +667,7 @@ namespace VDD_Control
                 Width = 260
             };
             inputDialog.Controls.Add(label);
-            
+
             NumericUpDown numericInput = new NumericUpDown
             {
                 Minimum = 1,
@@ -680,7 +680,7 @@ namespace VDD_Control
                 ForeColor = Color.White
             };
             inputDialog.Controls.Add(numericInput);
-            
+
             Button okButton = new Button
             {
                 Text = "OK",
@@ -693,7 +693,7 @@ namespace VDD_Control
             };
             okButton.Click += (s, args) => inputDialog.DialogResult = DialogResult.OK;
             inputDialog.Controls.Add(okButton);
-            
+
             Button cancelButton = new Button
             {
                 Text = "Cancel",
@@ -706,7 +706,7 @@ namespace VDD_Control
             };
             cancelButton.Click += (s, args) => inputDialog.DialogResult = DialogResult.Cancel;
             inputDialog.Controls.Add(cancelButton);
-            
+
             // Show dialog and process result
             if (inputDialog.ShowDialog(this) == DialogResult.OK)
             {
@@ -714,19 +714,19 @@ namespace VDD_Control
                 await SetDisplayCount(count);
             }
         }
-        
+
         // Set display count in XML and send to driver
         private async Task SetDisplayCount(int count)
         {
             AppendToConsole($"[ACTION] Setting display count to {count}...\n");
-            
+
             try
             {
                 // Update display count in XML
                 if (IXCLI != null)
                 {
                     IXCLI.Count = count;
-                    
+
                     // Save XML
                     try
                     {
@@ -739,15 +739,15 @@ namespace VDD_Control
                         AppendToConsole($"[ERROR] Failed to save XML with new display count: {ex.Message}\n");
                     }
                 }
-                
+
                 // Send command to driver
                 string command = $"SETCOUNT {count}";
                 string response = await SendCommandToDriver(command);
                 AppendToConsole($"[INFO] Driver response: {response}\n");
-                
+
                 // Update menu checked state
                 UpdateDisplayCountMenus(count);
-                
+
                 // Recommend driver restart
                 AppendToConsole("[INFO] Display count changed. You may need to restart the driver for changes to take effect.\n");
             }
@@ -756,7 +756,7 @@ namespace VDD_Control
                 AppendToConsole($"[ERROR] Failed to set display count: {ex.Message}\n");
             }
         }
-        
+
         // Update display count menus to reflect the current count
         private void UpdateDisplayCountMenus(int count)
         {
@@ -768,7 +768,7 @@ namespace VDD_Control
                     menuItem.Checked = (itemCount == count);
                 }
             }
-            
+
             // Update secondary menu if it exists
             if (displayCountToolStripMenuItem1 != null)
             {
@@ -811,10 +811,10 @@ namespace VDD_Control
             {
                 SetMenuItemStyle(item);
             }
-            
+
             // Hide the minimize to tray functionality
             if (minButton != null) minButton.Visible = false;
-            
+
             // Also hide any Minimize to Tray menu items
             // First in the main menu
             foreach (ToolStripItem item in menuToolStripMenuItem.DropDownItems)
@@ -825,7 +825,7 @@ namespace VDD_Control
                     break;
                 }
             }
-            
+
             // Then in the tray menu
             foreach (ToolStripItem item in menuToolStripMenuItem1.DropDownItems)
             {
@@ -835,11 +835,11 @@ namespace VDD_Control
                     break;
                 }
             }
-            
+
             // Display ASCII art animation with proper delays and scrolling first
             // before any other operations to ensure it's visible
             await DisplayAsciiArtAnimation();
-            
+
             // Check if we need to create the XML in the installation directory
             if (IXCLI == null)
             {
@@ -854,7 +854,7 @@ namespace VDD_Control
                         {
                             IXCLI = new XMLController(settingsPath);
                             AppendToConsole("[SUCCESS] Created and loaded default XML settings file\n");
-                            
+
                             // Load initial values from XML
                             SDR10_STATE = IXCLI.SDR10bit;
                             CUSTOMEDID_STATE = IXCLI.CustomEdid;
@@ -872,7 +872,7 @@ namespace VDD_Control
                     AppendToConsole($"[ERROR] Failed to create default XML file: {ex.Message}\n");
                 }
             }
-            
+
             // Only try to load XML if IXCLI was successfully initialized
             if (IXCLI != null)
             {
@@ -886,7 +886,7 @@ namespace VDD_Control
                     AppendToConsole($"[ERROR] Failed to load settings: {ex.Message}\n");
                 }
             }
-            
+
             // After ASCII art display, sync menu items with actual driver status
             await SyncMenuItemsWithDriverStatus();
 
@@ -1144,7 +1144,7 @@ namespace VDD_Control
                 return $"[ERROR] Sending command failed: {ex.Message}";
             }
         }
-        
+
         // Query the driver for the current status of a feature
         private async Task<bool> GetDriverFeatureStatus(string featureName)
         {
@@ -1152,7 +1152,7 @@ namespace VDD_Control
             {
                 // First check if logging is enabled
                 bool shouldUseXml = !LOGGING_STATE;
-                
+
                 // If logging is disabled, we know the driver won't respond to status commands with proper content
                 // So we'll directly use XML settings instead of querying the driver
                 if (shouldUseXml)
@@ -1160,17 +1160,17 @@ namespace VDD_Control
                     AppendToConsole($"[INFO] Logging is disabled. Using XML settings for {featureName}.\n");
                     return GetFeatureStatusFromXml(featureName);
                 }
-                
+
                 // If logging is enabled, try to get status from driver
                 string? response = await SendCommandToDriver("STATUS");
-                
+
                 if (string.IsNullOrEmpty(response) || response.StartsWith("[ERROR]"))
                 {
                     // If there's an error or no response, fall back to XML settings
                     AppendToConsole($"[INFO] Could not get driver status for {featureName}, using XML settings.\n");
                     return GetFeatureStatusFromXml(featureName);
                 }
-                
+
                 // Parse the response looking for the feature's status
                 // Expected format: "Feature1=true|Feature2=false|..." or similar
                 if (response.Contains(featureName + "="))
@@ -1178,11 +1178,11 @@ namespace VDD_Control
                     int startIndex = response.IndexOf(featureName + "=") + featureName.Length + 1;
                     int endIndex = response.IndexOf('|', startIndex);
                     if (endIndex == -1) endIndex = response.Length;
-                    
+
                     string statusValue = response.Substring(startIndex, endIndex - startIndex).Trim().ToLower();
                     return statusValue == "true" || statusValue == "1" || statusValue == "on";
                 }
-                
+
                 // If feature not found in response, fall back to XML settings
                 AppendToConsole($"[INFO] Feature {featureName} not found in driver status, using XML settings.\n");
                 return GetFeatureStatusFromXml(featureName);
@@ -1193,7 +1193,7 @@ namespace VDD_Control
                 return GetFeatureStatusFromXml(featureName);
             }
         }
-        
+
         // Helper method to get feature status from XML file
         private bool GetFeatureStatusFromXml(string featureName)
         {
@@ -1201,7 +1201,7 @@ namespace VDD_Control
             if (IXCLI == null)
             {
                 AppendToConsole("[INFO] XML controller not initialized, attempting to load XML settings.\n");
-                
+
                 // Try to locate the settings file
                 string settingsPath = LocateSettingsFile();
                 if (!string.IsNullOrEmpty(settingsPath))
@@ -1223,56 +1223,56 @@ namespace VDD_Control
                     return false; // Default to false if we can't find the file
                 }
             }
-            
+
             // Get the status from XML based on feature name
             if (IXCLI != null)
             {
                 bool result = false;
                 switch (featureName.ToUpper())
                 {
-                    case "SDR10": 
+                    case "SDR10":
                         result = IXCLI.SDR10bit;
                         break;
-                    case "HDRPLUS": 
+                    case "HDRPLUS":
                         result = IXCLI.HDRPlus;
                         break;
-                    case "CUSTOMEDID": 
+                    case "CUSTOMEDID":
                         result = IXCLI.CustomEdid;
                         break;
-                    case "HARDWARECURSOR": 
+                    case "HARDWARECURSOR":
                         result = IXCLI.HardwareCursor;
                         break;
-                    case "PREVENTSPOOF": 
+                    case "PREVENTSPOOF":
                         result = IXCLI.PreventSpoof;
                         break;
-                    case "CEAOVERRIDE": 
+                    case "CEAOVERRIDE":
                         result = IXCLI.EdidCeaOverride;
                         break;
-                    default: 
+                    default:
                         result = false;
                         break;
                 }
                 AppendToConsole($"[INFO] {featureName} from XML settings: {result}\n");
                 return result;
             }
-            
+
             return false; // No XML controller available
         }
-        
+
         private async Task SyncMenuItemsWithDriverStatus()
         {
             try
             {
                 // Check if we can connect to the driver
                 bool isDriverConnected = await TryConnectToDriver();
-                
+
                 if (!isDriverConnected)
                 {
                     // Driver not connected, use XML settings if available
                     if (IXCLI != null)
                     {
                         AppendToConsole("[INFO] Driver not connected. Using XML settings for menu items.\n");
-                        
+
                         // Set menu items based on XML settings
                         SDR10_STATE = IXCLI.SDR10bit;
                         HDR10PLUS_STATE = IXCLI.HDRPlus;
@@ -1280,7 +1280,7 @@ namespace VDD_Control
                         HARDWARECURSOR_STATE = IXCLI.HardwareCursor;
                         PREVENTEDIDSPOOF_STATE = IXCLI.PreventSpoof;
                         EDIDCEAOVERRRIDE_STATE = IXCLI.EdidCeaOverride;
-                        
+
                         // Update UI to match
                         sDR10bitToolStripMenuItem.Checked = SDR10_STATE;
                         hDRToolStripMenuItem.Checked = HDR10PLUS_STATE;
@@ -1288,21 +1288,21 @@ namespace VDD_Control
                         hardwareCursorToolStripMenuItem.Checked = HARDWARECURSOR_STATE;
                         preventMonitorSpoofToolStripMenuItem.Checked = PREVENTEDIDSPOOF_STATE;
                         eDIDCEAOverrideToolStripMenuItem.Checked = EDIDCEAOVERRRIDE_STATE;
-                        
+
                         AppendToConsole("[INFO] Menu items set from XML settings.\n");
                     }
                     else
                     {
                         // No XML settings and no driver, set all to unchecked
                         AppendToConsole("[INFO] Driver not connected and no XML settings. All feature menu items set to unchecked.\n");
-                        
+
                         sDR10bitToolStripMenuItem.Checked = false;
                         hDRToolStripMenuItem.Checked = false;
                         customEDIDToolStripMenuItem.Checked = false;
                         hardwareCursorToolStripMenuItem.Checked = false;
                         preventMonitorSpoofToolStripMenuItem.Checked = false;
                         eDIDCEAOverrideToolStripMenuItem.Checked = false;
-                        
+
                         // Update state variables too
                         SDR10_STATE = false;
                         HDR10PLUS_STATE = false;
@@ -1311,16 +1311,16 @@ namespace VDD_Control
                         PREVENTEDIDSPOOF_STATE = false;
                         EDIDCEAOVERRRIDE_STATE = false;
                     }
-                    
+
                     return;
                 }
-                
+
                 // If logging is disabled, use XML settings even if driver is connected
                 // because we know the driver won't respond to status commands properly
                 if (!LOGGING_STATE && IXCLI != null)
                 {
                     AppendToConsole("[INFO] Driver connected but logging is disabled. Using XML settings for menu items.\n");
-                    
+
                     // Set menu items based on XML settings
                     SDR10_STATE = IXCLI.SDR10bit;
                     HDR10PLUS_STATE = IXCLI.HDRPlus;
@@ -1328,7 +1328,7 @@ namespace VDD_Control
                     HARDWARECURSOR_STATE = IXCLI.HardwareCursor;
                     PREVENTEDIDSPOOF_STATE = IXCLI.PreventSpoof;
                     EDIDCEAOVERRRIDE_STATE = IXCLI.EdidCeaOverride;
-                    
+
                     // Update UI to match
                     sDR10bitToolStripMenuItem.Checked = SDR10_STATE;
                     hDRToolStripMenuItem.Checked = HDR10PLUS_STATE;
@@ -1336,49 +1336,49 @@ namespace VDD_Control
                     hardwareCursorToolStripMenuItem.Checked = HARDWARECURSOR_STATE;
                     preventMonitorSpoofToolStripMenuItem.Checked = PREVENTEDIDSPOOF_STATE;
                     eDIDCEAOverrideToolStripMenuItem.Checked = EDIDCEAOVERRRIDE_STATE;
-                    
+
                     AppendToConsole("[INFO] Menu items set from XML settings due to logging being disabled.\n");
                     return;
                 }
-                
+
                 // Driver is connected and logging is enabled, query the status of each feature
                 AppendToConsole("[INFO] Syncing menu items with actual driver status...\n");
-                
+
                 // Query and update SDR10 status
                 SDR10_STATE = await GetDriverFeatureStatus("SDR10");
                 sDR10bitToolStripMenuItem.Checked = SDR10_STATE;
-                
+
                 // Query and update HDR Plus status
                 HDR10PLUS_STATE = await GetDriverFeatureStatus("HDRPLUS");
                 hDRToolStripMenuItem.Checked = HDR10PLUS_STATE;
-                
+
                 // Query and update Custom EDID status
                 CUSTOMEDID_STATE = await GetDriverFeatureStatus("CUSTOMEDID");
                 customEDIDToolStripMenuItem.Checked = CUSTOMEDID_STATE;
-                
+
                 // Query and update Hardware Cursor status
                 HARDWARECURSOR_STATE = await GetDriverFeatureStatus("HARDWARECURSOR");
                 hardwareCursorToolStripMenuItem.Checked = HARDWARECURSOR_STATE;
-                
+
                 // Query and update Prevent Spoof status
                 PREVENTEDIDSPOOF_STATE = await GetDriverFeatureStatus("PREVENTSPOOF");
                 preventMonitorSpoofToolStripMenuItem.Checked = PREVENTEDIDSPOOF_STATE;
-                
+
                 // Query and update CEA Override status
                 EDIDCEAOVERRRIDE_STATE = await GetDriverFeatureStatus("CEAOVERRIDE");
                 eDIDCEAOverrideToolStripMenuItem.Checked = EDIDCEAOVERRRIDE_STATE;
-                
+
                 AppendToConsole("[SUCCESS] Menu items synced with driver status.\n");
             }
             catch (Exception ex)
             {
                 AppendToConsole($"[ERROR] Failed to sync menu items with driver status: {ex.Message}\n");
-                
+
                 // On error, try to use XML settings as a fallback
                 if (IXCLI != null)
                 {
                     AppendToConsole("[INFO] Using XML settings as fallback after error.\n");
-                    
+
                     // Set menu items based on XML settings
                     SDR10_STATE = IXCLI.SDR10bit;
                     HDR10PLUS_STATE = IXCLI.HDRPlus;
@@ -1386,7 +1386,7 @@ namespace VDD_Control
                     HARDWARECURSOR_STATE = IXCLI.HardwareCursor;
                     PREVENTEDIDSPOOF_STATE = IXCLI.PreventSpoof;
                     EDIDCEAOVERRRIDE_STATE = IXCLI.EdidCeaOverride;
-                    
+
                     // Update UI to match
                     sDR10bitToolStripMenuItem.Checked = SDR10_STATE;
                     hDRToolStripMenuItem.Checked = HDR10PLUS_STATE;
@@ -1419,7 +1419,7 @@ namespace VDD_Control
             taskProgressBar.Value = progressValue;
             Application.DoEvents(); // Ensure UI updates
         }
-        
+
         private async Task restartDriverToolStripMenuItem_Click(object sender, EventArgs e)
         {
             AppendToConsole("[ACTION] Restarting driver using Device Manager...\n");
@@ -1430,11 +1430,11 @@ namespace VDD_Control
                 // First disable the driver
                 AppendToConsole("[INFO] Disabling Virtual Display Driver...\n");
                 bool disableSuccess = await DisableDriverWithDeviceManager();
-                
+
                 if (!disableSuccess)
                 {
                     AppendToConsole("[WARNING] Could not disable the driver through standard methods. Trying direct approach...\n");
-                    
+
                     // Try a more direct approach as a last resort
                     string directDisableCommand = @"
                         # Direct disable of ROOT\DISPLAY\0001
@@ -1450,9 +1450,9 @@ namespace VDD_Control
                         } catch {
                             Write-Output ""FAILURE: $($_.Exception.Message)""
                         }";
-                    
+
                     string directResult = await RunPowerShellCommand(directDisableCommand);
-                    
+
                     if (directResult.Contains("SUCCESS"))
                     {
                         AppendToConsole("[SUCCESS] Driver disabled using alternative approach.\n");
@@ -1465,21 +1465,21 @@ namespace VDD_Control
                         return;
                     }
                 }
-                
+
                 UpdateTaskProgress("Restarting Driver", 40);
-                
+
                 // Give some time for the disable operation to complete
                 AppendToConsole("[INFO] Waiting for disable operation to complete (5 seconds)...\n");
                 await Task.Delay(5000);
-                
+
                 // Now enable the driver
                 AppendToConsole("[INFO] Enabling Virtual Display Driver...\n");
                 bool enableSuccess = await EnableDriverWithDeviceManager();
-                
+
                 if (!enableSuccess)
                 {
                     AppendToConsole("[WARNING] Failed to enable the driver through standard methods. Trying direct approach...\n");
-                    
+
                     // Try a more direct approach as a last resort
                     string directEnableCommand = @"
                         # Try all possible approaches to enable the display device
@@ -1533,9 +1533,9 @@ namespace VDD_Control
                         } else {
                             Write-Output ""OVERALL_FAILURE: All approaches failed""
                         }";
-                    
+
                     string directResult = await RunPowerShellCommand(directEnableCommand);
-                    
+
                     if (directResult.Contains("SUCCESS"))
                     {
                         AppendToConsole("[SUCCESS] Driver enabled using alternative approach.\n");
@@ -1548,9 +1548,9 @@ namespace VDD_Control
                         return;
                     }
                 }
-                
+
                 UpdateTaskProgress("Restarting Driver", 70);
-                
+
                 // Wait for the driver to fully initialize
                 AppendToConsole("[INFO] Waiting for driver to initialize (10 seconds)...\n");
                 await Task.Delay(10000);
@@ -1596,7 +1596,7 @@ namespace VDD_Control
                 UpdateTaskProgress("Restarting Driver", 0);
             }
         }
-        
+
         private async Task<bool> DisableDriverWithDeviceManager()
         {
             try
@@ -1638,10 +1638,10 @@ namespace VDD_Control
                         Write-Output ""NOT_FOUND: Could not find Virtual Display Driver device""
                         exit 2
                     }";
-                
+
                 AppendToConsole("[INFO] Searching for Virtual Display Driver in Device Manager...\n");
                 string result = await RunPowerShellCommand(command);
-                
+
                 if (result == "SUCCESS" || result.Contains("SUCCESS"))
                 {
                     AppendToConsole("[INFO] Driver disabled successfully through Device Manager.\n");
@@ -1669,7 +1669,7 @@ namespace VDD_Control
                 return false;
             }
         }
-        
+
         private async Task<bool> EnableDriverWithDeviceManager()
         {
             try
@@ -1758,13 +1758,13 @@ namespace VDD_Control
                         }
                     }
                 ";
-                
+
                 AppendToConsole("[INFO] Searching for disabled Virtual Display Driver...\n");
                 string result = await RunPowerShellCommand(command);
-                
+
                 // Log the raw result for debugging
                 AppendToConsole($"[DEBUG] PowerShell output:\n{result}\n");
-                
+
                 if (result.Contains("SUCCESS"))
                 {
                     AppendToConsole("[INFO] Driver enabled successfully through Device Manager.\n");
@@ -1778,10 +1778,10 @@ namespace VDD_Control
                 else if (result.Contains("NOT_FOUND"))
                 {
                     AppendToConsole("[ERROR] No disabled display device found that could be enabled.\n");
-                    
+
                     // Try a direct approach as a last resort
                     AppendToConsole("[INFO] Trying alternative approach to enable display device...\n");
-                    
+
                     string directCommand = @"
                         # Try to enable ROOT\DISPLAY\0001 directly
                         try {
@@ -1790,9 +1790,9 @@ namespace VDD_Control
                         } catch {
                             Write-Output ""FAILURE: $($_.Exception.Message)""
                         }";
-                    
+
                     string directResult = await RunPowerShellCommand(directCommand);
-                    
+
                     if (directResult.Contains("SUCCESS"))
                     {
                         AppendToConsole("[SUCCESS] Alternative approach successfully enabled the driver.\n");
@@ -1816,12 +1816,12 @@ namespace VDD_Control
                 return false;
             }
         }
-        
+
         private async Task<string> RunPowerShellCommand(string command)
         {
             // First try to check if we can run with admin privileges
             bool needsAdminRights = true;
-            
+
             try
             {
                 // Try a simple administrative operation to check if we have admin rights
@@ -1835,11 +1835,11 @@ namespace VDD_Control
                         UseShellExecute = false,
                         CreateNoWindow = true
                     };
-                    
+
                     testProcess.Start();
                     string result = await testProcess.StandardOutput.ReadToEndAsync();
                     await testProcess.WaitForExitAsync();
-                    
+
                     // If the result is "True", we're already running as admin
                     if (result.Trim().Equals("True", StringComparison.OrdinalIgnoreCase))
                     {
@@ -1852,21 +1852,21 @@ namespace VDD_Control
                 // If the test fails, assume we need admin rights
                 needsAdminRights = true;
             }
-            
+
             if (needsAdminRights)
             {
                 // Inform the user we need to run with elevated privileges
                 AppendToConsole("[INFO] Device management requires administrative privileges.\n");
                 AppendToConsole("[INFO] Attempting to run PowerShell as administrator...\n");
-                
+
                 // Create a temporary script file to execute with elevated privileges
                 string tempPath = Path.Combine(Path.GetTempPath(), $"vdd_script_{Guid.NewGuid()}.ps1");
-                
+
                 try
                 {
                     // Write command to temporary file
                     File.WriteAllText(tempPath, command);
-                    
+
                     // Create process to run PowerShell as admin
                     using (Process process = new Process())
                     {
@@ -1879,15 +1879,15 @@ namespace VDD_Control
                             CreateNoWindow = false,
                             WindowStyle = ProcessWindowStyle.Hidden
                         };
-                        
+
                         try
                         {
                             process.Start();
                             await process.WaitForExitAsync();
-                            
+
                             // Wait a moment to let Windows process the change
                             await Task.Delay(2000);
-                            
+
                             // Since we can't capture output when using UseShellExecute=true,
                             // we'll check if the operation was successful by looking for the devices
                             return "SUCCESS";
@@ -1932,19 +1932,19 @@ namespace VDD_Control
                         UseShellExecute = false,
                         CreateNoWindow = true
                     };
-                    
+
                     process.Start();
-                    
+
                     string output = await process.StandardOutput.ReadToEndAsync();
                     string error = await process.StandardError.ReadToEndAsync();
-                    
+
                     await process.WaitForExitAsync();
-                    
+
                     if (!string.IsNullOrEmpty(error))
                     {
                         AppendToConsole($"[ERROR] PowerShell error: {error}\n");
                     }
-                    
+
                     return output.Trim();
                 }
             }
@@ -2089,7 +2089,7 @@ namespace VDD_Control
             {
                 UpdateTaskProgress("Getting GPU Information", 10);
                 mainConsole.AppendText("Gathering GPU information...\n");
-                
+
                 // Initialize a process to execute PowerShell
                 Process process = new Process
                 {
@@ -2105,19 +2105,19 @@ namespace VDD_Control
                 };
 
                 UpdateTaskProgress("Getting GPU Information", 30);
-                
+
                 // Start the process and capture output
                 process.Start();
-                
+
                 UpdateTaskProgress("Getting GPU Information", 50);
-                
+
                 string output = await process.StandardOutput.ReadToEndAsync();
                 string error = await process.StandardError.ReadToEndAsync();
 
                 UpdateTaskProgress("Getting GPU Information", 80);
-                
+
                 await Task.Run(() => process.WaitForExit());
-                
+
                 // Use BeginInvoke to update progress on UI thread
                 this.BeginInvoke(new Action(() => UpdateTaskProgress("Getting GPU Information", 90)));
 
@@ -2134,7 +2134,7 @@ namespace VDD_Control
                 {
                     mainConsole.AppendText("No output received from the PowerShell command.");
                 }
-                
+
                 UpdateTaskProgress("Getting GPU Information", 100);
                 await Task.Delay(500); // Show 100% for a moment
                 this.BeginInvoke(new Action(() => UpdateTaskProgress("", 0))); // Clear task progress
@@ -2186,14 +2186,15 @@ namespace VDD_Control
         {
             // Show progress in task bar
             UpdateTaskProgress("Opening XML Editor", 50);
-            
+
             // Launch XML Editor
             XMLEditor form2 = new XMLEditor();
             form2.Show();
-            
+
             // Complete progress
             UpdateTaskProgress("Opening XML Editor", 100);
-            Task.Delay(500).ContinueWith(_ => {
+            Task.Delay(500).ContinueWith(_ =>
+            {
                 // Reset progress bar after a delay
                 this.BeginInvoke(new Action(() => UpdateTaskProgress("", 0)));
             });
@@ -2219,7 +2220,7 @@ namespace VDD_Control
                 if (IXCLI != null)
                 {
                     IXCLI.SDR10bit = SDR10_STATE;
-                    
+
                     // Save the updated XML settings
                     try
                     {
@@ -2232,11 +2233,11 @@ namespace VDD_Control
                         AppendToConsole($"[WARNING] Could not save XML settings: {xmlEx.Message}\n");
                     }
                 }
-                
+
                 // Now update the driver
                 string command = SDR10_STATE ? "SDR10 true" : "SDR10 false";
                 string? response = await SendCommandToDriver(command); // Send state based off bool
-                
+
                 // After sending the command, get actual status from driver to ensure the UI is in sync
                 // Only try to get actual status if logging is enabled
                 if (LOGGING_STATE)
@@ -2248,7 +2249,7 @@ namespace VDD_Control
                         SDR10_STATE = actualStatus;
                         sDR10bitToolStripMenuItem.Checked = actualStatus;
                         AppendToConsole($"[INFO] SDR 10 bit setting changed to {(actualStatus ? "ON" : "OFF")} based on driver status.\n");
-                        
+
                         // Also update XML to match
                         if (IXCLI != null)
                         {
@@ -2267,7 +2268,7 @@ namespace VDD_Control
             {
                 string errorMsg = $"[ERROR] Could not send toggle SDR command: {ex.Message}";
                 AppendToConsole(errorMsg + "\n");
-                
+
                 // On error, revert UI state to XML settings
                 if (IXCLI != null)
                 {
@@ -2308,7 +2309,7 @@ namespace VDD_Control
                 if (IXCLI != null)
                 {
                     IXCLI.HDRPlus = HDR10PLUS_STATE;
-                    
+
                     // Save the updated XML settings
                     try
                     {
@@ -2321,11 +2322,11 @@ namespace VDD_Control
                         AppendToConsole($"[WARNING] Could not save XML settings: {xmlEx.Message}\n");
                     }
                 }
-                
+
                 // Now update the driver
                 string command = HDR10PLUS_STATE ? "HDRPLUS true" : "HDRPLUS false";
                 string? response = await SendCommandToDriver(command);
-                
+
                 // After sending the command, get actual status from driver to ensure the UI is in sync
                 // Only try to get actual status if logging is enabled
                 if (LOGGING_STATE)
@@ -2337,7 +2338,7 @@ namespace VDD_Control
                         HDR10PLUS_STATE = actualStatus;
                         hDRToolStripMenuItem.Checked = actualStatus;
                         AppendToConsole($"[INFO] HDR-10+ setting changed to {(actualStatus ? "ON" : "OFF")} based on driver status.\n");
-                        
+
                         // Also update XML to match
                         if (IXCLI != null)
                         {
@@ -2356,7 +2357,7 @@ namespace VDD_Control
             {
                 string errorMsg = $"[ERROR] Could not send toggle HDR-10+ command: {ex.Message}";
                 AppendToConsole(errorMsg + "\n");
-                
+
                 // On error, revert UI state to XML settings
                 if (IXCLI != null)
                 {
@@ -2396,7 +2397,7 @@ namespace VDD_Control
                 if (IXCLI != null)
                 {
                     IXCLI.CustomEdid = CUSTOMEDID_STATE;
-                    
+
                     // Save the updated XML settings
                     try
                     {
@@ -2409,11 +2410,11 @@ namespace VDD_Control
                         AppendToConsole($"[WARNING] Could not save XML settings: {xmlEx.Message}\n");
                     }
                 }
-                
+
                 // Now update the driver
                 string command = CUSTOMEDID_STATE ? "CUSTOMEDID true" : "CUSTOMEDID false";
                 string? response = await SendCommandToDriver(command);
-                
+
                 // After sending the command, get actual status from driver to ensure the UI is in sync
                 // Only try to get actual status if logging is enabled
                 if (LOGGING_STATE)
@@ -2425,7 +2426,7 @@ namespace VDD_Control
                         CUSTOMEDID_STATE = actualStatus;
                         customEDIDToolStripMenuItem.Checked = actualStatus;
                         AppendToConsole($"[INFO] Custom EDID setting changed to {(actualStatus ? "ON" : "OFF")} based on driver status.\n");
-                        
+
                         // Also update XML to match
                         if (IXCLI != null)
                         {
@@ -2444,7 +2445,7 @@ namespace VDD_Control
             {
                 string errorMsg = $"[ERROR] Could not send toggle Custom EDID command: {ex.Message}";
                 AppendToConsole(errorMsg + "\n");
-                
+
                 // On error, revert UI state to XML settings
                 if (IXCLI != null)
                 {
@@ -2484,7 +2485,7 @@ namespace VDD_Control
                 if (IXCLI != null)
                 {
                     IXCLI.HardwareCursor = HARDWARECURSOR_STATE;
-                    
+
                     // Save the updated XML settings
                     try
                     {
@@ -2497,11 +2498,11 @@ namespace VDD_Control
                         AppendToConsole($"[WARNING] Could not save XML settings: {xmlEx.Message}\n");
                     }
                 }
-                
+
                 // Now update the driver
                 string command = HARDWARECURSOR_STATE ? "HARDWARECURSOR true" : "HARDWARECURSOR false";
                 string? response = await SendCommandToDriver(command);
-                
+
                 // After sending the command, get actual status from driver to ensure the UI is in sync
                 // Only try to get actual status if logging is enabled
                 if (LOGGING_STATE)
@@ -2513,7 +2514,7 @@ namespace VDD_Control
                         HARDWARECURSOR_STATE = actualStatus;
                         hardwareCursorToolStripMenuItem.Checked = actualStatus;
                         AppendToConsole($"[INFO] Hardware Cursor setting changed to {(actualStatus ? "ON" : "OFF")} based on driver status.\n");
-                        
+
                         // Also update XML to match
                         if (IXCLI != null)
                         {
@@ -2532,7 +2533,7 @@ namespace VDD_Control
             {
                 string errorMsg = $"[ERROR] Could not send toggle Hardware Cursor command: {ex.Message}";
                 AppendToConsole(errorMsg + "\n");
-                
+
                 // On error, revert UI state to XML settings
                 if (IXCLI != null)
                 {
@@ -2572,7 +2573,7 @@ namespace VDD_Control
                 if (IXCLI != null)
                 {
                     IXCLI.PreventSpoof = PREVENTEDIDSPOOF_STATE;
-                    
+
                     // Save the updated XML settings
                     try
                     {
@@ -2585,11 +2586,11 @@ namespace VDD_Control
                         AppendToConsole($"[WARNING] Could not save XML settings: {xmlEx.Message}\n");
                     }
                 }
-                
+
                 // Now update the driver
                 string command = PREVENTEDIDSPOOF_STATE ? "PREVENTSPOOF true" : "PREVENTSPOOF false";
                 string? response = await SendCommandToDriver(command);
-                
+
                 // After sending the command, get actual status from driver to ensure the UI is in sync
                 // Only try to get actual status if logging is enabled
                 if (LOGGING_STATE)
@@ -2601,7 +2602,7 @@ namespace VDD_Control
                         PREVENTEDIDSPOOF_STATE = actualStatus;
                         preventMonitorSpoofToolStripMenuItem.Checked = actualStatus;
                         AppendToConsole($"[INFO] Prevent Spoof setting changed to {(actualStatus ? "ON" : "OFF")} based on driver status.\n");
-                        
+
                         // Also update XML to match
                         if (IXCLI != null)
                         {
@@ -2620,7 +2621,7 @@ namespace VDD_Control
             {
                 string errorMsg = $"[ERROR] Could not send toggle Prevent Spoof command: {ex.Message}";
                 AppendToConsole(errorMsg + "\n");
-                
+
                 // On error, revert UI state to XML settings
                 if (IXCLI != null)
                 {
@@ -2660,7 +2661,7 @@ namespace VDD_Control
                 if (IXCLI != null)
                 {
                     IXCLI.EdidCeaOverride = EDIDCEAOVERRRIDE_STATE;
-                    
+
                     // Save the updated XML settings
                     try
                     {
@@ -2673,11 +2674,11 @@ namespace VDD_Control
                         AppendToConsole($"[WARNING] Could not save XML settings: {xmlEx.Message}\n");
                     }
                 }
-                
+
                 // Now update the driver
                 string command = EDIDCEAOVERRRIDE_STATE ? "CEAOVERRIDE true" : "CEAOVERRIDE false";
                 string? response = await SendCommandToDriver(command);
-                
+
                 // After sending the command, get actual status from driver to ensure the UI is in sync
                 // Only try to get actual status if logging is enabled
                 if (LOGGING_STATE)
@@ -2689,7 +2690,7 @@ namespace VDD_Control
                         EDIDCEAOVERRRIDE_STATE = actualStatus;
                         eDIDCEAOverrideToolStripMenuItem.Checked = actualStatus;
                         AppendToConsole($"[INFO] EDID CEA Override setting changed to {(actualStatus ? "ON" : "OFF")} based on driver status.\n");
-                        
+
                         // Also update XML to match
                         if (IXCLI != null)
                         {
@@ -2708,7 +2709,7 @@ namespace VDD_Control
             {
                 string errorMsg = $"[ERROR] Could not send toggle EDID CEA Override command: {ex.Message}";
                 AppendToConsole(errorMsg + "\n");
-                
+
                 // On error, revert UI state to XML settings
                 if (IXCLI != null)
                 {
@@ -2754,11 +2755,11 @@ namespace VDD_Control
         {
             AppendToConsole("[ACTION] Disabling Virtual Display Driver...\n");
             UpdateTaskProgress("Disabling Driver", 10);
-            
+
             try
             {
                 bool success = await DisableDriverWithDeviceManager();
-                
+
                 if (success)
                 {
                     AppendToConsole("[SUCCESS] Virtual Display Driver disabled successfully.\n");
@@ -2798,26 +2799,26 @@ namespace VDD_Control
         {
             Application.Exit();
         }
-        
+
         // Helper method to create a default XML file when none is found
         private async Task<bool> TryCreateDefaultXmlFile()
         {
             AppendToConsole("[INFO] Attempting to create default XML settings file...\n");
-            
+
             // First, check if the sample XML exists in our project directory
             string sampleXmlPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "vdd_settings.xml");
             string targetXmlPath = @"C:\VirtualDisplayDriver\vdd_settings.xml";
-            
+
             // If we have a sample XML in our application directory
             if (File.Exists(sampleXmlPath))
             {
                 AppendToConsole($"[INFO] Found sample XML at: {sampleXmlPath}\n");
-                
+
                 try
                 {
                     // Make sure the target directory exists
                     Directory.CreateDirectory(@"C:\VirtualDisplayDriver");
-                    
+
                     // Copy the sample XML to the driver directory
                     File.Copy(sampleXmlPath, targetXmlPath, true);
                     AppendToConsole($"[SUCCESS] Created default XML at: {targetXmlPath}\n");
@@ -2833,19 +2834,19 @@ namespace VDD_Control
             {
                 // Check for the XML file in the project root
                 string projectXmlPath = Path.Combine(
-                    Directory.GetParent(AppDomain.CurrentDomain.BaseDirectory).FullName, 
+                    Directory.GetParent(AppDomain.CurrentDomain.BaseDirectory).FullName,
                     "vdd_settings.xml"
                 );
-                
+
                 if (File.Exists(projectXmlPath))
                 {
                     AppendToConsole($"[INFO] Found XML in project root: {projectXmlPath}\n");
-                    
+
                     try
                     {
                         // Make sure the target directory exists
                         Directory.CreateDirectory(@"C:\VirtualDisplayDriver");
-                        
+
                         // Copy the XML to the driver directory
                         File.Copy(projectXmlPath, targetXmlPath, true);
                         AppendToConsole($"[SUCCESS] Created default XML at: {targetXmlPath}\n");
@@ -2930,18 +2931,18 @@ namespace VDD_Control
         {
             AppendToConsole("[ACTION] Enabling Virtual Display Driver...\n");
             UpdateTaskProgress("Enabling Driver", 10);
-            
+
             try
             {
                 bool success = await EnableDriverWithDeviceManager();
-                
+
                 if (success)
                 {
                     AppendToConsole("[SUCCESS] Virtual Display Driver enabled successfully.\n");
                     UpdateTaskProgress("Enabling Driver", 100);
                     await Task.Delay(1000); // Show 100% for a moment
                     this.BeginInvoke(new Action(() => UpdateTaskProgress("", 0))); // Clear task progress
-                    
+
                     // Try to connect to the driver after enabling
                     AppendToConsole("[INFO] Attempting to connect to enabled driver...\n");
                     if (await TryConnectToDriver())
@@ -2970,11 +2971,11 @@ namespace VDD_Control
         {
             AppendToConsole("[ACTION] Disabling Virtual Display Driver...\n");
             UpdateTaskProgress("Disabling Driver", 10);
-            
+
             try
             {
                 bool success = await DisableDriverWithDeviceManager();
-                
+
                 if (success)
                 {
                     AppendToConsole("[SUCCESS] Virtual Display Driver disabled successfully.\n");
@@ -3037,7 +3038,7 @@ namespace VDD_Control
                 userInput.Text = string.Empty;
             }
         }
-        
+
         // Add a method to clear the text box when it gets focus
         private void userInput_Enter(object sender, EventArgs e)
         {
@@ -3046,7 +3047,7 @@ namespace VDD_Control
                 userInput.Text = string.Empty;
             }
         }
-        
+
         // Add a method to handle the Enter key press in the userInput textBox
         protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
         {
@@ -3062,12 +3063,12 @@ namespace VDD_Control
         {
             await SendCommandFromInput();
         }
-        
+
         // Displays help information for available commands
         private void DisplayHelpCommand()
         {
             StringBuilder helpText = new StringBuilder();
-            
+
             helpText.AppendLine("Available Commands:");
             helpText.AppendLine("------------------");
             helpText.AppendLine("HELP                   - Displays this help information");
@@ -3084,18 +3085,18 @@ namespace VDD_Control
             helpText.AppendLine("VERSION                - Get driver version information");
             helpText.AppendLine("LOGGING [true/false]   - Enable/disable logging");
             helpText.AppendLine("DEBUGLOGGING [true/false] - Enable/disable debug level logging");
-            
+
             mainConsole.AppendText(helpText.ToString());
         }
-        
+
         private async Task SendCommandFromInput()
         {
             if (string.IsNullOrWhiteSpace(userInput.Text))
                 return;
-                
+
             string command = userInput.Text.Trim();
             AppendToConsole($"[COMMAND] {command}\n");
-            
+
             // Handle special commands
             if (command.Equals("HELP", StringComparison.OrdinalIgnoreCase))
             {
@@ -3104,9 +3105,9 @@ namespace VDD_Control
                 userInput.Text = string.Empty;
                 return;
             }
-            
+
             UpdateTaskProgress("Sending Command", 25);
-            
+
             try
             {
                 string? response = await SendCommandToDriver(command);
@@ -3150,27 +3151,27 @@ namespace VDD_Control
             mainConsole.SelectionStart = mainConsole.Text.Length;
             mainConsole.ScrollToCaret();
         }
-        
+
         // Helper method to append text to console and ensure scrolling
         private void AppendToConsole(string text)
         {
             // Append the text to the console
             mainConsole.AppendText(text);
-            
+
             // Ensure the console scrolls to show the latest text
             mainConsole.SelectionStart = mainConsole.Text.Length;
             mainConsole.ScrollToCaret();
             mainConsole.Refresh(); // Force a UI refresh to ensure scrolling happens immediately
         }
-        
+
         // Method to display ASCII art animation with proper line-by-line delay
         private async Task DisplayAsciiArtAnimation()
         {
             // Clear the console first
             mainConsole.Clear();
-            
+
             const int lineDelay = 40; // milliseconds between lines
-            
+
             // Array of ASCII art lines for animation with explicit line-by-line display
             string[] asciiArtLines = new string[]
             {
@@ -3205,10 +3206,10 @@ namespace VDD_Control
                 "                */////ROSHKINS//(////////////////                               ",
                 "                */SITIOM/////BALOUKJ///(////////(                               "
             };
-            
+
             // Use a separate StringBuilder to build the console contents line by line
             StringBuilder consoleContent = new StringBuilder();
-            
+
             // Display each line with a delay for animation effect
             for (int i = 0; i < asciiArtLines.Length; i++)
             {
@@ -3218,22 +3219,22 @@ namespace VDD_Control
                     consoleContent.AppendLine(); // Add a newline before each line except the first
                 }
                 consoleContent.Append(asciiArtLines[i]);
-                
+
                 // Update the console with all content so far
                 mainConsole.Text = consoleContent.ToString();
-                
+
                 // Manually scroll to ensure each line is visible
                 mainConsole.SelectionStart = mainConsole.Text.Length;
                 mainConsole.ScrollToCaret();
-                
+
                 // Force UI update
                 mainConsole.Update();
                 Application.DoEvents(); // Process any pending messages to ensure UI updates
-                
+
                 // Wait before showing the next line
                 await Task.Delay(lineDelay);
             }
-            
+
             // Add a couple of blank lines after the ASCII art
             consoleContent.AppendLine();
             consoleContent.AppendLine();
@@ -3401,6 +3402,15 @@ namespace VDD_Control
 
             // Show the dialog
             aboutDialog.ShowDialog(this);
+        }
+
+        private void linkLabel6_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
+        {
+            System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo
+            {
+                FileName = "https://www.patreon.com/c/mikethetech",
+                UseShellExecute = true
+            });
         }
     }
 }

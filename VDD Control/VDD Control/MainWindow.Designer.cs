@@ -705,6 +705,7 @@ namespace VDD_Control
             linkLabel6.TabIndex = 22;
             linkLabel6.TabStop = true;
             linkLabel6.Text = "Patreon";
+            linkLabel6.LinkClicked += linkLabel6_LinkClicked;
             // 
             // jockeSupport
             // 
