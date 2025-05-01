@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
+using System.IO;
 
 namespace VDD_Control
 {
@@ -37,8 +38,37 @@ namespace VDD_Control
 
         public void LoadFromXml(string filePath)
         {
-            string xmlfile = filePath + "\\vdd_settings.xml";
-            if (!File.Exists(xmlfile)) throw new FileNotFoundException("XML file not found", xmlfile);
+            string xmlfile = filePath;
+            if (!xmlfile.EndsWith("vdd_settings.xml"))
+            {
+                xmlfile = Path.Combine(filePath, "vdd_settings.xml");
+            }
+            
+            // Check if the file exists
+            if (!File.Exists(xmlfile))
+            {
+                // Check fallback locations
+                string[] fallbackPaths =
+                {
+                    @"C:\VirtualDisplayDriver\vdd_settings.xml",
+                    @"C:\IddSampleDriver\vdd_settings.xml"
+                };
+
+                foreach (string path in fallbackPaths)
+                {
+                    if (File.Exists(path))
+                    {
+                        xmlfile = path;
+                        break;
+                    }
+                }
+
+                // If still not found after checking fallbacks, throw exception
+                if (!File.Exists(xmlfile))
+                {
+                    throw new FileNotFoundException("XML file not found at specified path or fallback locations", xmlfile);
+                }
+            }
 
             string xmlContent;
             using (StreamReader reader = new StreamReader(xmlfile))

@@ -15,7 +15,7 @@ namespace VDD_Control
         private const string PIPE_NAME = "MTTVirtualDisplayPipe";
         string registryFilePath = "C:\\VirtualDisplayDriver"; //Lets not use null, just in case
 
-        private XMLController IXCLI; 
+        private XMLController IXCLI;
 
         private bool SDR10_STATE = false;
         private bool CUSTOMEDID_STATE = false;
@@ -33,17 +33,37 @@ namespace VDD_Control
         {
             InitializeComponent();
             ToolStripMenuItem restartItem = GetRestartDriverToolStripMenuItem(); // This is now safe
-            LocateSettingsFile();
-            IXCLI = new XMLController(registryFilePath);
-            SDR10_STATE = IXCLI.SDR10bit;
-            CUSTOMEDID_STATE = IXCLI.CustomEdid;
-            EDIDCEAOVERRRIDE_STATE = IXCLI.EdidCeaOverride;
-            PREVENTEDIDSPOOF_STATE = IXCLI.PreventSpoof;
-            HARDWARECURSOR_STATE = IXCLI.HardwareCursor;
-            LOGGING_STATE = IXCLI.Logging;
-            DEVLOGGING_STATE = IXCLI.DebugLogging;
+            string settingsPath = LocateSettingsFile();
 
-            sDR10bitToolStripMenuItem.Checked = SDR10_STATE;
+            try
+            {
+                // Only initialize if we found a valid settings path
+                if (!string.IsNullOrEmpty(settingsPath))
+                {
+                    IXCLI = new XMLController(settingsPath);
+                    SDR10_STATE = IXCLI.SDR10bit;
+                    CUSTOMEDID_STATE = IXCLI.CustomEdid;
+                    EDIDCEAOVERRRIDE_STATE = IXCLI.EdidCeaOverride;
+                    PREVENTEDIDSPOOF_STATE = IXCLI.PreventSpoof;
+                    HARDWARECURSOR_STATE = IXCLI.HardwareCursor;
+                    LOGGING_STATE = IXCLI.Logging;
+                    DEVLOGGING_STATE = IXCLI.DebugLogging;
+
+                    sDR10bitToolStripMenuItem.Checked = SDR10_STATE;
+                }
+                else
+                {
+                    mainConsole.AppendText("[ERROR] Could not locate settings file in any expected location.\n");
+                }
+            }
+            catch (FileNotFoundException ex)
+            {
+                mainConsole.AppendText($"[ERROR] {ex.Message}\n");
+            }
+            catch (Exception ex)
+            {
+                mainConsole.AppendText($"[ERROR] Error initializing settings: {ex.Message}\n");
+            }
         }
 
         private ToolStripMenuItem GetRestartDriverToolStripMenuItem()
@@ -69,7 +89,19 @@ namespace VDD_Control
         private async void Form1_Load(object sender, EventArgs e)
         {
             mainVisibleMenuStrip.Renderer = new ToolStripProfessionalRenderer(new CustomColorTable());
-            IXCLI.LoadFromXml(registryFilePath);
+
+            // Only try to load XML if IXCLI was successfully initialized
+            if (IXCLI != null)
+            {
+                try
+                {
+                    // No need to load again, already loaded in constructor
+                }
+                catch (Exception ex)
+                {
+                    mainConsole.AppendText($"[ERROR] Failed to load settings: {ex.Message}\n");
+                }
+            }
 
             // Set text color for all menu items
             foreach (ToolStripMenuItem item in mainVisibleMenuStrip.Items)
@@ -189,7 +221,8 @@ namespace VDD_Control
                 systemInfo += "CLR Version: " + Environment.Version.ToString() + "\n\n";
 
                 // Locate the vdd_settings.xml file
-                systemInfo += LocateSettingsFile();
+                string settingsPath = LocateSettingsFile();
+                systemInfo += settingsPath ?? "Could not locate settings file";
 
                 // Display the information in richTextBox1
                 mainConsole.AppendText(systemInfo);
@@ -235,9 +268,8 @@ namespace VDD_Control
 
         private string LocateSettingsFile()
         {
-            // Yo XML. Where u at?
-            string settingsInfo = "Settings File Information:\n--------------------------\n";
             string registryKeyPath = @"SOFTWARE\MikeTheTech\VirtualDisplayDriver";
+            string foundPath = null;
 
             try
             {
@@ -246,20 +278,25 @@ namespace VDD_Control
                 {
                     if (registryKey != null)
                     {
-                        registryFilePath = registryKey.GetValue("SettingsPath") as string;
-                        if (!string.IsNullOrEmpty(registryFilePath) && File.Exists(registryFilePath))
+                        string regPath = registryKey.GetValue("SettingsPath") as string;
+                        string fullPath = regPath;
+
+                        // Check if it's a directory path or direct file path
+                        if (!string.IsNullOrEmpty(regPath))
                         {
-                            settingsInfo += $"Found in Registry: {registryFilePath}\n";
-                            return settingsInfo;
+                            if (!regPath.EndsWith(".xml"))
+                            {
+                                // It's a directory path, append the filename
+                                fullPath = Path.Combine(regPath, "vdd_settings.xml");
+                            }
+
+                            if (File.Exists(fullPath))
+                            {
+                                registryFilePath = regPath; // Store the directory or full path
+                                foundPath = fullPath;       // Return the full file path
+                                return foundPath;
+                            }
                         }
-                        else
-                        {
-                            settingsInfo += "Registry key found but file is missing.\n";
-                        }
-                    }
-                    else
-                    {
-                        settingsInfo += "Registry key is missing.\n";
                     }
                 }
 
@@ -274,21 +311,26 @@ namespace VDD_Control
                 {
                     if (File.Exists(path))
                     {
-                        settingsInfo += $"Found in Fallback Path: {path}\n";
-                        return settingsInfo;
+                        // Extract directory path for the XML controller
+                        registryFilePath = Path.GetDirectoryName(path);
+                        foundPath = path;
+                        return foundPath;
                     }
                 }
 
-                // If no file is found
-                settingsInfo += "vdd_settings.xml not found in default locations. Are you using an older version of the driver?\n";
+                // Log that we couldn't find the file
+                mainConsole.AppendText("[WARNING] Settings file not found in registry or fallback locations.\n");
             }
             catch (Exception ex)
             {
-                settingsInfo += $"Error while locating settings file: {ex.Message}\n";
+                // Log the exception
+                mainConsole.AppendText($"[ERROR] Error while locating settings file: {ex.Message}\n");
             }
 
-            return settingsInfo;
+            // If no file is found, return null
+            return foundPath;
         }
+
         private async Task<bool> TryConnectToDriver()
         {
             // we should change this to check if it exists, not if it can be connected to to save on overhead in the driver
@@ -794,7 +836,7 @@ namespace VDD_Control
 
         private void aboutToolStripMenuItem_Click(object sender, EventArgs e)
         {
-
+            ShowAboutDialog();
         }
 
         private void exitToolStripMenuItem1_Click(object sender, EventArgs e)
@@ -889,7 +931,7 @@ namespace VDD_Control
 
         private void aboutToolStripMenuItem1_Click(object sender, EventArgs e)
         {
-
+            ShowAboutDialog();
         }
 
         private void button1_Click(object sender, EventArgs e) // Restart Driver
@@ -970,6 +1012,143 @@ namespace VDD_Control
             {
                 mainConsole.AppendText("[WARNING] Driver restart detected, but reconnection failed. Ensure the driver is running.\n");
             }
+        }
+
+        private void jockeSupport_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
+        {
+            System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo
+            {
+                FileName = "https://github.com/sponsors/zjoasan",
+                UseShellExecute = true
+            });
+        }
+
+        private void mttSupport_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
+        {
+            System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo
+            {
+                FileName = "https://www.patreon.com/c/mikethetech",
+                UseShellExecute = true
+            });
+        }
+        private void ShowAboutDialog()
+        {
+            // Create an about dialog
+            Form aboutDialog = new Form
+            {
+                Text = "About Virtual Driver Control",
+                Size = new Size(450, 300),
+                FormBorderStyle = FormBorderStyle.FixedDialog,
+                StartPosition = FormStartPosition.CenterParent,
+                MaximizeBox = false,
+                MinimizeBox = false,
+                BackColor = Color.FromArgb(32, 34, 37),
+                ForeColor = Color.White
+            };
+
+            // Add logo placeholder (could be replaced with an actual logo)
+            Label logoLabel = new Label
+            {
+                Text = "VDD Control",
+                Font = new Font("Consolas", 18, FontStyle.Bold),
+                ForeColor = Color.White,
+                TextAlign = ContentAlignment.MiddleCenter,
+                Size = new Size(400, 30),
+                Location = new Point(25, 20)
+            };
+            aboutDialog.Controls.Add(logoLabel);
+
+            // Add version information
+            Label versionLabel = new Label
+            {
+                Text = "Version 1.0",
+                Font = new Font("Consolas", 10),
+                ForeColor = Color.White,
+                TextAlign = ContentAlignment.MiddleCenter,
+                Size = new Size(400, 20),
+                Location = new Point(25, 50)
+            };
+            aboutDialog.Controls.Add(versionLabel);
+
+            // Add description
+            Label descLabel = new Label
+            {
+                Text = "Virtual Driver Control provides a graphical interface to configure and control the Virtual Display Driver.",
+                Font = new Font("Consolas", 9),
+                ForeColor = Color.White,
+                TextAlign = ContentAlignment.TopLeft,
+                Size = new Size(400, 40),
+                Location = new Point(25, 80)
+            };
+            aboutDialog.Controls.Add(descLabel);
+
+            // Add developers section
+            Label developersHeader = new Label
+            {
+                Text = "Developers:",
+                Font = new Font("Consolas", 9, FontStyle.Bold),
+                ForeColor = Color.White,
+                TextAlign = ContentAlignment.MiddleLeft,
+                Size = new Size(100, 20),
+                Location = new Point(25, 130)
+            };
+            aboutDialog.Controls.Add(developersHeader);
+
+            Label developersLabel = new Label
+            {
+                Text = "- MikeTheTech\n- Jocke",
+                Font = new Font("Consolas", 9),
+                ForeColor = Color.White,
+                TextAlign = ContentAlignment.TopLeft,
+                Size = new Size(400, 40),
+                Location = new Point(35, 150)
+            };
+            aboutDialog.Controls.Add(developersLabel);
+
+            // Add links section
+            Label linksHeader = new Label
+            {
+                Text = "Links:",
+                Font = new Font("Consolas", 9, FontStyle.Bold),
+                ForeColor = Color.White,
+                TextAlign = ContentAlignment.MiddleLeft,
+                Size = new Size(100, 20),
+                Location = new Point(25, 190)
+            };
+            aboutDialog.Controls.Add(linksHeader);
+
+            LinkLabel githubLink = new LinkLabel
+            {
+                Text = "GitHub: https://github.com/VirtualDisplay/",
+                Font = new Font("Consolas", 9),
+                LinkColor = Color.LightBlue,
+                ActiveLinkColor = Color.White,
+                TextAlign = ContentAlignment.TopLeft,
+                Size = new Size(400, 20),
+                Location = new Point(35, 210)
+            };
+            githubLink.LinkClicked += (s, e) => System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo
+            {
+                FileName = "https://github.com/VirtualDisplay/",
+                UseShellExecute = true
+            });
+            aboutDialog.Controls.Add(githubLink);
+
+            // Add OK button
+            Button okButton = new Button
+            {
+                Text = "OK",
+                Size = new Size(80, 30),
+                Location = new Point(350, 230),
+                BackColor = Color.FromArgb(45, 47, 49),
+                ForeColor = Color.White,
+                FlatStyle = FlatStyle.Flat
+            };
+            okButton.Click += (s, e) => aboutDialog.Close();
+            aboutDialog.Controls.Add(okButton);
+
+            // Show the dialog
+            aboutDialog.ShowDialog(this);
         }
     }
 }

@@ -59,13 +59,13 @@ namespace VDD_Control
             userModeLoggingToolStripMenuItem = new ToolStripMenuItem();
             devModeLoggingToolStripMenuItem = new ToolStripMenuItem();
             toolStripMenuItem1 = new ToolStripMenuItem();
+            aboutToolStripMenuItem1 = new ToolStripMenuItem();
+            exitToolStripMenuItem2 = new ToolStripMenuItem();
             virtualAudioDriverToolStripMenuItem1 = new ToolStripMenuItem();
             systemToolStripMenuItem2 = new ToolStripMenuItem();
             enableDriverToolStripMenuItem3 = new ToolStripMenuItem();
             disableDriverToolStripMenuItem3 = new ToolStripMenuItem();
             restartDriverToolStripMenuItem3 = new ToolStripMenuItem();
-            aboutToolStripMenuItem1 = new ToolStripMenuItem();
-            exitToolStripMenuItem2 = new ToolStripMenuItem();
             menuToolStripMenuItem = new ToolStripMenuItem();
             exitToolStripMenuItem = new ToolStripMenuItem();
             virtualDisplayDriverToolStripMenuItem = new ToolStripMenuItem();
@@ -103,12 +103,12 @@ namespace VDD_Control
             discordLabel = new Label();
             vddLink = new LinkLabel();
             mttLabel = new Label();
-            budLabel = new Label();
+            // budLabel removed
             jockeLabel = new Label();
             mttSupport = new LinkLabel();
             linkLabel6 = new LinkLabel();
             jockeSupport = new LinkLabel();
-            budSupport = new LinkLabel();
+            // budSupport removed
             patreonGroupBox = new GroupBox();
             patreonMembersListBox = new ListBox();
             devsGroupBox = new GroupBox();
@@ -143,9 +143,9 @@ namespace VDD_Control
             // 
             // trayMenu
             // 
-            trayMenu.Items.AddRange(new ToolStripItem[] { menuToolStripMenuItem1, toolsToolStripMenuItem1, virtualDisplayDriverToolStripMenuItem1, virtualAudioDriverToolStripMenuItem1, aboutToolStripMenuItem1, exitToolStripMenuItem2 });
+            trayMenu.Items.AddRange(new ToolStripItem[] { menuToolStripMenuItem1, toolsToolStripMenuItem1, virtualDisplayDriverToolStripMenuItem1, aboutToolStripMenuItem1, exitToolStripMenuItem2 });
             trayMenu.Name = "contextMenuStrip1";
-            trayMenu.Size = new Size(184, 158);
+            trayMenu.Size = new Size(184, 114);
             trayMenu.Text = "Menu";
             // 
             // menuToolStripMenuItem1
@@ -164,7 +164,7 @@ namespace VDD_Control
             // 
             // toolsToolStripMenuItem1
             // 
-            toolsToolStripMenuItem1.DropDownItems.AddRange(new ToolStripItem[] { communityScriptsToolStripMenuItem, sunshineScriptsToolStripMenuItem1, getDisplayInformationToolStripMenuItem1, getGPUInformationToolStripMenuItem1, getCPUInformationToolStripMenuItem1, getAudioInformationToolStripMenuItem1 });
+            toolsToolStripMenuItem1.DropDownItems.AddRange(new ToolStripItem[] { getDisplayInformationToolStripMenuItem1, getGPUInformationToolStripMenuItem1, getCPUInformationToolStripMenuItem1, getAudioInformationToolStripMenuItem1 });
             toolsToolStripMenuItem1.Name = "toolsToolStripMenuItem1";
             toolsToolStripMenuItem1.Size = new Size(183, 22);
             toolsToolStripMenuItem1.Text = "Tools";
@@ -316,6 +316,20 @@ namespace VDD_Control
             toolStripMenuItem1.Text = "XML/Options Editor";
             toolStripMenuItem1.Click += toolStripMenuItem1_Click;
             // 
+            // aboutToolStripMenuItem1
+            // 
+            aboutToolStripMenuItem1.Name = "aboutToolStripMenuItem1";
+            aboutToolStripMenuItem1.Size = new Size(183, 22);
+            aboutToolStripMenuItem1.Text = "About";
+            aboutToolStripMenuItem1.Click += aboutToolStripMenuItem1_Click;
+            // 
+            // exitToolStripMenuItem2
+            // 
+            exitToolStripMenuItem2.Name = "exitToolStripMenuItem2";
+            exitToolStripMenuItem2.Size = new Size(183, 22);
+            exitToolStripMenuItem2.Text = "Exit";
+            exitToolStripMenuItem2.Click += exitToolStripMenuItem2_Click;
+            // 
             // virtualAudioDriverToolStripMenuItem1
             // 
             virtualAudioDriverToolStripMenuItem1.DropDownItems.AddRange(new ToolStripItem[] { systemToolStripMenuItem2 });
@@ -347,20 +361,6 @@ namespace VDD_Control
             restartDriverToolStripMenuItem3.Name = "restartDriverToolStripMenuItem3";
             restartDriverToolStripMenuItem3.Size = new Size(146, 22);
             restartDriverToolStripMenuItem3.Text = "Restart Driver";
-            // 
-            // aboutToolStripMenuItem1
-            // 
-            aboutToolStripMenuItem1.Name = "aboutToolStripMenuItem1";
-            aboutToolStripMenuItem1.Size = new Size(183, 22);
-            aboutToolStripMenuItem1.Text = "About";
-            aboutToolStripMenuItem1.Click += aboutToolStripMenuItem1_Click;
-            // 
-            // exitToolStripMenuItem2
-            // 
-            exitToolStripMenuItem2.Name = "exitToolStripMenuItem2";
-            exitToolStripMenuItem2.Size = new Size(183, 22);
-            exitToolStripMenuItem2.Text = "Exit";
-            exitToolStripMenuItem2.Click += exitToolStripMenuItem2_Click;
             // 
             // menuToolStripMenuItem
             // 
@@ -547,16 +547,16 @@ namespace VDD_Control
             // 
             mainVisibleMenuStrip.BackColor = Color.FromArgb(32, 34, 37);
             mainVisibleMenuStrip.Dock = DockStyle.None;
-            mainVisibleMenuStrip.Items.AddRange(new ToolStripItem[] { menuToolStripMenuItem, toolsToolStripMenuItem, virtualDisplayDriverToolStripMenuItem, virtualAudioDriverToolStripMenuItem, aboutToolStripMenuItem });
+            mainVisibleMenuStrip.Items.AddRange(new ToolStripItem[] { menuToolStripMenuItem, toolsToolStripMenuItem, virtualDisplayDriverToolStripMenuItem, aboutToolStripMenuItem });
             mainVisibleMenuStrip.Location = new Point(255, 22);
             mainVisibleMenuStrip.Name = "mainVisibleMenuStrip";
-            mainVisibleMenuStrip.Size = new Size(407, 24);
+            mainVisibleMenuStrip.Size = new Size(285, 24);
             mainVisibleMenuStrip.TabIndex = 1;
             mainVisibleMenuStrip.Text = "mainVisibleToolstrip";
             // 
             // toolsToolStripMenuItem
             // 
-            toolsToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { scriptsToolStripMenuItem, sunshineScriptsToolStripMenuItem, getGPUInformationToolStripMenuItem, getCPUInformationToolStripMenuItem, getDisplayInformationToolStripMenuItem2, getAudioInformationToolStripMenuItem });
+            toolsToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { getGPUInformationToolStripMenuItem, getCPUInformationToolStripMenuItem, getDisplayInformationToolStripMenuItem2, getAudioInformationToolStripMenuItem });
             toolsToolStripMenuItem.ForeColor = SystemColors.ButtonFace;
             toolsToolStripMenuItem.Name = "toolsToolStripMenuItem";
             toolsToolStripMenuItem.Size = new Size(47, 20);
@@ -669,22 +669,13 @@ namespace VDD_Control
             mttLabel.Size = new Size(112, 17);
             mttLabel.TabIndex = 11;
             mttLabel.Text = "- MikeTheTech";
-            // 
-            // budLabel
-            // 
-            budLabel.AutoSize = true;
-            budLabel.Font = new Font("Consolas", 10F, FontStyle.Bold, GraphicsUnit.Point);
-            budLabel.Location = new Point(6, 44);
-            budLabel.Name = "budLabel";
-            budLabel.Size = new Size(48, 17);
-            budLabel.TabIndex = 12;
-            budLabel.Text = "- Bud";
+
             // 
             // jockeLabel
             // 
             jockeLabel.AutoSize = true;
             jockeLabel.Font = new Font("Consolas", 10F, FontStyle.Bold, GraphicsUnit.Point);
-            jockeLabel.Location = new Point(6, 65);
+            jockeLabel.Location = new Point(6, 44);
             jockeLabel.Name = "jockeLabel";
             jockeLabel.Size = new Size(64, 17);
             jockeLabel.TabIndex = 13;
@@ -701,6 +692,7 @@ namespace VDD_Control
             mttSupport.TabIndex = 16;
             mttSupport.TabStop = true;
             mttSupport.Text = "(Support this Dev)";
+            mttSupport.LinkClicked += mttSupport_LinkClicked;
             // 
             // linkLabel6
             // 
@@ -719,24 +711,13 @@ namespace VDD_Control
             jockeSupport.AutoSize = true;
             jockeSupport.Font = new Font("Segoe UI", 7F, FontStyle.Regular, GraphicsUnit.Point);
             jockeSupport.LinkColor = Color.White;
-            jockeSupport.Location = new Point(158, 70);
+            jockeSupport.Location = new Point(158, 46);
             jockeSupport.Name = "jockeSupport";
             jockeSupport.Size = new Size(84, 12);
             jockeSupport.TabIndex = 23;
             jockeSupport.TabStop = true;
             jockeSupport.Text = "(Support this Dev)";
-            // 
-            // budSupport
-            // 
-            budSupport.AutoSize = true;
-            budSupport.Font = new Font("Segoe UI", 7F, FontStyle.Regular, GraphicsUnit.Point);
-            budSupport.LinkColor = Color.White;
-            budSupport.Location = new Point(158, 49);
-            budSupport.Name = "budSupport";
-            budSupport.Size = new Size(84, 12);
-            budSupport.TabIndex = 24;
-            budSupport.TabStop = true;
-            budSupport.Text = "(Support this Dev)";
+            jockeSupport.LinkClicked += jockeSupport_LinkClicked;
             // 
             // patreonGroupBox
             // 
@@ -744,9 +725,9 @@ namespace VDD_Control
             patreonGroupBox.Controls.Add(patreonMembersListBox);
             patreonGroupBox.Font = new Font("Consolas", 8.25F, FontStyle.Bold, GraphicsUnit.Point);
             patreonGroupBox.ForeColor = SystemColors.ButtonHighlight;
-            patreonGroupBox.Location = new Point(555, 274);
+            patreonGroupBox.Location = new Point(555, 249);
             patreonGroupBox.Name = "patreonGroupBox";
-            patreonGroupBox.Size = new Size(248, 115);
+            patreonGroupBox.Size = new Size(248, 140);
             patreonGroupBox.TabIndex = 25;
             patreonGroupBox.TabStop = false;
             patreonGroupBox.Text = "Patreon Supporters";
@@ -767,16 +748,16 @@ namespace VDD_Control
             // devsGroupBox
             // 
             devsGroupBox.Controls.Add(mttLabel);
-            devsGroupBox.Controls.Add(budLabel);
+            // budLabel removed
             devsGroupBox.Controls.Add(jockeLabel);
             devsGroupBox.Controls.Add(jockeSupport);
-            devsGroupBox.Controls.Add(budSupport);
+            // budSupport removed
             devsGroupBox.Controls.Add(mttSupport);
             devsGroupBox.Font = new Font("Consolas", 8.25F, FontStyle.Bold, GraphicsUnit.Point);
             devsGroupBox.ForeColor = SystemColors.ButtonHighlight;
             devsGroupBox.Location = new Point(555, 173);
             devsGroupBox.Name = "devsGroupBox";
-            devsGroupBox.Size = new Size(248, 95);
+            devsGroupBox.Size = new Size(248, 70);
             devsGroupBox.TabIndex = 26;
             devsGroupBox.TabStop = false;
             devsGroupBox.Text = "Developers";
@@ -1084,12 +1065,12 @@ namespace VDD_Control
         private ToolStripMenuItem getCPUInformationToolStripMenuItem1;
         private ToolStripMenuItem getAudioInformationToolStripMenuItem1;
         private Label mttLabel;
-        private Label budLabel;
+        // private Label budLabel; - removed
         private Label jockeLabel;
         private LinkLabel mttSupport;
         private LinkLabel linkLabel6;
         private LinkLabel jockeSupport;
-        private LinkLabel budSupport;
+        // private LinkLabel budSupport; - removed
         private ToolStripMenuItem xMLOptionsEditorToolStripMenuItem;
         private ToolStripMenuItem toolStripMenuItem1;
         private GroupBox patreonGroupBox;
