@@ -34,6 +34,8 @@ namespace VDD_Control
         public mainWindow()
         {
             InitializeComponent();
+            SetupMinimizeToTrayMenu();
+
             ToolStripMenuItem restartItem = GetRestartDriverToolStripMenuItem(); // This is now safe
             string settingsPath = LocateSettingsFile();
 
@@ -87,9 +89,6 @@ namespace VDD_Control
                         mainConsole.AppendText("[ERROR] Could not locate settings file in any expected location.\n");
                     }
                 }
-
-                // Set the state of other feature menus not directly tied to XML options
-                // Skip SetupMinimizeToTrayMenu(); as it's being hidden
 
                 // Hide GPU selection menu as requested
                 selectGPUToolStripMenuItem.Visible = false;
@@ -812,30 +811,6 @@ namespace VDD_Control
                 SetMenuItemStyle(item);
             }
 
-            // Hide the minimize to tray functionality
-            if (minButton != null) minButton.Visible = false;
-
-            // Also hide any Minimize to Tray menu items
-            // First in the main menu
-            foreach (ToolStripItem item in menuToolStripMenuItem.DropDownItems)
-            {
-                if (item is ToolStripMenuItem menuItem && menuItem.Text == "Minimize to Tray")
-                {
-                    menuItem.Visible = false;
-                    break;
-                }
-            }
-
-            // Then in the tray menu
-            foreach (ToolStripItem item in menuToolStripMenuItem1.DropDownItems)
-            {
-                if (item is ToolStripMenuItem menuItem && menuItem.Text == "Minimize to Tray")
-                {
-                    menuItem.Visible = false;
-                    break;
-                }
-            }
-
             // Display ASCII art animation with proper delays and scrolling first
             // before any other operations to ensure it's visible
             await DisplayAsciiArtAnimation();
@@ -946,7 +921,7 @@ namespace VDD_Control
                 systemInfo += settingsPath ?? "Could not locate settings file";
 
                 // Display the information in richTextBox1
-                AppendToConsole(systemInfo + "\n");
+                //AppendToConsole(systemInfo + "\n");
             }
             catch (Exception ex)
             {
@@ -3081,8 +3056,6 @@ namespace VDD_Control
             helpText.AppendLine("CEAOVERRIDE [true/false] - Enable/disable EDID CEA Override");
             helpText.AppendLine("SETGPU [gpu_name]      - Set the GPU to use for virtual displays");
             helpText.AppendLine("SETCOUNT [number]      - Set the number of virtual displays");
-            helpText.AppendLine("STATUS                 - Get current driver status");
-            helpText.AppendLine("VERSION                - Get driver version information");
             helpText.AppendLine("LOGGING [true/false]   - Enable/disable logging");
             helpText.AppendLine("DEBUGLOGGING [true/false] - Enable/disable debug level logging");
 
@@ -3411,6 +3384,22 @@ namespace VDD_Control
                 FileName = "https://www.patreon.com/c/mikethetech",
                 UseShellExecute = true
             });
+        }
+
+
+        private void toolStripMenuItem1_Click_1(object sender, EventArgs e)
+        {
+            MinimizeToTray();
+
+        }
+
+        private void notificationIcon_MouseDoubleClick(object sender, MouseEventArgs e)
+        {
+            this.Show();
+            this.WindowState = FormWindowState.Normal;
+            this.Activate();
+
+            AppendToConsole("[INFO] Application restored from tray\n");
         }
     }
 }
