@@ -3047,7 +3047,8 @@ namespace VDD_Control
             helpText.AppendLine("Available Commands:");
             helpText.AppendLine("------------------");
             helpText.AppendLine("HELP                   - Displays this help information");
-            helpText.AppendLine("RESTART_DRIVER         - Restarts the virtual display driver");
+            helpText.AppendLine("RESTART_DRIVER         - Restarts the system virtual distplay driver");
+            helpText.AppendLine("RELOAD_DRIVER          - Asks the driver to reload itself.");
             helpText.AppendLine("SDR10 [true/false]     - Enable/disable SDR 10-bit mode");
             helpText.AppendLine("HDRPLUS [true/false]   - Enable/disable HDR+ mode");
             helpText.AppendLine("CUSTOMEDID [true/false]- Enable/disable custom EDID");
@@ -3061,7 +3062,211 @@ namespace VDD_Control
 
             mainConsole.AppendText(helpText.ToString());
         }
+        private async void ReloadDriverCommand()
+        {
+            AppendToConsole("[ACTION] Reloading driver...\n");
+            UpdateTaskProgress("Reloading Driver", 50);
 
+            try
+            {
+                string? response = await SendCommandToDriver("RELOAD_DRIVER");
+                UpdateTaskProgress("Reloading Driver", 100);
+                await Task.Delay(1000);
+                UpdateTaskProgress("", 0);
+            }
+            catch (Exception ex)
+            {
+                AppendToConsole($"[ERROR] Failed to reload driver: {ex.Message}\n");
+                UpdateTaskProgress("Reloading Driver", 0);
+            }
+        }
+
+        private async void GetSettingsCommand()
+        {
+            AppendToConsole("[ACTION] Retrieving current settings...\n");
+            UpdateTaskProgress("Getting Settings", 50);
+
+            try
+            {
+                string? response = await SendCommandToDriver("GETSETTINGS");
+                UpdateTaskProgress("Getting Settings", 100);
+                await Task.Delay(1000);
+                UpdateTaskProgress("", 0);
+            }
+            catch (Exception ex)
+            {
+                AppendToConsole($"[ERROR] Failed to get settings: {ex.Message}\n");
+                UpdateTaskProgress("Getting Settings", 0);
+            }
+        }
+
+        // Logging Control Commands
+        private async void SetDebugLoggingCommand(bool state)
+        {
+            DEVLOGGING_STATE = state;
+            string action = state ? "ON" : "OFF";
+            AppendToConsole($"[ACTION] Toggling Debug Logging to {action}...\n");
+
+            try
+            {
+                // Update the XML settings first
+                if (IXCLI != null)
+                {
+                    IXCLI.DebugLogging = state;
+
+                    try
+                    {
+                        string xmlPath = Path.Combine(registryFilePath, "vdd_settings.xml");
+                        IXCLI.SaveToXml(xmlPath);
+                        AppendToConsole($"[SUCCESS] Updated XML settings for Debug Logging: {state}\n");
+                    }
+                    catch (Exception xmlEx)
+                    {
+                        AppendToConsole($"[WARNING] Could not save XML settings: {xmlEx.Message}\n");
+                    }
+                }
+
+                // Now update the driver
+                string command = state ? "LOG_DEBUG true" : "LOG_DEBUG false";
+                string? response = await SendCommandToDriver(command);
+            }
+            catch (Exception ex)
+            {
+                AppendToConsole($"[ERROR] Could not set debug logging: {ex.Message}\n");
+            }
+        }
+
+        private async void SetLoggingCommand(bool state)
+        {
+            LOGGING_STATE = state;
+            string action = state ? "ON" : "OFF";
+            AppendToConsole($"[ACTION] Toggling General Logging to {action}...\n");
+
+            try
+            {
+                // Update the XML settings first
+                if (IXCLI != null)
+                {
+                    IXCLI.Logging = state;
+
+                    try
+                    {
+                        string xmlPath = Path.Combine(registryFilePath, "vdd_settings.xml");
+                        IXCLI.SaveToXml(xmlPath);
+                        AppendToConsole($"[SUCCESS] Updated XML settings for Logging: {state}\n");
+                    }
+                    catch (Exception xmlEx)
+                    {
+                        AppendToConsole($"[WARNING] Could not save XML settings: {xmlEx.Message}\n");
+                    }
+                }
+
+                // Now update the driver
+                string command = state ? "LOGGING true" : "LOGGING false";
+                string? response = await SendCommandToDriver(command);
+            }
+            catch (Exception ex)
+            {
+                AppendToConsole($"[ERROR] Could not set logging: {ex.Message}\n");
+            }
+        }
+
+        // Runtime Information Commands
+        private async void GetD3DDeviceGPUCommand()
+        {
+            AppendToConsole("[ACTION] Retrieving D3D GPU information...\n");
+            UpdateTaskProgress("Getting D3D GPU Info", 50);
+
+            try
+            {
+                string? response = await SendCommandToDriver("D3DDEVICEGPU");
+                UpdateTaskProgress("Getting D3D GPU Info", 100);
+                await Task.Delay(1000);
+                UpdateTaskProgress("", 0);
+            }
+            catch (Exception ex)
+            {
+                AppendToConsole($"[ERROR] Failed to get D3D GPU info: {ex.Message}\n");
+                UpdateTaskProgress("Getting D3D GPU Info", 0);
+            }
+        }
+
+        private async void GetIDDCXVersionCommand()
+        {
+            AppendToConsole("[ACTION] Retrieving IDDCX version information...\n");
+            UpdateTaskProgress("Getting IDDCX Version", 50);
+
+            try
+            {
+                string? response = await SendCommandToDriver("IDDCXVERSION");
+                UpdateTaskProgress("Getting IDDCX Version", 100);
+                await Task.Delay(1000);
+                UpdateTaskProgress("", 0);
+            }
+            catch (Exception ex)
+            {
+                AppendToConsole($"[ERROR] Failed to get IDDCX version: {ex.Message}\n");
+                UpdateTaskProgress("Getting IDDCX Version", 0);
+            }
+        }
+
+        private async void GetAssignedGPUCommand()
+        {
+            AppendToConsole("[ACTION] Retrieving assigned GPU information...\n");
+            UpdateTaskProgress("Getting Assigned GPU", 50);
+
+            try
+            {
+                string? response = await SendCommandToDriver("GETASSIGNEDGPU");
+                UpdateTaskProgress("Getting Assigned GPU", 100);
+                await Task.Delay(1000);
+                UpdateTaskProgress("", 0);
+            }
+            catch (Exception ex)
+            {
+                AppendToConsole($"[ERROR] Failed to get assigned GPU: {ex.Message}\n");
+                UpdateTaskProgress("Getting Assigned GPU", 0);
+            }
+        }
+
+        private async void GetAllGPUsCommand()
+        {
+            AppendToConsole("[ACTION] Retrieving all available GPUs...\n");
+            UpdateTaskProgress("Getting All GPUs", 50);
+
+            try
+            {
+                string? response = await SendCommandToDriver("GETALLGPUS");
+                UpdateTaskProgress("Getting All GPUs", 100);
+                await Task.Delay(1000);
+                UpdateTaskProgress("", 0);
+            }
+            catch (Exception ex)
+            {
+                AppendToConsole($"[ERROR] Failed to get all GPUs: {ex.Message}\n");
+                UpdateTaskProgress("Getting All GPUs", 0);
+            }
+        }
+
+        // System Commands
+        private async void PingDriverCommand()
+        {
+            AppendToConsole("[ACTION] Sending PING to driver...\n");
+
+            try
+            {
+                string? response = await SendCommandToDriver("PING");
+                // The driver should respond with "PONG"
+                if (response != null && response.Contains("PONG"))
+                {
+                    AppendToConsole("[SUCCESS] Driver responded with PONG\n");
+                }
+            }
+            catch (Exception ex)
+            {
+                AppendToConsole($"[ERROR] PING failed: {ex.Message}\n");
+            }
+        }
         private async Task SendCommandFromInput()
         {
             if (string.IsNullOrWhiteSpace(userInput.Text))
@@ -3074,40 +3279,380 @@ namespace VDD_Control
             if (command.Equals("HELP", StringComparison.OrdinalIgnoreCase))
             {
                 DisplayHelpCommand();
-                // Clear input after sending
                 userInput.Text = string.Empty;
                 return;
             }
 
-            UpdateTaskProgress("Sending Command", 25);
+            // Parse command parts
+            string[] parts = command.Split(' ');
+            string baseCommand = parts[0].ToUpper();
 
-            try
+            // Handle all pipeline commands
+            switch (baseCommand)
             {
-                string? response = await SendCommandToDriver(command);
-                if (response != null)
-                {
-                    AppendToConsole($"[RESPONSE] {response}\n");
-                }
-                else
-                {
-                    AppendToConsole("[RESPONSE] No response received from driver.\n");
-                }
-                UpdateTaskProgress("Sending Command", 100);
-            }
-            catch (Exception ex)
-            {
-                AppendToConsole($"[ERROR] {ex.Message}\n");
-                UpdateTaskProgress("Sending Command", 0);
-            }
-            finally
-            {
-                // Clear input after sending
-                userInput.Text = string.Empty;
-                await Task.Delay(500);
-                UpdateTaskProgress("", 0);
+                // Driver Control Commands
+                case "RESTART_DRIVER":
+                    // Using the existing Device Manager restart
+                    userInput.Text = string.Empty;
+                    await restartDriverToolStripMenuItem_Click(null, EventArgs.Empty);
+                    return;
+
+                case "RELOAD_DRIVER":
+                    userInput.Text = string.Empty;
+                    ReloadDriverCommand();
+                    return;
+
+                case "GETSETTINGS":
+                    userInput.Text = string.Empty;
+                    GetSettingsCommand();
+                    return;
+
+                // Logging Control Commands
+                case "LOG_DEBUG":
+                    if (parts.Length > 1 && bool.TryParse(parts[1], out bool debugState))
+                    {
+                        SetDebugLoggingCommand(debugState);
+                    }
+                    else
+                    {
+                        AppendToConsole("[ERROR] LOG_DEBUG requires true/false parameter\n");
+                    }
+                    userInput.Text = string.Empty;
+                    return;
+
+                case "LOGGING":
+                    if (parts.Length > 1 && bool.TryParse(parts[1], out bool logState))
+                    {
+                        SetLoggingCommand(logState);
+                    }
+                    else
+                    {
+                        AppendToConsole("[ERROR] LOGGING requires true/false parameter\n");
+                    }
+                    userInput.Text = string.Empty;
+                    return;
+
+                // Display Configuration Commands
+                case "SDR10":
+                    if (parts.Length > 1 && bool.TryParse(parts[1], out bool sdr10State))
+                    {
+                        SDR10_STATE = sdr10State;
+                        sDR10bitToolStripMenuItem.Checked = sdr10State;
+                        await toggleSDR10Command(sdr10State);
+                    }
+                    else
+                    {
+                        AppendToConsole("[ERROR] SDR10 requires true/false parameter\n");
+                    }
+                    userInput.Text = string.Empty;
+                    return;
+
+                case "HDRPLUS":
+                    if (parts.Length > 1 && bool.TryParse(parts[1], out bool hdrState))
+                    {
+                        HDR10PLUS_STATE = hdrState;
+                        hDRToolStripMenuItem.Checked = hdrState;
+                        await toggleHDRPlusCommand(hdrState);
+                    }
+                    else
+                    {
+                        AppendToConsole("[ERROR] HDRPLUS requires true/false parameter\n");
+                    }
+                    userInput.Text = string.Empty;
+                    return;
+
+                case "CUSTOMEDID":
+                    if (parts.Length > 1 && bool.TryParse(parts[1], out bool customEdidState))
+                    {
+                        CUSTOMEDID_STATE = customEdidState;
+                        customEDIDToolStripMenuItem.Checked = customEdidState;
+                        await toggleCustomEDIDCommand(customEdidState);
+                    }
+                    else
+                    {
+                        AppendToConsole("[ERROR] CUSTOMEDID requires true/false parameter\n");
+                    }
+                    userInput.Text = string.Empty;
+                    return;
+
+                case "HARDWARECURSOR":
+                    if (parts.Length > 1 && bool.TryParse(parts[1], out bool cursorState))
+                    {
+                        HARDWARECURSOR_STATE = cursorState;
+                        hardwareCursorToolStripMenuItem.Checked = cursorState;
+                        await toggleHardwareCursorCommand(cursorState);
+                    }
+                    else
+                    {
+                        AppendToConsole("[ERROR] HARDWARECURSOR requires true/false parameter\n");
+                    }
+                    userInput.Text = string.Empty;
+                    return;
+
+                case "PREVENTSPOOF":
+                    if (parts.Length > 1 && bool.TryParse(parts[1], out bool preventSpoofState))
+                    {
+                        PREVENTEDIDSPOOF_STATE = preventSpoofState;
+                        preventMonitorSpoofToolStripMenuItem.Checked = preventSpoofState;
+                        await togglePreventSpoofCommand(preventSpoofState);
+                    }
+                    else
+                    {
+                        AppendToConsole("[ERROR] PREVENTSPOOF requires true/false parameter\n");
+                    }
+                    userInput.Text = string.Empty;
+                    return;
+
+                case "CEAOVERRIDE":
+                    if (parts.Length > 1 && bool.TryParse(parts[1], out bool ceaState))
+                    {
+                        EDIDCEAOVERRRIDE_STATE = ceaState;
+                        eDIDCEAOverrideToolStripMenuItem.Checked = ceaState;
+                        await toggleCEAOverrideCommand(ceaState);
+                    }
+                    else
+                    {
+                        AppendToConsole("[ERROR] CEAOVERRIDE requires true/false parameter\n");
+                    }
+                    userInput.Text = string.Empty;
+                    return;
+
+                // Runtime Information Commands
+                case "D3DDEVICEGPU":
+                    userInput.Text = string.Empty;
+                    GetD3DDeviceGPUCommand();
+                    return;
+
+                case "IDDCXVERSION":
+                    userInput.Text = string.Empty;
+                    GetIDDCXVersionCommand();
+                    return;
+
+                case "GETASSIGNEDGPU":
+                    userInput.Text = string.Empty;
+                    GetAssignedGPUCommand();
+                    return;
+
+                case "GETALLGPUS":
+                    userInput.Text = string.Empty;
+                    GetAllGPUsCommand();
+                    return;
+
+                // Configuration Commands
+                case "SETGPU":
+                    if (parts.Length > 1)
+                    {
+                        // Handle quoted GPU names
+                        string gpuName;
+                        if (parts.Length > 2 && parts[1].StartsWith("\""))
+                        {
+                            // Reconstruct quoted GPU name
+                            gpuName = string.Join(" ", parts.Skip(1)).Trim('"');
+                        }
+                        else
+                        {
+                            gpuName = parts[1];
+                        }
+
+                        await setGPUCommand(gpuName);
+                    }
+                    else
+                    {
+                        AppendToConsole("[ERROR] SETGPU requires GPU name parameter. Use quotes for names with spaces.\n");
+                    }
+                    userInput.Text = string.Empty;
+                    return;
+
+                case "SETCOUNT":
+                    if (parts.Length > 1 && int.TryParse(parts[1], out int displayCount))
+                    {
+                        await SetDisplayCount(displayCount);
+                    }
+                    else
+                    {
+                        AppendToConsole("[ERROR] SETCOUNT requires a number parameter\n");
+                    }
+                    userInput.Text = string.Empty;
+                    return;
+
+                // System Commands
+                case "PING":
+                    userInput.Text = string.Empty;
+                    PingDriverCommand();
+                    return;
+
+                // For any unrecognized command, attempt to send directly to driver
+                default:
+                    UpdateTaskProgress("Sending Command", 25);
+
+                    try
+                    {
+                        string? response = await SendCommandToDriver(command);
+                        if (response != null)
+                        {
+                            AppendToConsole($"[RESPONSE] {response}\n");
+                        }
+                        else
+                        {
+                            AppendToConsole("[RESPONSE] No response received from driver.\n");
+                        }
+                        UpdateTaskProgress("Sending Command", 100);
+                    }
+                    catch (Exception ex)
+                    {
+                        AppendToConsole($"[ERROR] {ex.Message}\n");
+                        UpdateTaskProgress("Sending Command", 0);
+                    }
+                    finally
+                    {
+                        userInput.Text = string.Empty;
+                        await Task.Delay(500);
+                        UpdateTaskProgress("", 0);
+                    }
+                    break;
             }
         }
 
+        // Add these helper methods for display configuration commands
+        private async Task toggleSDR10Command(bool state)
+        {
+            try
+            {
+                string command = state ? "SDR10 true" : "SDR10 false";
+                await SendCommandToDriver(command);
+
+                if (IXCLI != null)
+                {
+                    IXCLI.SDR10bit = state;
+                    string xmlPath = Path.Combine(registryFilePath, "vdd_settings.xml");
+                    IXCLI.SaveToXml(xmlPath);
+                }
+            }
+            catch (Exception ex)
+            {
+                AppendToConsole($"[ERROR] Failed to set SDR10: {ex.Message}\n");
+            }
+        }
+
+        private async Task toggleHDRPlusCommand(bool state)
+        {
+            try
+            {
+                string command = state ? "HDRPLUS true" : "HDRPLUS false";
+                await SendCommandToDriver(command);
+
+                if (IXCLI != null)
+                {
+                    IXCLI.HDRPlus = state;
+                    string xmlPath = Path.Combine(registryFilePath, "vdd_settings.xml");
+                    IXCLI.SaveToXml(xmlPath);
+                }
+            }
+            catch (Exception ex)
+            {
+                AppendToConsole($"[ERROR] Failed to set HDRPLUS: {ex.Message}\n");
+            }
+        }
+
+        private async Task toggleCustomEDIDCommand(bool state)
+        {
+            try
+            {
+                string command = state ? "CUSTOMEDID true" : "CUSTOMEDID false";
+                await SendCommandToDriver(command);
+
+                if (IXCLI != null)
+                {
+                    IXCLI.CustomEdid = state;
+                    string xmlPath = Path.Combine(registryFilePath, "vdd_settings.xml");
+                    IXCLI.SaveToXml(xmlPath);
+                }
+            }
+            catch (Exception ex)
+            {
+                AppendToConsole($"[ERROR] Failed to set CUSTOMEDID: {ex.Message}\n");
+            }
+        }
+
+        private async Task toggleHardwareCursorCommand(bool state)
+        {
+            try
+            {
+                string command = state ? "HARDWARECURSOR true" : "HARDWARECURSOR false";
+                await SendCommandToDriver(command);
+
+                if (IXCLI != null)
+                {
+                    IXCLI.HardwareCursor = state;
+                    string xmlPath = Path.Combine(registryFilePath, "vdd_settings.xml");
+                    IXCLI.SaveToXml(xmlPath);
+                }
+            }
+            catch (Exception ex)
+            {
+                AppendToConsole($"[ERROR] Failed to set HARDWARECURSOR: {ex.Message}\n");
+            }
+        }
+
+        private async Task togglePreventSpoofCommand(bool state)
+        {
+            try
+            {
+                string command = state ? "PREVENTSPOOF true" : "PREVENTSPOOF false";
+                await SendCommandToDriver(command);
+
+                if (IXCLI != null)
+                {
+                    IXCLI.PreventSpoof = state;
+                    string xmlPath = Path.Combine(registryFilePath, "vdd_settings.xml");
+                    IXCLI.SaveToXml(xmlPath);
+                }
+            }
+            catch (Exception ex)
+            {
+                AppendToConsole($"[ERROR] Failed to set PREVENTSPOOF: {ex.Message}\n");
+            }
+        }
+
+        private async Task toggleCEAOverrideCommand(bool state)
+        {
+            try
+            {
+                string command = state ? "CEAOVERRIDE true" : "CEAOVERRIDE false";
+                await SendCommandToDriver(command);
+
+                if (IXCLI != null)
+                {
+                    IXCLI.EdidCeaOverride = state;
+                    string xmlPath = Path.Combine(registryFilePath, "vdd_settings.xml");
+                    IXCLI.SaveToXml(xmlPath);
+                }
+            }
+            catch (Exception ex)
+            {
+                AppendToConsole($"[ERROR] Failed to set CEAOVERRIDE: {ex.Message}\n");
+            }
+        }
+
+        private async Task setGPUCommand(string gpuName)
+        {
+            try
+            {
+                string command = $"SETGPU \"{gpuName}\"";
+                await SendCommandToDriver(command);
+
+                if (IXCLI != null)
+                {
+                    IXCLI.Friendlyname = gpuName;
+                    string xmlPath = Path.Combine(registryFilePath, "vdd_settings.xml");
+                    IXCLI.SaveToXml(xmlPath);
+                }
+            }
+            catch (Exception ex)
+            {
+                AppendToConsole($"[ERROR] Failed to set GPU: {ex.Message}\n");
+            }
+        }
         private void linkLabel2_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
         {
 
