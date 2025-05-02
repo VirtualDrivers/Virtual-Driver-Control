@@ -3994,5 +3994,15 @@ namespace VDD_Control
             if (userModeLoggingToolStripMenuItem != null) userModeLoggingToolStripMenuItem.Checked = LOGGING_STATE;
             if (devModeLoggingToolStripMenuItem != null) devModeLoggingToolStripMenuItem.Checked = DEVLOGGING_STATE;
         }
+
+        private void userModeLoggingToolStripMenuItem1_Click(object sender, EventArgs e)
+        {
+            userModeLoggingToolStripMenuItem_Click_1(sender, e);
+        }
+
+        private void devModeLoggingToolStripMenuItem1_Click(object sender, EventArgs e)
+        {
+            devModeLoggingToolStripMenuItem_Click_1(sender, e);
+        }
     }
 }

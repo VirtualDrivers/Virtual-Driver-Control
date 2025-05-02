@@ -79,6 +79,8 @@ namespace VDD_Control
             disableDriverToolStripMenuItem = new ToolStripMenuItem();
             restartDriverToolStripMenuItem = new ToolStripMenuItem();
             loggingToolStripMenuItem = new ToolStripMenuItem();
+            userModeLoggingToolStripMenuItem = new ToolStripMenuItem();
+            devModeLoggingToolStripMenuItem = new ToolStripMenuItem();
             virtualAudioDriverToolStripMenuItem = new ToolStripMenuItem();
             systemToolStripMenuItem = new ToolStripMenuItem();
             enableDriverToolStripMenuItem1 = new ToolStripMenuItem();
@@ -117,8 +119,9 @@ namespace VDD_Control
             sunshineScriptsToolStripMenuItem = new ToolStripMenuItem();
             communityScriptsToolStripMenuItem = new ToolStripMenuItem();
             sunshineScriptsToolStripMenuItem1 = new ToolStripMenuItem();
-            userModeLoggingToolStripMenuItem = new ToolStripMenuItem();
-            devModeLoggingToolStripMenuItem = new ToolStripMenuItem();
+            loggingToolStripMenuItem1 = new ToolStripMenuItem();
+            userModeLoggingToolStripMenuItem1 = new ToolStripMenuItem();
+            devModeLoggingToolStripMenuItem1 = new ToolStripMenuItem();
             trayMenu.SuspendLayout();
             mainVisibleMenuStrip.SuspendLayout();
             patreonGroupBox.SuspendLayout();
@@ -140,7 +143,7 @@ namespace VDD_Control
             // 
             trayMenu.Items.AddRange(new ToolStripItem[] { menuToolStripMenuItem1, toolsToolStripMenuItem1, virtualDisplayDriverToolStripMenuItem1, aboutToolStripMenuItem1, exitToolStripMenuItem2 });
             trayMenu.Name = "contextMenuStrip1";
-            trayMenu.Size = new Size(184, 114);
+            trayMenu.Size = new Size(184, 136);
             trayMenu.Text = "Menu";
             // 
             // menuToolStripMenuItem1
@@ -194,7 +197,7 @@ namespace VDD_Control
             // 
             // virtualDisplayDriverToolStripMenuItem1
             // 
-            virtualDisplayDriverToolStripMenuItem1.DropDownItems.AddRange(new ToolStripItem[] { sDR10bitToolStripMenuItem1, hDRToolStripMenuItem1, customEDIDToolStripMenuItem1, hardwareCursorToolStripMenuItem1, preventMonitorSpoofToolStripMenuItem1, eDIDCEAOverrideToolStripMenuItem1, selectGPUToolStripMenuItem1, displayCountToolStripMenuItem1, systemToolStripMenuItem1 });
+            virtualDisplayDriverToolStripMenuItem1.DropDownItems.AddRange(new ToolStripItem[] { sDR10bitToolStripMenuItem1, hDRToolStripMenuItem1, customEDIDToolStripMenuItem1, hardwareCursorToolStripMenuItem1, preventMonitorSpoofToolStripMenuItem1, eDIDCEAOverrideToolStripMenuItem1, selectGPUToolStripMenuItem1, displayCountToolStripMenuItem1, systemToolStripMenuItem1, loggingToolStripMenuItem1 });
             virtualDisplayDriverToolStripMenuItem1.Name = "virtualDisplayDriverToolStripMenuItem1";
             virtualDisplayDriverToolStripMenuItem1.Size = new Size(183, 22);
             virtualDisplayDriverToolStripMenuItem1.Text = "Virtual Display Driver";
@@ -457,6 +460,20 @@ namespace VDD_Control
             loggingToolStripMenuItem.Size = new Size(194, 22);
             loggingToolStripMenuItem.Text = "Logging";
             // 
+            // userModeLoggingToolStripMenuItem
+            // 
+            userModeLoggingToolStripMenuItem.Name = "userModeLoggingToolStripMenuItem";
+            userModeLoggingToolStripMenuItem.Size = new Size(180, 22);
+            userModeLoggingToolStripMenuItem.Text = "User-Mode Logging";
+            userModeLoggingToolStripMenuItem.Click += userModeLoggingToolStripMenuItem_Click_1;
+            // 
+            // devModeLoggingToolStripMenuItem
+            // 
+            devModeLoggingToolStripMenuItem.Name = "devModeLoggingToolStripMenuItem";
+            devModeLoggingToolStripMenuItem.Size = new Size(180, 22);
+            devModeLoggingToolStripMenuItem.Text = "Dev-Mode Logging";
+            devModeLoggingToolStripMenuItem.Click += devModeLoggingToolStripMenuItem_Click_1;
+            // 
             // virtualAudioDriverToolStripMenuItem
             // 
             virtualAudioDriverToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { systemToolStripMenuItem });
@@ -507,7 +524,7 @@ namespace VDD_Control
             mainVisibleMenuStrip.Items.AddRange(new ToolStripItem[] { menuToolStripMenuItem, toolsToolStripMenuItem, virtualDisplayDriverToolStripMenuItem, aboutToolStripMenuItem });
             mainVisibleMenuStrip.Location = new Point(255, 22);
             mainVisibleMenuStrip.Name = "mainVisibleMenuStrip";
-            mainVisibleMenuStrip.Size = new Size(405, 24);
+            mainVisibleMenuStrip.Size = new Size(285, 24);
             mainVisibleMenuStrip.TabIndex = 1;
             mainVisibleMenuStrip.Text = "mainVisibleToolstrip";
             // 
@@ -915,19 +932,26 @@ namespace VDD_Control
             sunshineScriptsToolStripMenuItem1.Size = new Size(199, 22);
             sunshineScriptsToolStripMenuItem1.Text = "Sunshine Scripts";
             // 
-            // userModeLoggingToolStripMenuItem
+            // loggingToolStripMenuItem1
             // 
-            userModeLoggingToolStripMenuItem.Name = "userModeLoggingToolStripMenuItem";
-            userModeLoggingToolStripMenuItem.Size = new Size(180, 22);
-            userModeLoggingToolStripMenuItem.Text = "User-Mode Logging";
-            userModeLoggingToolStripMenuItem.Click += userModeLoggingToolStripMenuItem_Click_1;
+            loggingToolStripMenuItem1.DropDownItems.AddRange(new ToolStripItem[] { userModeLoggingToolStripMenuItem1, devModeLoggingToolStripMenuItem1 });
+            loggingToolStripMenuItem1.Name = "loggingToolStripMenuItem1";
+            loggingToolStripMenuItem1.Size = new Size(194, 22);
+            loggingToolStripMenuItem1.Text = "Logging";
             // 
-            // devModeLoggingToolStripMenuItem
+            // userModeLoggingToolStripMenuItem1
             // 
-            devModeLoggingToolStripMenuItem.Name = "devModeLoggingToolStripMenuItem";
-            devModeLoggingToolStripMenuItem.Size = new Size(180, 22);
-            devModeLoggingToolStripMenuItem.Text = "Dev-Mode Logging";
-            devModeLoggingToolStripMenuItem.Click += devModeLoggingToolStripMenuItem_Click_1;
+            userModeLoggingToolStripMenuItem1.Name = "userModeLoggingToolStripMenuItem1";
+            userModeLoggingToolStripMenuItem1.Size = new Size(180, 22);
+            userModeLoggingToolStripMenuItem1.Text = "User-Mode Logging";
+            userModeLoggingToolStripMenuItem1.Click += userModeLoggingToolStripMenuItem1_Click;
+            // 
+            // devModeLoggingToolStripMenuItem1
+            // 
+            devModeLoggingToolStripMenuItem1.Name = "devModeLoggingToolStripMenuItem1";
+            devModeLoggingToolStripMenuItem1.Size = new Size(180, 22);
+            devModeLoggingToolStripMenuItem1.Text = "Dev-Mode Logging";
+            devModeLoggingToolStripMenuItem1.Click += devModeLoggingToolStripMenuItem1_Click;
             // 
             // mainWindow
             // 
@@ -1055,5 +1079,8 @@ namespace VDD_Control
         private ToolStripMenuItem loggingToolStripMenuItem;
         private ToolStripMenuItem userModeLoggingToolStripMenuItem;
         private ToolStripMenuItem devModeLoggingToolStripMenuItem;
+        private ToolStripMenuItem loggingToolStripMenuItem1;
+        private ToolStripMenuItem userModeLoggingToolStripMenuItem1;
+        private ToolStripMenuItem devModeLoggingToolStripMenuItem1;
     }
 }
