@@ -6,7 +6,9 @@ using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Linq;
+using System.Net.Http;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
@@ -15,13 +17,24 @@ namespace VDD_Control
     public partial class CommunityScriptsForm : Form
     {
         private const string SCRIPTS_FOLDER = "Community Scripts";
+        private const string GITHUB_SCRIPTS_URL = "https://github.com/VirtualDrivers/Virtual-Display-Driver/tree/master/Community%20Scripts";
         private ListBox scriptListBox;
         private Label noScriptsLabel;
+        private Button syncButton;
 
         public CommunityScriptsForm()
         {
             InitializeComponents();
             LoadScripts();
+            
+            // Handle resize to keep button visible
+            this.Resize += CommunityScriptsForm_Resize;
+        }
+        
+        private void CommunityScriptsForm_Resize(object sender, EventArgs e)
+        {
+            // Ensure controls are properly laid out after resize
+            this.PerformLayout();
         }
 
         private void InitializeComponents()
@@ -36,6 +49,22 @@ namespace VDD_Control
             this.BackColor = Color.FromArgb(32, 34, 37);
             this.ForeColor = Color.White;
 
+            // Set up the form layout
+            this.Controls.Clear();
+            
+            // Create TableLayoutPanel for better control of layout
+            TableLayoutPanel tableLayout = new TableLayoutPanel
+            {
+                Dock = DockStyle.Fill,
+                RowCount = 2,
+                ColumnCount = 1,
+                Padding = new Padding(10, 10, 10, 10)
+            };
+            
+            // Configure rows - first row (scripts) takes all available space, second row (button) is fixed height
+            tableLayout.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
+            tableLayout.RowStyles.Add(new RowStyle(SizeType.Absolute, 40F));
+            
             // Create script list box
             scriptListBox = new ListBox
             {
@@ -57,9 +86,32 @@ namespace VDD_Control
                 Visible = false
             };
 
-            // Add controls to form
-            this.Controls.Add(scriptListBox);
-            this.Controls.Add(noScriptsLabel);
+            // Create sync button
+            syncButton = new Button
+            {
+                Text = "Sync from GitHub",
+                BackColor = Color.FromArgb(114, 137, 218),
+                ForeColor = Color.White,
+                FlatStyle = FlatStyle.Flat,
+                Dock = DockStyle.Fill,
+                Margin = new Padding(0, 5, 0, 0)
+            };
+            syncButton.Click += SyncButton_Click;
+
+            // Panel to hold the list or label
+            Panel listPanel = new Panel
+            {
+                Dock = DockStyle.Fill
+            };
+            listPanel.Controls.Add(scriptListBox);
+            listPanel.Controls.Add(noScriptsLabel);
+            
+            // Add controls to the table layout
+            tableLayout.Controls.Add(listPanel, 0, 0);
+            tableLayout.Controls.Add(syncButton, 0, 1);
+            
+            // Add the layout to the form
+            this.Controls.Add(tableLayout);
         }
 
         private void LoadScripts()
@@ -165,6 +217,88 @@ namespace VDD_Control
         public void RefreshScripts()
         {
             LoadScripts();
+        }
+
+        private async void SyncButton_Click(object sender, EventArgs e)
+        {
+            // Disable the sync button during the operation
+            syncButton.Enabled = false;
+            syncButton.Text = "Syncing...";
+            
+            try
+            {
+                await SyncScriptsFromGitHub();
+                MessageBox.Show("Community scripts successfully synchronized from GitHub!", 
+                    "Sync Complete", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error synchronizing scripts: {ex.Message}", 
+                    "Sync Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            finally
+            {
+                // Re-enable the button
+                syncButton.Enabled = true;
+                syncButton.Text = "Sync from GitHub";
+                
+                // Refresh the script list to show the updates
+                LoadScripts();
+            }
+        }
+
+        private async Task SyncScriptsFromGitHub()
+        {
+            // Create HTTP client
+            using (HttpClient client = new HttpClient())
+            {
+                // GitHub API requires a user agent
+                client.DefaultRequestHeaders.Add("User-Agent", "VDD-Control-App");
+
+                // Convert the GitHub web URL to API URL to get the directory contents
+                // Format: https://api.github.com/repos/{owner}/{repo}/contents/{path}
+                string apiUrl = "https://api.github.com/repos/VirtualDrivers/Virtual-Display-Driver/contents/Community%20Scripts";
+                
+                // Get the directory listing
+                HttpResponseMessage response = await client.GetAsync(apiUrl);
+                response.EnsureSuccessStatusCode();
+                
+                string responseBody = await response.Content.ReadAsStringAsync();
+                JsonDocument doc = JsonDocument.Parse(responseBody);
+                
+                // Make sure the scripts directory exists
+                string scriptsDirectory = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, SCRIPTS_FOLDER);
+                if (!Directory.Exists(scriptsDirectory))
+                {
+                    Directory.CreateDirectory(scriptsDirectory);
+                }
+                
+                // Process each file in the repository
+                foreach (JsonElement item in doc.RootElement.EnumerateArray())
+                {
+                    // Only download script files (.cmd, .bat, .ps1, .exe)
+                    string fileName = item.GetProperty("name").GetString();
+                    if (fileName.EndsWith(".cmd", StringComparison.OrdinalIgnoreCase) ||
+                        fileName.EndsWith(".bat", StringComparison.OrdinalIgnoreCase) ||
+                        fileName.EndsWith(".ps1", StringComparison.OrdinalIgnoreCase) ||
+                        fileName.EndsWith(".exe", StringComparison.OrdinalIgnoreCase))
+                    {
+                        // Get download URL
+                        string downloadUrl = item.GetProperty("download_url").GetString();
+                        
+                        // Download the file
+                        HttpResponseMessage fileResponse = await client.GetAsync(downloadUrl);
+                        fileResponse.EnsureSuccessStatusCode();
+                        
+                        // Save the file to the scripts directory
+                        string filePath = Path.Combine(scriptsDirectory, fileName);
+                        using (FileStream fs = new FileStream(filePath, FileMode.Create))
+                        {
+                            await fileResponse.Content.CopyToAsync(fs);
+                        }
+                    }
+                }
+            }
         }
     }
 }
