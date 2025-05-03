@@ -55,7 +55,7 @@ namespace VDD_Control
                         // Sync all menu items with the loaded state
                         SyncAllMenuItemsWithState();
 
-                        mainConsole.AppendText($"[INFO] XML Settings loaded: SDR10={SDR10_STATE}, HDR+={HDR10PLUS_STATE}, CustomEDID={CUSTOMEDID_STATE}\n");
+                        // Simplified logging - removed detailed state information
 
                         // Sync all menu items with the loaded state
                         SyncAllMenuItemsWithState();
@@ -943,7 +943,12 @@ namespace VDD_Control
 
             AppendToConsole("Virtual Display Driver Control Initialized.\n");
 
-            if (!await TryConnectToDriver())
+            // Try to connect to the driver once at initialization
+            if (await TryConnectToDriver())
+            {
+                AppendToConsole("[SUCCESS] Connected to the driver.\n");
+            }
+            else
             {
                 AppendToConsole("[WARNING] Could not verify driver connection. Ensure the driver is running.\n");
             }
@@ -999,7 +1004,7 @@ namespace VDD_Control
                             {
                                 registryFilePath = regPath; // Store the directory or full path
                                 foundPath = fullPath;       // Return the full file path
-                                mainConsole.AppendText($"[INFO] Settings file found in registry: {fullPath}\n");
+                                mainConsole.AppendText($"[INFO] Settings file found at registry location: {fullPath}\n");
                                 return foundPath;
                             }
                         }
@@ -1055,7 +1060,7 @@ namespace VDD_Control
                     using (var pipeClient = new NamedPipeClientStream(".", PIPE_NAME, PipeDirection.InOut))
                     {
                         await pipeClient.ConnectAsync(2000);
-                        AppendToConsole("[SUCCESS] Connected to the driver.\n");
+                        // We'll remove the logging here and only show it at the end
                         return true;
                     }
                 }
@@ -1152,7 +1157,10 @@ namespace VDD_Control
                 if (string.IsNullOrEmpty(response) || response.StartsWith("[ERROR]"))
                 {
                     // If there's an error or no response, fall back to XML settings
-                    AppendToConsole($"[INFO] Could not get driver status for {featureName}, using XML settings.\n");
+                    if (featureName == "SDR10") // Only log once for the first feature check
+                    {
+                        AppendToConsole($"[INFO] Could not get driver status, using XML settings.\n");
+                    }
                     return GetFeatureStatusFromXml(featureName);
                 }
 
@@ -1169,7 +1177,10 @@ namespace VDD_Control
                 }
 
                 // If feature not found in response, fall back to XML settings
-                AppendToConsole($"[INFO] Feature {featureName} not found in driver status, using XML settings.\n");
+                if (featureName == "SDR10") // Only log once
+                {
+                    AppendToConsole($"[INFO] Could not get driver status, using XML settings.\n");
+                }
                 return GetFeatureStatusFromXml(featureName);
             }
             catch (Exception ex)
@@ -1237,7 +1248,7 @@ namespace VDD_Control
                         result = false;
                         break;
                 }
-                AppendToConsole($"[INFO] {featureName} from XML settings: {result}\n");
+                // We'll skip logging individual feature values for a cleaner output
                 return result;
             }
 
@@ -1267,7 +1278,7 @@ namespace VDD_Control
                         EDIDCEAOVERRRIDE_STATE = IXCLI.EdidCeaOverride;
 
                         // Log current states for debugging
-                        AppendToConsole($"[DEBUG] XML Settings loaded: SDR10={SDR10_STATE}, HDR+={HDR10PLUS_STATE}, CustomEDID={CUSTOMEDID_STATE}\n");
+                        // Simplified logging - removed detailed state logging
 
                         // Update UI to match
                         UpdateAllMenuItemsWithStates();
@@ -1312,7 +1323,7 @@ namespace VDD_Control
                     EDIDCEAOVERRRIDE_STATE = IXCLI.EdidCeaOverride;
 
                     // Log current states for debugging
-                    AppendToConsole($"[DEBUG] XML Settings loaded: SDR10={SDR10_STATE}, HDR+={HDR10PLUS_STATE}, CustomEDID={CUSTOMEDID_STATE}\n");
+                    // Simplified logging - removed detailed state logging
 
                     // Update UI to match
                     UpdateAllMenuItemsWithStates();
@@ -3814,27 +3825,28 @@ namespace VDD_Control
         }
         private void ShowAboutDialog()
         {
-            // Create an about dialog
+            // Create an about dialog with size adjusted to avoid scrollbars
             Form aboutDialog = new Form
             {
                 Text = "About Virtual Driver Control",
-                Size = new Size(450, 300),
+                Size = new Size(600, 750), // Even larger to ensure all content fits without scrollbars
                 FormBorderStyle = FormBorderStyle.FixedDialog,
                 StartPosition = FormStartPosition.CenterParent,
                 MaximizeBox = false,
                 MinimizeBox = false,
                 BackColor = Color.FromArgb(32, 34, 37),
-                ForeColor = Color.White
+                ForeColor = Color.White,
+                AutoScroll = false // Disable scrolling as we'll size properly
             };
 
-            // Add logo placeholder (could be replaced with an actual logo)
+            // Add logo placeholder
             Label logoLabel = new Label
             {
                 Text = "VDD Control",
                 Font = new Font("Consolas", 18, FontStyle.Bold),
                 ForeColor = Color.White,
                 TextAlign = ContentAlignment.MiddleCenter,
-                Size = new Size(400, 30),
+                Size = new Size(550, 30),
                 Location = new Point(25, 20)
             };
             aboutDialog.Controls.Add(logoLabel);
@@ -3846,8 +3858,8 @@ namespace VDD_Control
                 Font = new Font("Consolas", 10),
                 ForeColor = Color.White,
                 TextAlign = ContentAlignment.MiddleCenter,
-                Size = new Size(400, 20),
-                Location = new Point(25, 50)
+                Size = new Size(550, 20),
+                Location = new Point(25, 55) // Increased vertical spacing
             };
             aboutDialog.Controls.Add(versionLabel);
 
@@ -3858,45 +3870,131 @@ namespace VDD_Control
                 Font = new Font("Consolas", 9),
                 ForeColor = Color.White,
                 TextAlign = ContentAlignment.TopLeft,
-                Size = new Size(400, 40),
-                Location = new Point(25, 80)
+                Size = new Size(550, 40),
+                Location = new Point(25, 90) // Increased vertical spacing
             };
             aboutDialog.Controls.Add(descLabel);
 
-            // Add developers section
-            Label developersHeader = new Label
+            int currentY = 145; // Increased starting position
+
+            // Project Leadership section
+            Label leadershipHeader = new Label
             {
-                Text = "Developers:",
-                Font = new Font("Consolas", 9, FontStyle.Bold),
+                Text = "Project Leadership",
+                Font = new Font("Consolas", 10, FontStyle.Bold),
                 ForeColor = Color.White,
                 TextAlign = ContentAlignment.MiddleLeft,
-                Size = new Size(100, 20),
-                Location = new Point(25, 130)
+                Size = new Size(200, 20),
+                Location = new Point(25, currentY)
             };
-            aboutDialog.Controls.Add(developersHeader);
+            aboutDialog.Controls.Add(leadershipHeader);
+            currentY += 25;
 
-            Label developersLabel = new Label
+            Label leadershipLabel = new Label
             {
-                Text = "- MikeTheTech\n- Jocke",
+                Text = "• Mike \"MikeTheTech\" Rodriguez – Project Manager, Owner, and Principal Programmer",
                 Font = new Font("Consolas", 9),
                 ForeColor = Color.White,
                 TextAlign = ContentAlignment.TopLeft,
-                Size = new Size(400, 40),
-                Location = new Point(35, 150)
+                Size = new Size(500, 20),
+                Location = new Point(35, currentY)
             };
-            aboutDialog.Controls.Add(developersLabel);
+            aboutDialog.Controls.Add(leadershipLabel);
+            currentY += 40; // Increased spacing
+
+            // Core Development section
+            Label coreDevHeader = new Label
+            {
+                Text = "Core Development",
+                Font = new Font("Consolas", 10, FontStyle.Bold),
+                ForeColor = Color.White,
+                TextAlign = ContentAlignment.MiddleLeft,
+                Size = new Size(200, 20),
+                Location = new Point(25, currentY)
+            };
+            aboutDialog.Controls.Add(coreDevHeader);
+            currentY += 25;
+
+            Label coreDevLabel = new Label
+            {
+                Text = "• Bud – Former Lead Programmer\n" +
+                      "• zjoasan – Programmer; scripting, EDID integration, installer logic\n" +
+                      "• Baloukj – 8‑bit / 10‑bit color‑depth implementation; first public release\n" +
+                      "  of the new Microsoft driver",
+                Font = new Font("Consolas", 9),
+                ForeColor = Color.White,
+                TextAlign = ContentAlignment.TopLeft,
+                Size = new Size(550, 80), // Increased width and height
+                Location = new Point(35, currentY)
+            };
+            aboutDialog.Controls.Add(coreDevLabel);
+            currentY += 95; // Increased spacing
+
+            // Research & Engineering Support section
+            Label researchHeader = new Label
+            {
+                Text = "Research & Engineering Support",
+                Font = new Font("Consolas", 10, FontStyle.Bold),
+                ForeColor = Color.White,
+                TextAlign = ContentAlignment.MiddleLeft,
+                Size = new Size(250, 20),
+                Location = new Point(25, currentY)
+            };
+            aboutDialog.Controls.Add(researchHeader);
+            currentY += 25;
+
+            Label researchLabel = new Label
+            {
+                Text = "• Anakngtokwa – Source discovery and driver‑code research\n" +
+                      "• AKATrevorJay – High‑resolution EDID contribution\n" +
+                      "• LexTrack – MiniScreenRecorder script",
+                Font = new Font("Consolas", 9),
+                ForeColor = Color.White,
+                TextAlign = ContentAlignment.TopLeft,
+                Size = new Size(550, 70), // Increased width and height
+                Location = new Point(35, currentY)
+            };
+            aboutDialog.Controls.Add(researchLabel);
+            currentY += 85; // Increased spacing
+
+            // Foundational Code section
+            Label foundationHeader = new Label
+            {
+                Text = "Foundational Code & Inspiration",
+                Font = new Font("Consolas", 10, FontStyle.Bold),
+                ForeColor = Color.White,
+                TextAlign = ContentAlignment.MiddleLeft,
+                Size = new Size(250, 20),
+                Location = new Point(25, currentY)
+            };
+            aboutDialog.Controls.Add(foundationHeader);
+            currentY += 25;
+
+            Label foundationLabel = new Label
+            {
+                Text = "• Microsoft, ge9, sitiom – Original Indirect Display Driver sample\n" +
+                      "• Roshkins – Original repository host and maintainer",
+                Font = new Font("Consolas", 9),
+                ForeColor = Color.White,
+                TextAlign = ContentAlignment.TopLeft,
+                Size = new Size(550, 50), // Increased width and height
+                Location = new Point(35, currentY)
+            };
+            aboutDialog.Controls.Add(foundationLabel);
+            currentY += 75; // Increased spacing
 
             // Add links section
             Label linksHeader = new Label
             {
                 Text = "Links:",
-                Font = new Font("Consolas", 9, FontStyle.Bold),
+                Font = new Font("Consolas", 10, FontStyle.Bold),
                 ForeColor = Color.White,
                 TextAlign = ContentAlignment.MiddleLeft,
                 Size = new Size(100, 20),
-                Location = new Point(25, 190)
+                Location = new Point(25, currentY)
             };
             aboutDialog.Controls.Add(linksHeader);
+            currentY += 25;
 
             LinkLabel githubLink = new LinkLabel
             {
@@ -3905,8 +4003,8 @@ namespace VDD_Control
                 LinkColor = Color.LightBlue,
                 ActiveLinkColor = Color.White,
                 TextAlign = ContentAlignment.TopLeft,
-                Size = new Size(400, 20),
-                Location = new Point(35, 210)
+                Size = new Size(500, 20),
+                Location = new Point(35, currentY)
             };
             githubLink.LinkClicked += (s, e) => System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo
             {
@@ -3914,13 +4012,14 @@ namespace VDD_Control
                 UseShellExecute = true
             });
             aboutDialog.Controls.Add(githubLink);
+            currentY += 55; // Increased spacing
 
             // Add OK button
             Button okButton = new Button
             {
                 Text = "OK",
                 Size = new Size(80, 30),
-                Location = new Point(350, 230),
+                Location = new Point(495, currentY), // Further adjusted position
                 BackColor = Color.FromArgb(45, 47, 49),
                 ForeColor = Color.White,
                 FlatStyle = FlatStyle.Flat
@@ -3978,16 +4077,8 @@ namespace VDD_Control
         }
         private void UpdateAllMenuItemsWithStates()
         {
-            // Debug: Log current state values
-            AppendToConsole($"[DEBUG] Updating menu items - Current state values:\n");
-            AppendToConsole($"  SDR10_STATE: {SDR10_STATE}\n");
-            AppendToConsole($"  HDR10PLUS_STATE: {HDR10PLUS_STATE}\n");
-            AppendToConsole($"  CUSTOMEDID_STATE: {CUSTOMEDID_STATE}\n");
-            AppendToConsole($"  HARDWARECURSOR_STATE: {HARDWARECURSOR_STATE}\n");
-            AppendToConsole($"  PREVENTEDIDSPOOF_STATE: {PREVENTEDIDSPOOF_STATE}\n");
-            AppendToConsole($"  EDIDCEAOVERRRIDE_STATE: {EDIDCEAOVERRRIDE_STATE}\n");
-            AppendToConsole($"  LOGGING_STATE: {LOGGING_STATE}\n");
-            AppendToConsole($"  DEVLOGGING_STATE: {DEVLOGGING_STATE}\n");
+            // Simplified debug logging
+            AppendToConsole($"[DEBUG] Updating menu items\n");
 
             // Update primary menu items
             sDR10bitToolStripMenuItem.Checked = SDR10_STATE;
@@ -4021,11 +4112,7 @@ namespace VDD_Control
             if (devModeLoggingToolStripMenuItem1 != null)
                 devModeLoggingToolStripMenuItem1.Checked = DEVLOGGING_STATE;
 
-            // Debug: Log actual menu item states after update
-            AppendToConsole($"[DEBUG] Menu items after update:\n");
-            AppendToConsole($"  SDR10 menu: {sDR10bitToolStripMenuItem.Checked}\n");
-            AppendToConsole($"  HDR+ menu: {hDRToolStripMenuItem.Checked}\n");
-            AppendToConsole($"  CustomEDID menu: {customEDIDToolStripMenuItem.Checked}\n");
+            // Removed detailed logging of menu states
 
             // Force UI update
             mainVisibleMenuStrip.Invalidate();
