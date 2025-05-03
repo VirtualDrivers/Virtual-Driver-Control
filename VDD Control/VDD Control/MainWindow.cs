@@ -799,6 +799,7 @@ namespace VDD_Control
                 }
             }
         }
+
         private async void Form1_Load(object sender, EventArgs e)
         {
             mainVisibleMenuStrip.Renderer = new ToolStripProfessionalRenderer(new CustomColorTable());
@@ -853,6 +854,9 @@ namespace VDD_Control
                 {
                     // No need to load again, already loaded in constructor
                     AppendToConsole("[INFO] XML configuration loaded successfully\n");
+
+                    // Let's explicitly sync menu items with the loaded XML settings
+                    UpdateAllMenuItemsWithStates();
                 }
                 catch (Exception ex)
                 {
@@ -861,7 +865,17 @@ namespace VDD_Control
             }
 
             // After ASCII art display, sync menu items with actual driver status
-            await SyncMenuItemsWithDriverStatus();
+            // But make sure to preserve loaded XML settings if driver isn't available
+            try
+            {
+                await SyncMenuItemsWithDriverStatus();
+            }
+            catch (Exception ex)
+            {
+                AppendToConsole($"[ERROR] Failed to sync with driver: {ex.Message}\n");
+                // Ensure XML settings are applied even if driver sync fails
+                UpdateAllMenuItemsWithStates();
+            }
 
             try
             {
@@ -934,8 +948,6 @@ namespace VDD_Control
                 AppendToConsole("[WARNING] Could not verify driver connection. Ensure the driver is running.\n");
             }
         }
-
-
 
         class CustomColorTable : ProfessionalColorTable
         {
@@ -1254,14 +1266,11 @@ namespace VDD_Control
                         PREVENTEDIDSPOOF_STATE = IXCLI.PreventSpoof;
                         EDIDCEAOVERRRIDE_STATE = IXCLI.EdidCeaOverride;
 
-                        // Update UI to match
-                        sDR10bitToolStripMenuItem.Checked = SDR10_STATE;
-                        hDRToolStripMenuItem.Checked = HDR10PLUS_STATE;
-                        customEDIDToolStripMenuItem.Checked = CUSTOMEDID_STATE;
-                        hardwareCursorToolStripMenuItem.Checked = HARDWARECURSOR_STATE;
-                        preventMonitorSpoofToolStripMenuItem.Checked = PREVENTEDIDSPOOF_STATE;
-                        eDIDCEAOverrideToolStripMenuItem.Checked = EDIDCEAOVERRRIDE_STATE;
+                        // Log current states for debugging
+                        AppendToConsole($"[DEBUG] XML Settings loaded: SDR10={SDR10_STATE}, HDR+={HDR10PLUS_STATE}, CustomEDID={CUSTOMEDID_STATE}\n");
 
+                        // Update UI to match
+                        UpdateAllMenuItemsWithStates();
                         AppendToConsole("[INFO] Menu items set from XML settings.\n");
                     }
                     else
@@ -1302,15 +1311,20 @@ namespace VDD_Control
                     PREVENTEDIDSPOOF_STATE = IXCLI.PreventSpoof;
                     EDIDCEAOVERRRIDE_STATE = IXCLI.EdidCeaOverride;
 
-                    // Update UI to match
-                    sDR10bitToolStripMenuItem.Checked = SDR10_STATE;
-                    hDRToolStripMenuItem.Checked = HDR10PLUS_STATE;
-                    customEDIDToolStripMenuItem.Checked = CUSTOMEDID_STATE;
-                    hardwareCursorToolStripMenuItem.Checked = HARDWARECURSOR_STATE;
-                    preventMonitorSpoofToolStripMenuItem.Checked = PREVENTEDIDSPOOF_STATE;
-                    eDIDCEAOverrideToolStripMenuItem.Checked = EDIDCEAOVERRRIDE_STATE;
+                    // Log current states for debugging
+                    AppendToConsole($"[DEBUG] XML Settings loaded: SDR10={SDR10_STATE}, HDR+={HDR10PLUS_STATE}, CustomEDID={CUSTOMEDID_STATE}\n");
 
+                    // Update UI to match
+                    UpdateAllMenuItemsWithStates();
                     AppendToConsole("[INFO] Menu items set from XML settings due to logging being disabled.\n");
+
+                    // Force UI refresh
+                    Application.DoEvents();
+                    mainVisibleMenuStrip.Refresh();
+
+                    // Log final menu states for debugging
+                    AppendToConsole($"[DEBUG] Menu states: SDR10={sDR10bitToolStripMenuItem.Checked}, HDR+={hDRToolStripMenuItem.Checked}, CustomEDID={customEDIDToolStripMenuItem.Checked}\n");
+
                     return;
                 }
 
@@ -1361,16 +1375,10 @@ namespace VDD_Control
                     EDIDCEAOVERRRIDE_STATE = IXCLI.EdidCeaOverride;
 
                     // Update UI to match
-                    sDR10bitToolStripMenuItem.Checked = SDR10_STATE;
-                    hDRToolStripMenuItem.Checked = HDR10PLUS_STATE;
-                    customEDIDToolStripMenuItem.Checked = CUSTOMEDID_STATE;
-                    hardwareCursorToolStripMenuItem.Checked = HARDWARECURSOR_STATE;
-                    preventMonitorSpoofToolStripMenuItem.Checked = PREVENTEDIDSPOOF_STATE;
-                    eDIDCEAOverrideToolStripMenuItem.Checked = EDIDCEAOVERRRIDE_STATE;
+                    UpdateAllMenuItemsWithStates();
                 }
             }
         }
-
         private async void RestartDriverHandler(object sender, EventArgs e)
         {
             // Don't use fire-and-forget pattern, instead properly await the Task
@@ -3970,6 +3978,17 @@ namespace VDD_Control
         }
         private void UpdateAllMenuItemsWithStates()
         {
+            // Debug: Log current state values
+            AppendToConsole($"[DEBUG] Updating menu items - Current state values:\n");
+            AppendToConsole($"  SDR10_STATE: {SDR10_STATE}\n");
+            AppendToConsole($"  HDR10PLUS_STATE: {HDR10PLUS_STATE}\n");
+            AppendToConsole($"  CUSTOMEDID_STATE: {CUSTOMEDID_STATE}\n");
+            AppendToConsole($"  HARDWARECURSOR_STATE: {HARDWARECURSOR_STATE}\n");
+            AppendToConsole($"  PREVENTEDIDSPOOF_STATE: {PREVENTEDIDSPOOF_STATE}\n");
+            AppendToConsole($"  EDIDCEAOVERRRIDE_STATE: {EDIDCEAOVERRRIDE_STATE}\n");
+            AppendToConsole($"  LOGGING_STATE: {LOGGING_STATE}\n");
+            AppendToConsole($"  DEVLOGGING_STATE: {DEVLOGGING_STATE}\n");
+
             // Update primary menu items
             sDR10bitToolStripMenuItem.Checked = SDR10_STATE;
             hDRToolStripMenuItem.Checked = HDR10PLUS_STATE;
@@ -4001,8 +4020,18 @@ namespace VDD_Control
                 userModeLoggingToolStripMenuItem1.Checked = LOGGING_STATE;
             if (devModeLoggingToolStripMenuItem1 != null)
                 devModeLoggingToolStripMenuItem1.Checked = DEVLOGGING_STATE;
-        }
 
+            // Debug: Log actual menu item states after update
+            AppendToConsole($"[DEBUG] Menu items after update:\n");
+            AppendToConsole($"  SDR10 menu: {sDR10bitToolStripMenuItem.Checked}\n");
+            AppendToConsole($"  HDR+ menu: {hDRToolStripMenuItem.Checked}\n");
+            AppendToConsole($"  CustomEDID menu: {customEDIDToolStripMenuItem.Checked}\n");
+
+            // Force UI update
+            mainVisibleMenuStrip.Invalidate();
+            mainVisibleMenuStrip.Update();
+            Application.DoEvents();
+        }
         private void userModeLoggingToolStripMenuItem1_Click(object sender, EventArgs e)
         {
             userModeLoggingToolStripMenuItem_Click_1(sender, e);

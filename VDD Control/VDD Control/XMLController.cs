@@ -186,14 +186,36 @@ namespace VDD_Control
 
         private void ParseBooleanOption(XmlDocument doc, string xpath, out bool value)
         {
-            XmlNode node = doc.SelectSingleNode(xpath);
+            // Add the '//' prefix if it's missing
+            string fullXpath = xpath.StartsWith("//") ? xpath : "//" + xpath;
+
+            XmlNode node = doc.SelectSingleNode(fullXpath);
             if (node != null)
             {
-                bool.TryParse(node.InnerText, out value);
+                Console.WriteLine($"[DEBUG] Found node: {xpath} = {node.InnerText}");
+
+                string nodeValue = node.InnerText.Trim();
+
+                // Case-insensitive parsing of boolean values
+                if (nodeValue.Equals("true", StringComparison.OrdinalIgnoreCase))
+                {
+                    value = true;
+                }
+                else if (nodeValue.Equals("false", StringComparison.OrdinalIgnoreCase))
+                {
+                    value = false;
+                }
+                else
+                {
+                    // If the value is not "true" or "false", default to false
+                    value = false;
+                    Console.WriteLine($"[WARNING] Invalid boolean value for {xpath}: '{nodeValue}'. Defaulting to false.");
+                }
             }
             else
             {
                 value = false; // Default to false if node not found
+                Console.WriteLine($"[DEBUG] Node not found: {fullXpath}");
             }
         }
 
