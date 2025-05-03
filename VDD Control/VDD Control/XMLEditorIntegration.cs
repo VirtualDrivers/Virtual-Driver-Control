@@ -15,37 +15,37 @@ namespace VDD_Control
         /// </summary>
         private void InitializeXMLEditorMenuItems()
         {
-            // Create XML Editor menu item for main menu
-            xmlEditorToolStripMenuItem = new ToolStripMenuItem
-            {
-                Name = "xmlEditorToolStripMenuItem",
-                Size = new System.Drawing.Size(199, 22),
-                Text = "XML Editor"
-            };
-            xmlEditorToolStripMenuItem.Click += xmlEditorToolStripMenuItem_Click;
+            //// Create XML Editor menu item for main menu
+            ////xmlEditorToolStripMenuItem = new ToolStripMenuItem
+            //{
+            //    Name = "xmlEditorToolStripMenuItem",
+            //    Size = new System.Drawing.Size(199, 22),
+            //    Text = "XML Editor"
+            //};
+            //xmlEditorToolStripMenuItem.Click += xmlEditorToolStripMenuItem_Click;
             
             // Add to main menu Tools dropdown
             if (toolsToolStripMenuItem != null && toolsToolStripMenuItem.DropDownItems != null)
             {
-                toolsToolStripMenuItem.DropDownItems.Add(xmlEditorToolStripMenuItem);
-                mainConsole.AppendText("[INFO] Added XML Editor to main menu\n");
+                //toolsToolStripMenuItem.DropDownItems.Add(xmlEditorToolStripMenuItem);
+                //mainConsole.AppendText("[INFO] Added XML Editor to main menu\n");
             }
             
             // Create XML Editor menu item for tray menu
-            xmlEditorToolStripMenuItem1 = new ToolStripMenuItem
-            {
-                Name = "xmlEditorToolStripMenuItem1",
-                Size = new System.Drawing.Size(199, 22),
-                Text = "XML Editor"
-            };
-            xmlEditorToolStripMenuItem1.Click += xmlEditorToolStripMenuItem_Click;
+            //xmlEditorToolStripMenuItem1 = new ToolStripMenuItem
+            //{
+            //    Name = "xmlEditorToolStripMenuItem1",
+            //    Size = new System.Drawing.Size(199, 22),
+            //    Text = "XML Editor"
+            //};
+            //xmlEditorToolStripMenuItem1.Click += xmlEditorToolStripMenuItem_Click;
             
             // Add to tray menu Tools dropdown
-            if (toolsToolStripMenuItem1 != null && toolsToolStripMenuItem1.DropDownItems != null)
-            {
-                toolsToolStripMenuItem1.DropDownItems.Add(xmlEditorToolStripMenuItem1);
-                mainConsole.AppendText("[INFO] Added XML Editor to tray menu\n");
-            }
+            //if (toolsToolStripMenuItem1 != null && toolsToolStripMenuItem1.DropDownItems != null)
+            //{
+            //    toolsToolStripMenuItem1.DropDownItems.Add(xmlEditorToolStripMenuItem1);
+            //    mainConsole.AppendText("[INFO] Added XML Editor to tray menu\n");
+            //}
         }
         
         /// <summary>

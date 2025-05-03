@@ -12,7 +12,12 @@
     <RuntimeIdentifier>win-x64</RuntimeIdentifier>
     <PublishReadyToRun>true</PublishReadyToRun>
     <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
+    <ApplicationIcon>Virtual Display Driver.ico</ApplicationIcon>
   </PropertyGroup>
+
+  <ItemGroup>
+    <Content Include="Virtual Display Driver.ico" />
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="ReaLTaiizor" Version="3.8.1.1" />
