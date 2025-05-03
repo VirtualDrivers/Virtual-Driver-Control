@@ -52,8 +52,13 @@ namespace VDD_Control
 
                         // Load initial values from XML and set menu checked state immediately from XML
                         LoadSettingsFromXML();
+                        // Sync all menu items with the loaded state
+                        SyncAllMenuItemsWithState();
 
                         mainConsole.AppendText($"[INFO] XML Settings loaded: SDR10={SDR10_STATE}, HDR+={HDR10PLUS_STATE}, CustomEDID={CUSTOMEDID_STATE}\n");
+
+                        // Sync all menu items with the loaded state
+                        SyncAllMenuItemsWithState();
                     }
                     catch (Exception ex)
                     {
@@ -78,6 +83,8 @@ namespace VDD_Control
 
                             // Load values from XML and update menu state
                             LoadSettingsFromXML();
+                            // Sync all menu items with the loaded state
+                            SyncAllMenuItemsWithState();
                         }
                         catch (Exception ex)
                         {
@@ -124,29 +131,18 @@ namespace VDD_Control
             DEVLOGGING_STATE = IXCLI.DebugLogging;
             HDR10PLUS_STATE = IXCLI.HDRPlus;
 
+            // Update menu items with loaded states
             UpdateAllMenuItemsWithStates();
 
-            // Update menu checked state to match XML values
-            sDR10bitToolStripMenuItem.Checked = SDR10_STATE;
-            hDRToolStripMenuItem.Checked = HDR10PLUS_STATE;
-            customEDIDToolStripMenuItem.Checked = CUSTOMEDID_STATE;
-            hardwareCursorToolStripMenuItem.Checked = HARDWARECURSOR_STATE;
-            preventMonitorSpoofToolStripMenuItem.Checked = PREVENTEDIDSPOOF_STATE;
-            eDIDCEAOverrideToolStripMenuItem.Checked = EDIDCEAOVERRRIDE_STATE;
-
-            // Also update any duplicate menu items in different menus
-            if (sDR10bitToolStripMenuItem1 != null) sDR10bitToolStripMenuItem1.Checked = SDR10_STATE;
-            if (hDRToolStripMenuItem1 != null) hDRToolStripMenuItem1.Checked = HDR10PLUS_STATE;
-            if (customEDIDToolStripMenuItem1 != null) customEDIDToolStripMenuItem1.Checked = CUSTOMEDID_STATE;
-            if (hardwareCursorToolStripMenuItem1 != null) hardwareCursorToolStripMenuItem1.Checked = HARDWARECURSOR_STATE;
-            if (preventMonitorSpoofToolStripMenuItem1 != null) preventMonitorSpoofToolStripMenuItem1.Checked = PREVENTEDIDSPOOF_STATE;
-            if (eDIDCEAOverrideToolStripMenuItem1 != null) eDIDCEAOverrideToolStripMenuItem1.Checked = EDIDCEAOVERRRIDE_STATE;
-
             // Hide the Select GPU option as requested
-            selectGPUToolStripMenuItem.Visible = false;
-            if (selectGPUToolStripMenuItem1 != null) selectGPUToolStripMenuItem1.Visible = false;
+            HideSelectGPUMenuItems();
         }
-
+        private void HideSelectGPUMenuItems()
+        {
+            selectGPUToolStripMenuItem.Visible = false;
+            if (selectGPUToolStripMenuItem1 != null)
+                selectGPUToolStripMenuItem1.Visible = false;
+        }
         // Fields for system tray functionality
         private NotifyIcon? trayIcon;
         private bool minimizeToTray = false; // Default to disabled - feature currently hidden
@@ -3983,23 +3979,42 @@ namespace VDD_Control
             eDIDCEAOverrideToolStripMenuItem.Checked = EDIDCEAOVERRRIDE_STATE;
 
             // Update secondary menu items (if they exist)
-            if (sDR10bitToolStripMenuItem1 != null) sDR10bitToolStripMenuItem1.Checked = SDR10_STATE;
-            if (hDRToolStripMenuItem1 != null) hDRToolStripMenuItem1.Checked = HDR10PLUS_STATE;
-            if (customEDIDToolStripMenuItem1 != null) customEDIDToolStripMenuItem1.Checked = CUSTOMEDID_STATE;
-            if (hardwareCursorToolStripMenuItem1 != null) hardwareCursorToolStripMenuItem1.Checked = HARDWARECURSOR_STATE;
-            if (preventMonitorSpoofToolStripMenuItem1 != null) preventMonitorSpoofToolStripMenuItem1.Checked = PREVENTEDIDSPOOF_STATE;
-            if (eDIDCEAOverrideToolStripMenuItem1 != null) eDIDCEAOverrideToolStripMenuItem1.Checked = EDIDCEAOVERRRIDE_STATE;
+            if (sDR10bitToolStripMenuItem1 != null)
+                sDR10bitToolStripMenuItem1.Checked = SDR10_STATE;
+            if (hDRToolStripMenuItem1 != null)
+                hDRToolStripMenuItem1.Checked = HDR10PLUS_STATE;
+            if (customEDIDToolStripMenuItem1 != null)
+                customEDIDToolStripMenuItem1.Checked = CUSTOMEDID_STATE;
+            if (hardwareCursorToolStripMenuItem1 != null)
+                hardwareCursorToolStripMenuItem1.Checked = HARDWARECURSOR_STATE;
+            if (preventMonitorSpoofToolStripMenuItem1 != null)
+                preventMonitorSpoofToolStripMenuItem1.Checked = PREVENTEDIDSPOOF_STATE;
+            if (eDIDCEAOverrideToolStripMenuItem1 != null)
+                eDIDCEAOverrideToolStripMenuItem1.Checked = EDIDCEAOVERRRIDE_STATE;
 
-            // Don't forget to update logging menu items
-            if (userModeLoggingToolStripMenuItem != null) userModeLoggingToolStripMenuItem.Checked = LOGGING_STATE;
-            if (devModeLoggingToolStripMenuItem != null) devModeLoggingToolStripMenuItem.Checked = DEVLOGGING_STATE;
+            // Update logging menu items
+            if (userModeLoggingToolStripMenuItem != null)
+                userModeLoggingToolStripMenuItem.Checked = LOGGING_STATE;
+            if (devModeLoggingToolStripMenuItem != null)
+                devModeLoggingToolStripMenuItem.Checked = DEVLOGGING_STATE;
+            if (userModeLoggingToolStripMenuItem1 != null)
+                userModeLoggingToolStripMenuItem1.Checked = LOGGING_STATE;
+            if (devModeLoggingToolStripMenuItem1 != null)
+                devModeLoggingToolStripMenuItem1.Checked = DEVLOGGING_STATE;
         }
 
         private void userModeLoggingToolStripMenuItem1_Click(object sender, EventArgs e)
         {
             userModeLoggingToolStripMenuItem_Click_1(sender, e);
         }
+        private void SyncAllMenuItemsWithState()
+        {
+            // This ensures all menu items are in sync with internal state
+            UpdateAllMenuItemsWithStates();
 
+            // Hide GPU select items as they're deprecated
+            HideSelectGPUMenuItems();
+        }
         private void devModeLoggingToolStripMenuItem1_Click(object sender, EventArgs e)
         {
             devModeLoggingToolStripMenuItem_Click_1(sender, e);
