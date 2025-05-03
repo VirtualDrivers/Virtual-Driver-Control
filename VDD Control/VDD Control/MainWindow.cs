@@ -18,6 +18,9 @@ namespace VDD_Control
 
         // Make IXCLI nullable to fix null safety warnings
         private XMLController? IXCLI;
+        
+        // Reference to the community scripts form
+        private CommunityScriptsForm? communityScriptsForm;
 
         private bool SDR10_STATE = false;
         private bool CUSTOMEDID_STATE = false;
@@ -4134,6 +4137,35 @@ namespace VDD_Control
         private void devModeLoggingToolStripMenuItem1_Click(object sender, EventArgs e)
         {
             devModeLoggingToolStripMenuItem_Click_1(sender, e);
+        }
+
+        // Community Scripts event handlers
+        private void communityScriptsToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            ShowCommunityScriptsWindow();
+        }
+
+        private void scriptsToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            ShowCommunityScriptsWindow();
+        }
+
+        // Method to show the Community Scripts window
+        private void ShowCommunityScriptsWindow()
+        {
+            // Create the form if it doesn't exist or was disposed
+            if (communityScriptsForm == null || communityScriptsForm.IsDisposed)
+            {
+                communityScriptsForm = new CommunityScriptsForm();
+            }
+            else
+            {
+                // If form exists, refresh the scripts
+                communityScriptsForm.RefreshScripts();
+            }
+
+            // Show the form
+            communityScriptsForm.ShowDialog(this);
         }
     }
 }

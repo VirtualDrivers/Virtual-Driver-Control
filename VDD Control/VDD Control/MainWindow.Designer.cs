@@ -162,7 +162,7 @@ namespace VDD_Control
             // 
             // toolsToolStripMenuItem1
             // 
-            toolsToolStripMenuItem1.DropDownItems.AddRange(new ToolStripItem[] { getDisplayInformationToolStripMenuItem1, getGPUInformationToolStripMenuItem1, getCPUInformationToolStripMenuItem1, getAudioInformationToolStripMenuItem1 });
+            toolsToolStripMenuItem1.DropDownItems.AddRange(new ToolStripItem[] { getDisplayInformationToolStripMenuItem1, getGPUInformationToolStripMenuItem1, getCPUInformationToolStripMenuItem1, getAudioInformationToolStripMenuItem1, communityScriptsToolStripMenuItem });
             toolsToolStripMenuItem1.Name = "toolsToolStripMenuItem1";
             toolsToolStripMenuItem1.Size = new Size(183, 22);
             toolsToolStripMenuItem1.Text = "Tools";
@@ -530,7 +530,7 @@ namespace VDD_Control
             // 
             // toolsToolStripMenuItem
             // 
-            toolsToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { getGPUInformationToolStripMenuItem, getCPUInformationToolStripMenuItem, getDisplayInformationToolStripMenuItem2, getAudioInformationToolStripMenuItem });
+            toolsToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { getGPUInformationToolStripMenuItem, getCPUInformationToolStripMenuItem, getDisplayInformationToolStripMenuItem2, getAudioInformationToolStripMenuItem, scriptsToolStripMenuItem });
             toolsToolStripMenuItem.ForeColor = SystemColors.ButtonFace;
             toolsToolStripMenuItem.Name = "toolsToolStripMenuItem";
             toolsToolStripMenuItem.Size = new Size(47, 20);
@@ -913,6 +913,7 @@ namespace VDD_Control
             scriptsToolStripMenuItem.Name = "scriptsToolStripMenuItem";
             scriptsToolStripMenuItem.Size = new Size(199, 22);
             scriptsToolStripMenuItem.Text = "Community Scripts";
+            scriptsToolStripMenuItem.Click += new EventHandler(scriptsToolStripMenuItem_Click);
             // 
             // sunshineScriptsToolStripMenuItem
             // 
@@ -925,6 +926,7 @@ namespace VDD_Control
             communityScriptsToolStripMenuItem.Name = "communityScriptsToolStripMenuItem";
             communityScriptsToolStripMenuItem.Size = new Size(199, 22);
             communityScriptsToolStripMenuItem.Text = "Community Scripts";
+            communityScriptsToolStripMenuItem.Click += new EventHandler(communityScriptsToolStripMenuItem_Click);
             // 
             // sunshineScriptsToolStripMenuItem1
             // 
