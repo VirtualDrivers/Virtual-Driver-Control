@@ -3857,7 +3857,7 @@ namespace VDD_Control
             // Add version information
             Label versionLabel = new Label
             {
-                Text = "Version 1.0",
+                Text = "Version 25.5.2",
                 Font = new Font("Consolas", 10),
                 ForeColor = Color.White,
                 TextAlign = ContentAlignment.MiddleCenter,
