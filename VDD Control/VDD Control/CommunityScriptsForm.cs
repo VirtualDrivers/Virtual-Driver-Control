@@ -166,44 +166,167 @@ namespace VDD_Control
                 AppDomain.CurrentDomain.BaseDirectory, 
                 SCRIPTS_FOLDER, 
                 selectedScript);
+                
+            // Display a security warning and confirmation dialog
+            string scriptType = GetScriptTypeDescription(selectedScript);
+            string warningMessage = 
+                $"WARNING: You are about to execute a {scriptType}.\n\n" +
+                "Running scripts from external sources can be a security risk. " +
+                "The script will run with your current user permissions and could potentially:\n\n" +
+                "• Access or modify your files\n" +
+                "• Install software\n" +
+                "• Communicate with external servers\n" +
+                "• Make system changes\n\n" +
+                "Are you sure you want to continue?";
+                
+            DialogResult result = MessageBox.Show(
+                warningMessage,
+                "Security Warning",
+                MessageBoxButtons.YesNo,
+                MessageBoxIcon.Warning,
+                MessageBoxDefaultButton.Button2); // Default to "No"
+                
+            if (result != DialogResult.Yes)
+            {
+                return; // User canceled execution
+            }
+            
+            // Perform basic security scan
+            if (!PerformBasicSecurityScan(scriptPath, selectedScript))
+            {
+                MessageBox.Show(
+                    "The script failed the basic security scan. Execution aborted.",
+                    "Security Warning",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Error);
+                return;
+            }
 
             // Execute the script based on its extension
             try
             {
                 if (selectedScript.EndsWith(".ps1", StringComparison.OrdinalIgnoreCase))
                 {
-                    // PowerShell script
-                    Process process = new Process
+                    // PowerShell script - using more restrictive execution policy
+                    using (Process process = new Process
                     {
                         StartInfo = new ProcessStartInfo
                         {
                             FileName = "powershell.exe",
-                            Arguments = $"-ExecutionPolicy Bypass -File \"{scriptPath}\"",
+                            // Using RemoteSigned instead of Bypass for better security
+                            // This allows local scripts to run but requires remote scripts to be signed
+                            Arguments = $"-ExecutionPolicy RemoteSigned -NoProfile -File \"{scriptPath}\"",
                             UseShellExecute = false,
-                            CreateNoWindow = false
+                            CreateNoWindow = false,
+                            // Redirect output to capture any errors
+                            RedirectStandardError = true,
+                            // Working directory set to script directory
+                            WorkingDirectory = Path.GetDirectoryName(scriptPath)
                         }
-                    };
-                    process.Start();
+                    })
+                    {
+                        try
+                        {
+                            // Log execution for auditing
+                            File.AppendAllText(
+                                Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "script_execution.log"),
+                                $"{DateTime.Now}: Executed PowerShell script: {selectedScript}\r\n");
+                                
+                            process.Start();
+                            
+                            // Start a background thread to monitor for errors
+                            Task.Run(async () => {
+                                string error = await process.StandardError.ReadToEndAsync();
+                                if (!string.IsNullOrEmpty(error))
+                                {
+                                    // Log errors
+                                    File.AppendAllText(
+                                        Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "script_errors.log"),
+                                        $"{DateTime.Now}: Error in {selectedScript}: {error}\r\n");
+                                }
+                            });
+                        }
+                        catch (Exception ex)
+                        {
+                            MessageBox.Show($"Error starting PowerShell script: {ex.Message}", "Execution Error", 
+                                MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        }
+                    }
                 }
                 else if (selectedScript.EndsWith(".exe", StringComparison.OrdinalIgnoreCase))
                 {
-                    // Executable
-                    Process.Start(scriptPath);
+                    try
+                    {
+                        // Executable - Using ProcessStartInfo for more control
+                        using (Process process = new Process
+                        {
+                            StartInfo = new ProcessStartInfo
+                            {
+                                FileName = scriptPath,
+                                UseShellExecute = true, // Use shell execute to run with same privileges as current user
+                                WorkingDirectory = Path.GetDirectoryName(scriptPath)
+                            }
+                        })
+                        {
+                            // Log execution for auditing
+                            File.AppendAllText(
+                                Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "script_execution.log"),
+                                $"{DateTime.Now}: Executed executable: {selectedScript}\r\n");
+                                
+                            process.Start();
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show($"Error starting executable: {ex.Message}", "Execution Error", 
+                            MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    }
                 }
                 else
                 {
                     // Batch or CMD file
-                    Process process = new Process
+                    using (Process process = new Process
                     {
                         StartInfo = new ProcessStartInfo
                         {
                             FileName = "cmd.exe",
                             Arguments = $"/c \"{scriptPath}\"",
                             UseShellExecute = false,
-                            CreateNoWindow = false
+                            CreateNoWindow = false,
+                            // Redirect output to capture any errors
+                            RedirectStandardError = true,
+                            // Working directory set to script directory
+                            WorkingDirectory = Path.GetDirectoryName(scriptPath)
                         }
-                    };
-                    process.Start();
+                    })
+                    {
+                        try
+                        {
+                            // Log execution for auditing
+                            File.AppendAllText(
+                                Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "script_execution.log"),
+                                $"{DateTime.Now}: Executed batch file: {selectedScript}\r\n");
+                                
+                            process.Start();
+                            
+                            // Start a background thread to monitor for errors
+                            Task.Run(async () => {
+                                string error = await process.StandardError.ReadToEndAsync();
+                                if (!string.IsNullOrEmpty(error))
+                                {
+                                    // Log errors
+                                    File.AppendAllText(
+                                        Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "script_errors.log"),
+                                        $"{DateTime.Now}: Error in {selectedScript}: {error}\r\n");
+                                }
+                            });
+                        }
+                        catch (Exception ex)
+                        {
+                            MessageBox.Show($"Error starting batch file: {ex.Message}", "Execution Error", 
+                                MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        }
+                    }
                 }
             }
             catch (Exception ex)
@@ -247,6 +370,105 @@ namespace VDD_Control
             }
         }
 
+        // Helper method to get a user-friendly description of the script type
+        private string GetScriptTypeDescription(string scriptName)
+        {
+            if (scriptName.EndsWith(".ps1", StringComparison.OrdinalIgnoreCase))
+                return "PowerShell script";
+            else if (scriptName.EndsWith(".exe", StringComparison.OrdinalIgnoreCase))
+                return "executable file";
+            else if (scriptName.EndsWith(".bat", StringComparison.OrdinalIgnoreCase) || 
+                     scriptName.EndsWith(".cmd", StringComparison.OrdinalIgnoreCase))
+                return "batch file";
+            else
+                return "script file";
+        }
+        
+        // Perform a basic security scan on the script
+        private bool PerformBasicSecurityScan(string filePath, string fileName)
+        {
+            try
+            {
+                // Check if file exists
+                if (!File.Exists(filePath))
+                {
+                    MessageBox.Show($"File not found: {filePath}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return false;
+                }
+                
+                // Check file size - limit to 5MB
+                FileInfo fileInfo = new FileInfo(filePath);
+                if (fileInfo.Length > 5 * 1024 * 1024) // 5MB
+                {
+                    MessageBox.Show(
+                        "Script file is too large (>5MB). This could indicate malicious content.",
+                        "Security Warning",
+                        MessageBoxButtons.OK,
+                        MessageBoxIcon.Warning);
+                    return false;
+                }
+                
+                // Basic content scan for PowerShell, BAT and CMD files
+                if (fileName.EndsWith(".ps1", StringComparison.OrdinalIgnoreCase) ||
+                    fileName.EndsWith(".bat", StringComparison.OrdinalIgnoreCase) ||
+                    fileName.EndsWith(".cmd", StringComparison.OrdinalIgnoreCase))
+                {
+                    string content = File.ReadAllText(filePath);
+                    
+                    // Check for potentially dangerous commands
+                    string[] dangerousPatterns = new[] {
+                        "Invoke-Expression", "IEX ", "DownloadString",
+                        "DownloadFile", "Net.WebClient",
+                        "System.Reflection", "GetConstructor", "AddScript",
+                        "Start-Process", "-WindowStyle Hidden",
+                        "Set-MpPreference", "DisableRealTimeMonitoring",
+                        "netsh firewall", "netsh advfirewall",
+                        "reg delete", "reg add",
+                        "del %windir%", "rmdir /s /q %windir%", 
+                        "format", "deltree", "rd /s /q"
+                    };
+                    
+                    List<string> foundPatterns = new List<string>();
+                    foreach (string pattern in dangerousPatterns)
+                    {
+                        if (content.Contains(pattern, StringComparison.OrdinalIgnoreCase))
+                        {
+                            foundPatterns.Add(pattern);
+                        }
+                    }
+                    
+                    if (foundPatterns.Count > 0)
+                    {
+                        string warningList = string.Join("\n• ", foundPatterns);
+                        DialogResult result = MessageBox.Show(
+                            $"Warning: This script contains potentially dangerous commands:\n\n• {warningList}\n\n" +
+                            "These commands could modify system settings or pose security risks.\n\n" +
+                            "Do you still want to run this script?",
+                            "Security Warning",
+                            MessageBoxButtons.YesNo,
+                            MessageBoxIcon.Warning,
+                            MessageBoxDefaultButton.Button2); // Default to No
+                            
+                        if (result != DialogResult.Yes)
+                        {
+                            return false;
+                        }
+                    }
+                }
+                
+                return true;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(
+                    $"Error scanning script: {ex.Message}",
+                    "Security Scan Error",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Error);
+                return false;
+            }
+        }
+
         private async Task SyncScriptsFromGitHub()
         {
             // Create HTTP client
@@ -274,6 +496,11 @@ namespace VDD_Control
                 }
                 
                 // Process each file in the repository
+                // Create a list to track sync results for user feedback
+                List<string> scriptSyncResults = new List<string>();
+                int fileCount = 0;
+                int skippedCount = 0;
+                
                 foreach (JsonElement item in doc.RootElement.EnumerateArray())
                 {
                     // Only download script files (.cmd, .bat, .ps1, .exe)
@@ -283,21 +510,103 @@ namespace VDD_Control
                         fileName.EndsWith(".ps1", StringComparison.OrdinalIgnoreCase) ||
                         fileName.EndsWith(".exe", StringComparison.OrdinalIgnoreCase))
                     {
-                        // Get download URL
-                        string downloadUrl = item.GetProperty("download_url").GetString();
-                        
-                        // Download the file
-                        HttpResponseMessage fileResponse = await client.GetAsync(downloadUrl);
-                        fileResponse.EnsureSuccessStatusCode();
-                        
-                        // Save the file to the scripts directory
-                        string filePath = Path.Combine(scriptsDirectory, fileName);
-                        using (FileStream fs = new FileStream(filePath, FileMode.Create))
+                        try
                         {
-                            await fileResponse.Content.CopyToAsync(fs);
+                            // Get download URL
+                            string downloadUrl = item.GetProperty("download_url").GetString();
+                            
+                            // For security, don't download .exe files larger than 2MB
+                            if (fileName.EndsWith(".exe", StringComparison.OrdinalIgnoreCase))
+                            {
+                                // Get file size from header if available
+                                HttpResponseMessage headResponse = await client.SendAsync(
+                                    new HttpRequestMessage(HttpMethod.Head, downloadUrl));
+                                    
+                                if (headResponse.Content.Headers.ContentLength.HasValue && 
+                                    headResponse.Content.Headers.ContentLength.Value > 2 * 1024 * 1024)
+                                {
+                                    scriptSyncResults.Add($"Skipped {fileName}: Executable too large (>2MB)");
+                                    skippedCount++;
+                                    continue;
+                                }
+                            }
+                            
+                            // Download the file content
+                            HttpResponseMessage fileResponse = await client.GetAsync(downloadUrl);
+                            fileResponse.EnsureSuccessStatusCode();
+                            
+                            // Get file content
+                            byte[] fileContent = await fileResponse.Content.ReadAsByteArrayAsync();
+                            
+                            // For script files, perform a security check before saving
+                            if (fileName.EndsWith(".ps1", StringComparison.OrdinalIgnoreCase) ||
+                                fileName.EndsWith(".bat", StringComparison.OrdinalIgnoreCase) ||
+                                fileName.EndsWith(".cmd", StringComparison.OrdinalIgnoreCase))
+                            {
+                                string textContent = System.Text.Encoding.UTF8.GetString(fileContent);
+                                
+                                // Check for potentially dangerous commands
+                                string[] highRiskPatterns = new[] {
+                                    "format", "deltree", "rd /s /q %windir%", 
+                                    "del %windir%", "rmdir /s /q %windir%",
+                                    "del /f /s /q %systemroot%"
+                                };
+                                
+                                bool containsHighRisk = false;
+                                foreach (string pattern in highRiskPatterns)
+                                {
+                                    if (textContent.Contains(pattern, StringComparison.OrdinalIgnoreCase))
+                                    {
+                                        containsHighRisk = true;
+                                        break;
+                                    }
+                                }
+                                
+                                if (containsHighRisk)
+                                {
+                                    scriptSyncResults.Add($"Skipped {fileName}: Contains potentially dangerous commands");
+                                    skippedCount++;
+                                    continue;
+                                }
+                            }
+                            
+                            // Save the validated file to the scripts directory
+                            string filePath = Path.Combine(scriptsDirectory, fileName);
+                            
+                            // Create a temp file first for safety
+                            string tempFilePath = Path.Combine(scriptsDirectory, $"temp_{Guid.NewGuid()}_{fileName}");
+                            using (FileStream fs = new FileStream(tempFilePath, FileMode.Create))
+                            {
+                                await fs.WriteAsync(fileContent, 0, fileContent.Length);
+                            }
+                            
+                            // Once successfully written, move to final location
+                            if (File.Exists(filePath))
+                            {
+                                File.Delete(filePath);
+                            }
+                            File.Move(tempFilePath, filePath);
+                            
+                            scriptSyncResults.Add($"Downloaded: {fileName}");
+                            fileCount++;
+                        }
+                        catch (Exception ex)
+                        {
+                            scriptSyncResults.Add($"Error downloading {fileName}: {ex.Message}");
                         }
                     }
                 }
+                
+                // Show summary to the user
+                MessageBox.Show(
+                    $"Synchronization complete:\n" +
+                    $"• {fileCount} files downloaded\n" +
+                    $"• {skippedCount} files skipped for security reasons\n\n" +
+                    $"Scripts are located in: {scriptsDirectory}",
+                    "Sync Results", 
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Information
+                );
             }
         }
     }

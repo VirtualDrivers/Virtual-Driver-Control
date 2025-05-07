@@ -117,11 +117,33 @@ namespace VDD_Control
             // Log successful file read
             Console.WriteLine($"[DEBUG] Successfully read XML content, length: {xmlContent.Length}");
 
+            // Create XML document with secure settings
             XmlDocument xmlDoc = new XmlDocument();
+            
+            // Create secure XML reader settings to prevent XXE attacks
+            XmlReaderSettings secureSettings = new XmlReaderSettings
+            {
+                DtdProcessing = DtdProcessing.Prohibit,  // Prohibit DTD processing
+                ValidationType = ValidationType.None,    // No validation
+                XmlResolver = null,                      // No resolution of external entities
+                MaxCharactersFromEntities = 1024,        // Limit entity expansion
+                MaxCharactersInDocument = 1024 * 1024    // Limit document size to 1MB
+            };
+            
             try
             {
-                xmlDoc.LoadXml(xmlContent);
-                Console.WriteLine("[DEBUG] Successfully parsed XML document");
+                // Use XmlReader with secure settings
+                using (StringReader stringReader = new StringReader(xmlContent))
+                using (XmlReader secureReader = XmlReader.Create(stringReader, secureSettings))
+                {
+                    xmlDoc.Load(secureReader);
+                    Console.WriteLine("[DEBUG] Successfully parsed XML document securely");
+                }
+            }
+            catch (XmlException xmlEx)
+            {
+                Console.WriteLine($"[ERROR] XML parsing error: {xmlEx.Message}");
+                throw new XmlException($"The XML file appears to be malformed: {xmlEx.Message}", xmlEx);
             }
             catch (Exception ex)
             {
@@ -131,7 +153,17 @@ namespace VDD_Control
 
             XmlNode countNode = xmlDoc.SelectSingleNode("//monitors/count");
             if (countNode != null)
-                Count = int.Parse(countNode.InnerText);
+            {
+                if (!int.TryParse(countNode.InnerText, out int countValue))
+                {
+                    Console.WriteLine($"[WARNING] Invalid monitor count value: {countNode.InnerText}. Defaulting to 1.");
+                    Count = 1; // Default value
+                }
+                else
+                {
+                    Count = countValue;
+                }
+            }
 
             XmlNode friendlynameNode = xmlDoc.SelectSingleNode("//gpu/friendlyname");
             if (friendlynameNode != null)
@@ -148,13 +180,45 @@ namespace VDD_Control
             XmlNodeList resolutionNodes = xmlDoc.SelectNodes("//resolutions/resolution");
             foreach (XmlNode resNode in resolutionNodes)
             {
-                Resolution res = new Resolution
+                try
                 {
-                    Width = int.Parse(resNode.SelectSingleNode("width").InnerText),
-                    Height = int.Parse(resNode.SelectSingleNode("height").InnerText),
-                    Refresh_rate = double.Parse(resNode.SelectSingleNode("refresh_rate").InnerText)
-                };
-                Resolutions.Add(res);
+                    XmlNode widthNode = resNode.SelectSingleNode("width");
+                    XmlNode heightNode = resNode.SelectSingleNode("height");
+                    XmlNode refreshNode = resNode.SelectSingleNode("refresh_rate");
+                    
+                    // Check if nodes exist
+                    if (widthNode == null || heightNode == null || refreshNode == null)
+                    {
+                        Console.WriteLine("[WARNING] Skipping resolution node with missing width, height, or refresh_rate");
+                        continue;
+                    }
+                    
+                    // Use TryParse for safer parsing
+                    bool validWidth = int.TryParse(widthNode.InnerText, out int width);
+                    bool validHeight = int.TryParse(heightNode.InnerText, out int height);
+                    bool validRefresh = double.TryParse(refreshNode.InnerText, out double refreshRate);
+                    
+                    // Skip invalid values
+                    if (!validWidth || !validHeight || !validRefresh)
+                    {
+                        Console.WriteLine($"[WARNING] Skipping resolution with invalid values: Width={widthNode.InnerText}, Height={heightNode.InnerText}, RefreshRate={refreshNode.InnerText}");
+                        continue;
+                    }
+                    
+                    // Create and add valid resolution
+                    Resolution res = new Resolution
+                    {
+                        Width = width,
+                        Height = height,
+                        Refresh_rate = refreshRate
+                    };
+                    Resolutions.Add(res);
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"[WARNING] Error parsing resolution: {ex.Message}");
+                    // Continue to the next resolution node
+                }
             }
 
             bool tempValue;
@@ -232,9 +296,22 @@ namespace VDD_Control
 
         public void SaveToXml(string filePath)
         {
-            XmlDocument doc = new XmlDocument();
-            XmlElement root = doc.CreateElement("vdd_settings");
-            doc.AppendChild(root);
+            try
+            {
+                // Create secure XmlWriterSettings
+                XmlWriterSettings settings = new XmlWriterSettings
+                {
+                    Indent = true,                 // Makes the output more readable
+                    IndentChars = "  ",            // Two spaces for indentation
+                    NewLineHandling = NewLineHandling.Replace,
+                    Encoding = Encoding.UTF8,      // Use UTF-8 encoding
+                    CheckCharacters = true         // Check for invalid XML characters
+                };
+                
+                // Create a new XmlDocument
+                XmlDocument doc = new XmlDocument();
+                XmlElement root = doc.CreateElement("vdd_settings");
+                doc.AppendChild(root);
 
             // Monitors
             XmlElement monitors = doc.CreateElement("monitors");
@@ -293,7 +370,18 @@ namespace VDD_Control
             AddOptionElement(doc, options, "debuglogging", DebugLogging);
             root.AppendChild(options);
 
-            doc.Save(filePath);
+                // Save the document using XmlWriter for security
+                using (XmlWriter writer = XmlWriter.Create(filePath, settings))
+                {
+                    doc.WriteTo(writer);
+                }
+            }
+            catch (Exception ex)
+            {
+                // Log and rethrow
+                Console.WriteLine($"[ERROR] Failed to save XML file: {ex.Message}");
+                throw;
+            }
         }
 
         private void AddOptionElement(XmlDocument doc, XmlElement parent, string name, bool value)

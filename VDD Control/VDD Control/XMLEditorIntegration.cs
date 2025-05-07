@@ -7,6 +7,9 @@ namespace VDD_Control
     // Add this class to the MainWindow.cs file
     public partial class mainWindow
     {
+        // Track the XML Editor form instance
+        private XMLEditor xmlEditorForm;
+        
         //private ToolStripMenuItem xmlEditorToolStripMenuItem;
         //private ToolStripMenuItem xmlEditorToolStripMenuItem1;
         
@@ -15,43 +18,79 @@ namespace VDD_Control
         /// </summary>
         private void InitializeXMLEditorMenuItems()
         {
-            //// Create XML Editor menu item for main menu
-            ////xmlEditorToolStripMenuItem = new ToolStripMenuItem
-            //{
-            //    Name = "xmlEditorToolStripMenuItem",
-            //    Size = new System.Drawing.Size(199, 22),
-            //    Text = "XML Editor"
-            //};
-            //xmlEditorToolStripMenuItem.Click += xmlEditorToolStripMenuItem_Click;
+            // Create XML Editor menu item for main menu
+            var xmlEditorToolStripMenuItem = new ToolStripMenuItem
+            {
+                Name = "xmlEditorToolStripMenuItem",
+                Size = new System.Drawing.Size(199, 22),
+                Text = "XML Editor"
+            };
+            xmlEditorToolStripMenuItem.Click += xmlEditorToolStripMenuItem_Click;
             
             // Add to main menu Tools dropdown
             if (toolsToolStripMenuItem != null && toolsToolStripMenuItem.DropDownItems != null)
             {
-                //toolsToolStripMenuItem.DropDownItems.Add(xmlEditorToolStripMenuItem);
-                //mainConsole.AppendText("[INFO] Added XML Editor to main menu\n");
+                // Check if it already exists
+                bool exists = false;
+                foreach (ToolStripItem item in toolsToolStripMenuItem.DropDownItems)
+                {
+                    if (item.Name == "xmlEditorToolStripMenuItem")
+                    {
+                        exists = true;
+                        break;
+                    }
+                }
+                
+                if (!exists)
+                {
+                    toolsToolStripMenuItem.DropDownItems.Add(xmlEditorToolStripMenuItem);
+                    mainConsole.AppendText("[INFO] Added XML Editor to main menu\n");
+                }
             }
             
             // Create XML Editor menu item for tray menu
-            //xmlEditorToolStripMenuItem1 = new ToolStripMenuItem
-            //{
-            //    Name = "xmlEditorToolStripMenuItem1",
-            //    Size = new System.Drawing.Size(199, 22),
-            //    Text = "XML Editor"
-            //};
-            //xmlEditorToolStripMenuItem1.Click += xmlEditorToolStripMenuItem_Click;
+            var xmlEditorToolStripMenuItem1 = new ToolStripMenuItem
+            {
+                Name = "xmlEditorToolStripMenuItem1",
+                Size = new System.Drawing.Size(199, 22),
+                Text = "XML Editor"
+            };
+            xmlEditorToolStripMenuItem1.Click += xmlEditorToolStripMenuItem_Click;
             
             // Add to tray menu Tools dropdown
-            //if (toolsToolStripMenuItem1 != null && toolsToolStripMenuItem1.DropDownItems != null)
-            //{
-            //    toolsToolStripMenuItem1.DropDownItems.Add(xmlEditorToolStripMenuItem1);
-            //    mainConsole.AppendText("[INFO] Added XML Editor to tray menu\n");
-            //}
+            if (toolsToolStripMenuItem1 != null && toolsToolStripMenuItem1.DropDownItems != null)
+            {
+                // Check if it already exists
+                bool exists = false;
+                foreach (ToolStripItem item in toolsToolStripMenuItem1.DropDownItems)
+                {
+                    if (item.Name == "xmlEditorToolStripMenuItem1")
+                    {
+                        exists = true;
+                        break;
+                    }
+                }
+                
+                if (!exists)
+                {
+                    toolsToolStripMenuItem1.DropDownItems.Add(xmlEditorToolStripMenuItem1);
+                    mainConsole.AppendText("[INFO] Added XML Editor to tray menu\n");
+                }
+            }
         }
         
         /// <summary>
         /// Event handler for XML Editor menu item click
         /// </summary>
         private void xmlEditorToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            ShowXMLEditorWindow();
+        }
+        
+        /// <summary>
+        /// Shows the XML Editor window, creating it if necessary or reusing existing instance
+        /// </summary>
+        private void ShowXMLEditorWindow()
         {
             try
             {
@@ -71,10 +110,31 @@ namespace VDD_Control
                 
                 mainConsole.AppendText($"[INFO] Opening XML Editor with file: {xmlFilePath}\n");
                 
-                // Create and show the XML Editor form
-                XMLEditor xmlEditor = new XMLEditor(xmlFilePath);
-                xmlEditor.Show();
-                xmlEditor.BringToFront();
+                // Create the form if it doesn't exist or was disposed
+                if (xmlEditorForm == null || xmlEditorForm.IsDisposed)
+                {
+                    xmlEditorForm = new XMLEditor(xmlFilePath);
+                    
+                    // Subscribe to form closed event to clean up reference
+                    xmlEditorForm.FormClosed += (s, args) => 
+                    {
+                        // Null out the reference when the form is closed
+                        if (s == xmlEditorForm)
+                        {
+                            xmlEditorForm = null;
+                        }
+                    };
+                }
+                else
+                {
+                    // If the form exists, update its file path if needed
+                    xmlEditorForm.LoadXmlFile(xmlFilePath);
+                    xmlEditorForm.BringToFront();
+                }
+                
+                // Show the form
+                xmlEditorForm.Show();
+                xmlEditorForm.BringToFront();
             }
             catch (Exception ex)
             {
@@ -84,6 +144,28 @@ namespace VDD_Control
                     mainConsole.AppendText($"[ERROR] Inner Exception: {ex.InnerException.Message}\n");
                 }
                 MessageBox.Show($"Error opening XML Editor: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+        
+        /// <summary>
+        /// Dispose the XML Editor form specifically
+        /// </summary>
+        private void DisposeXMLEditorForm()
+        {
+            // Dispose XML Editor form if it exists
+            if (xmlEditorForm != null && !xmlEditorForm.IsDisposed)
+            {
+                try
+                {
+                    xmlEditorForm.Close();
+                    xmlEditorForm.Dispose();
+                    xmlEditorForm = null;
+                }
+                catch (Exception ex)
+                {
+                    // Just log, don't rethrow as we're in cleanup code
+                    mainConsole.AppendText($"[WARNING] Error disposing XML Editor: {ex.Message}\n");
+                }
             }
         }
     }

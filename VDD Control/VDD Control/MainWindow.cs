@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Drawing;
 using System.ComponentModel; // For Win32Exception
+using System.Xml; // For XmlException
 
 namespace VDD_Control
 {
@@ -38,6 +39,8 @@ namespace VDD_Control
         {
             InitializeComponent();
             SetupMinimizeToTrayMenu();
+            InitializeXMLEditorMenuItems(); // Initialize XML Editor menu items
+            InitializeOptionsMenu(); // Initialize Options menu
 
             ToolStripMenuItem restartItem = GetRestartDriverToolStripMenuItem(); // This is now safe
             string settingsPath = LocateSettingsFile();
@@ -63,6 +66,55 @@ namespace VDD_Control
                         // Sync all menu items with the loaded state
                         SyncAllMenuItemsWithState();
                     }
+                    catch (FileNotFoundException fnfEx)
+                    {
+                        mainConsole.AppendText($"[ERROR] XML file not found: {fnfEx.Message}\n");
+                        mainConsole.AppendText("[RECOVERY] Will attempt to create a new XML file with default settings\n");
+                        
+                        try
+                        {
+                            // Create default XML settings file
+                            CreateDefaultXmlSettings(settingsPath);
+                            mainConsole.AppendText("[SUCCESS] Created default XML settings file\n");
+                            
+                            // Try to initialize with new default file
+                            IXCLI = new XMLController(settingsPath);
+                            LoadSettingsFromXML();
+                            SyncAllMenuItemsWithState();
+                        }
+                        catch (Exception createEx)
+                        {
+                            mainConsole.AppendText($"[ERROR] Failed to create default settings: {createEx.Message}\n");
+                            // Will try local path as fallback below
+                        }
+                    }
+                    catch (XmlException xmlEx)
+                    {
+                        mainConsole.AppendText($"[ERROR] XML file is corrupted: {xmlEx.Message}\n");
+                        mainConsole.AppendText("[RECOVERY] Will attempt to backup and recreate XML file\n");
+                        
+                        try
+                        {
+                            // Backup corrupted file
+                            string backupPath = settingsPath + ".backup." + DateTime.Now.ToString("yyyyMMddHHmmss");
+                            File.Copy(settingsPath, backupPath);
+                            mainConsole.AppendText($"[INFO] Backed up corrupted file to {backupPath}\n");
+                            
+                            // Create default XML settings file
+                            CreateDefaultXmlSettings(settingsPath);
+                            mainConsole.AppendText("[SUCCESS] Created new XML settings file\n");
+                            
+                            // Try to initialize with new file
+                            IXCLI = new XMLController(settingsPath);
+                            LoadSettingsFromXML();
+                            SyncAllMenuItemsWithState();
+                        }
+                        catch (Exception createEx)
+                        {
+                            mainConsole.AppendText($"[ERROR] Failed to recover from corrupted XML: {createEx.Message}\n");
+                            // Will try local path as fallback below
+                        }
+                    }
                     catch (Exception ex)
                     {
                         mainConsole.AppendText($"[ERROR] Failed to initialize XMLController: {ex.Message}\n");
@@ -70,6 +122,7 @@ namespace VDD_Control
                         {
                             mainConsole.AppendText($"[ERROR] Inner Exception: {ex.InnerException.Message}\n");
                         }
+                        mainConsole.AppendText("[RECOVERY] Will try alternate XML locations\n");
                     }
                 }
                 else
@@ -189,6 +242,11 @@ namespace VDD_Control
                     {
                         e.Cancel = true;
                         MinimizeToTray();
+                    }
+                    else if (!e.Cancel)
+                    {
+                        // If actually closing (not just minimizing to tray), dispose child forms
+                        DisposeChildForms();
                     }
                 };
             }
@@ -512,7 +570,7 @@ namespace VDD_Control
             try
             {
                 // Initialize a process to execute PowerShell to get GPU info
-                Process process = new Process
+                using (Process process = new Process
                 {
                     StartInfo = new ProcessStartInfo
                     {
@@ -523,25 +581,26 @@ namespace VDD_Control
                         UseShellExecute = false,
                         CreateNoWindow = true
                     }
-                };
-
-                // Start the process
-                process.Start();
-
-                // Read output
-                string output = await process.StandardOutput.ReadToEndAsync();
-                await process.WaitForExitAsync();
-
-                // Process the output - each line is a GPU
-                if (!string.IsNullOrWhiteSpace(output))
+                })
                 {
-                    string[] lines = output.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
-                    foreach (string line in lines)
+                    // Start the process
+                    process.Start();
+
+                    // Read output
+                    string output = await process.StandardOutput.ReadToEndAsync();
+                    await process.WaitForExitAsync();
+
+                    // Process the output - each line is a GPU
+                    if (!string.IsNullOrWhiteSpace(output))
                     {
-                        string trimmedLine = line.Trim();
-                        if (!string.IsNullOrEmpty(trimmedLine) && !trimmedLine.Equals("default", StringComparison.OrdinalIgnoreCase))
+                        string[] lines = output.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
+                        foreach (string line in lines)
                         {
-                            gpuList.Add(trimmedLine);
+                            string trimmedLine = line.Trim();
+                            if (!string.IsNullOrEmpty(trimmedLine) && !trimmedLine.Equals("default", StringComparison.OrdinalIgnoreCase))
+                            {
+                                gpuList.Add(trimmedLine);
+                            }
                         }
                     }
                 }
@@ -716,9 +775,55 @@ namespace VDD_Control
         }
 
         // Set display count in XML and send to driver
+        // Helper method to create default XML settings file
+        private void CreateDefaultXmlSettings(string filePath)
+        {
+            // Create directory if it doesn't exist
+            string directory = Path.GetDirectoryName(filePath);
+            if (!string.IsNullOrEmpty(directory) && !Directory.Exists(directory))
+            {
+                Directory.CreateDirectory(directory);
+            }
+            
+            // Create a new XMLController with default values
+            XMLController defaultXml = new XMLController(null);
+            
+            // Set default values
+            defaultXml.Count = 1; // Default to 1 monitor
+            defaultXml.Friendlyname = "default"; // Default GPU
+            defaultXml.G_refresh_rate = new List<string> { "60.0" }; // Default refresh rate
+            
+            // Create a default resolution
+            XMLController.Resolution defaultResolution = new XMLController.Resolution
+            {
+                Width = 1920,
+                Height = 1080,
+                Refresh_rate = 60.0
+            };
+            
+            // Add the default resolution
+            defaultXml.Resolutions = new List<XMLController.Resolution> { defaultResolution };
+            
+            // Set default feature values
+            defaultXml.CustomEdid = false;
+            defaultXml.PreventSpoof = false;
+            defaultXml.EdidCeaOverride = false;
+            defaultXml.HardwareCursor = true;
+            defaultXml.SDR10bit = false;
+            defaultXml.HDRPlus = false;
+            defaultXml.Logging = true;
+            defaultXml.DebugLogging = false;
+            
+            // Save the default settings
+            defaultXml.SaveToXml(filePath);
+        }
+        
         private async Task SetDisplayCount(int count)
         {
             AppendToConsole($"[ACTION] Setting display count to {count}...\n");
+
+            bool xmlUpdateSuccessful = false;
+            bool driverCommandSuccessful = false;
 
             try
             {
@@ -733,27 +838,110 @@ namespace VDD_Control
                         string xmlPath = Path.Combine(registryFilePath, "vdd_settings.xml");
                         IXCLI.SaveToXml(xmlPath);
                         AppendToConsole($"[SUCCESS] Updated XML settings with new display count: {count}\n");
+                        xmlUpdateSuccessful = true;
+                    }
+                    catch (DirectoryNotFoundException dirEx)
+                    {
+                        AppendToConsole($"[ERROR] Directory not found: {dirEx.Message}\n");
+                        AppendToConsole("[RECOVERY] Attempting to create directory...\n");
+                        
+                        try
+                        {
+                            Directory.CreateDirectory(registryFilePath);
+                            string xmlPath = Path.Combine(registryFilePath, "vdd_settings.xml");
+                            IXCLI.SaveToXml(xmlPath);
+                            AppendToConsole($"[SUCCESS] Created directory and saved XML settings\n");
+                            xmlUpdateSuccessful = true;
+                        }
+                        catch (Exception createEx)
+                        {
+                            AppendToConsole($"[ERROR] Failed to create directory: {createEx.Message}\n");
+                        }
+                    }
+                    catch (UnauthorizedAccessException authEx)
+                    {
+                        AppendToConsole($"[ERROR] Access denied when saving XML: {authEx.Message}\n");
+                        AppendToConsole("[RECOVERY] Attempting to save to application directory instead...\n");
+                        
+                        try
+                        {
+                            string localXmlPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "vdd_settings.xml");
+                            IXCLI.SaveToXml(localXmlPath);
+                            AppendToConsole($"[SUCCESS] Saved XML settings to application directory: {localXmlPath}\n");
+                            xmlUpdateSuccessful = true;
+                        }
+                        catch (Exception localEx)
+                        {
+                            AppendToConsole($"[ERROR] Failed to save to application directory: {localEx.Message}\n");
+                        }
                     }
                     catch (Exception ex)
                     {
                         AppendToConsole($"[ERROR] Failed to save XML with new display count: {ex.Message}\n");
                     }
                 }
+                else
+                {
+                    AppendToConsole("[WARNING] XMLController not initialized, display count saved only to driver\n");
+                }
 
                 // Send command to driver
-                string command = $"SETCOUNT {count}";
-                string response = await SendCommandToDriver(command);
-                //AppendToConsole($"[INFO] Driver response: {response}\n");
+                try
+                {
+                    string command = $"SETCOUNT {count}";
+                    string response = await SendCommandToDriver(command);
+                    
+                    if (response != null && !response.StartsWith("[ERROR]"))
+                    {
+                        driverCommandSuccessful = true;
+                        AppendToConsole($"[SUCCESS] Driver display count update successful\n");
+                    }
+                    else
+                    {
+                        AppendToConsole($"[WARNING] Driver response indicated an issue: {response}\n");
+                    }
+                }
+                catch (Exception driverEx)
+                {
+                    AppendToConsole($"[ERROR] Failed to send command to driver: {driverEx.Message}\n");
+                }
 
-                // Update menu checked state
+                // Update menu checked state regardless of success
                 UpdateDisplayCountMenus(count);
 
+                // Provide appropriate feedback based on success
+                if (xmlUpdateSuccessful && driverCommandSuccessful)
+                {
+                    AppendToConsole("[INFO] Display count changed successfully\n");
+                }
+                else if (xmlUpdateSuccessful)
+                {
+                    AppendToConsole("[WARNING] Display count saved to XML only, driver update failed\n");
+                    AppendToConsole("[INFO] You'll need to restart the driver or application for changes to take effect\n");
+                }
+                else if (driverCommandSuccessful)
+                {
+                    AppendToConsole("[WARNING] Display count updated in driver only, XML save failed\n");
+                    AppendToConsole("[INFO] Changes may not persist after driver restart\n");
+                }
+                else
+                {
+                    AppendToConsole("[ERROR] Failed to update display count in both XML and driver\n");
+                    AppendToConsole("[RECOVERY] Please try restarting the application with administrator privileges\n");
+                    return; // Exit early to prevent showing success message
+                }
+
                 // Recommend driver restart
-                AppendToConsole("[INFO] Display count changed. You may need to restart the driver for changes to take effect.\n");
+                AppendToConsole("[INFO] You may need to restart the driver for changes to take full effect.\n");
             }
             catch (Exception ex)
             {
                 AppendToConsole($"[ERROR] Failed to set display count: {ex.Message}\n");
+                if (ex.InnerException != null)
+                {
+                    AppendToConsole($"[DETAIL] Inner exception: {ex.InnerException.Message}\n");
+                }
+                AppendToConsole("[RECOVERY] Try restarting the application or reinstalling the driver\n");
             }
         }
 
@@ -991,7 +1179,23 @@ namespace VDD_Control
                 {
                     if (registryKey != null)
                     {
+                        // Try SettingsPath first (original setting)
                         string regPath = registryKey.GetValue("SettingsPath") as string;
+                        
+                        // If SettingsPath is not found, try VDDPATH
+                        if (string.IsNullOrEmpty(regPath))
+                        {
+                            regPath = registryKey.GetValue("VDDPATH") as string;
+                            if (!string.IsNullOrEmpty(regPath))
+                            {
+                                mainConsole.AppendText($"[INFO] Found driver path in registry (VDDPATH): {regPath}\n");
+                            }
+                        }
+                        else
+                        {
+                            mainConsole.AppendText($"[INFO] Found settings path in registry (SettingsPath): {regPath}\n");
+                        }
+                        
                         string fullPath = regPath;
 
                         // Check if it's a directory path or direct file path
@@ -1052,35 +1256,178 @@ namespace VDD_Control
 
         private async Task<bool> TryConnectToDriver()
         {
-            // we should change this to check if it exists, not if it can be connected to to save on overhead in the driver
             const int maxAttempts = 5;
             int attempt = 0;
+            bool driverServiceRunning = false;
+            string serviceOutput = "";
 
+            // First, check if the driver service is running
+            try
+            {
+                using (Process process = new Process
+                {
+                    StartInfo = new ProcessStartInfo
+                    {
+                        FileName = "sc.exe",
+                        Arguments = "query VirtualDisplayDriver",
+                        RedirectStandardOutput = true,
+                        UseShellExecute = false,
+                        CreateNoWindow = true
+                    }
+                })
+                {
+                    process.Start();
+                    serviceOutput = await process.StandardOutput.ReadToEndAsync();
+                    await process.WaitForExitAsync();
+                    
+                    // Check if service exists and is running
+                    driverServiceRunning = serviceOutput.Contains("STATE") && serviceOutput.Contains("RUNNING");
+                    
+                    if (!driverServiceRunning)
+                    {
+                        if (serviceOutput.Contains("specified service does not exist"))
+                        {
+                            AppendToConsole("[ERROR] Virtual Display Driver service is not installed\n");
+                            AppendToConsole("[RECOVERY] Please install the driver first\n");
+                            
+                            // Set the flag to indicate driver is not installed
+                            driverNotInstalled = true;
+                        }
+                        else if (serviceOutput.Contains("STOPPED"))
+                        {
+                            AppendToConsole("[WARNING] Virtual Display Driver service is installed but stopped\n");
+                            AppendToConsole("[RECOVERY] Attempting to start the service...\n");
+                            
+                            // Try to start the service
+                            using (Process startProcess = new Process
+                            {
+                                StartInfo = new ProcessStartInfo
+                                {
+                                    FileName = "sc.exe",
+                                    Arguments = "start VirtualDisplayDriver",
+                                    RedirectStandardOutput = true,
+                                    UseShellExecute = false,
+                                    CreateNoWindow = true
+                                }
+                            })
+                            {
+                                startProcess.Start();
+                                string startOutput = await startProcess.StandardOutput.ReadToEndAsync();
+                                await startProcess.WaitForExitAsync();
+                                
+                                if (startOutput.Contains("SUCCESS") || startOutput.Contains("started"))
+                                {
+                                    AppendToConsole("[SUCCESS] Started the driver service\n");
+                                    AppendToConsole("[INFO] Waiting for service to initialize...\n");
+                                    await Task.Delay(3000); // Wait for service to initialize
+                                    driverServiceRunning = true;
+                                }
+                                else
+                                {
+                                    AppendToConsole($"[ERROR] Failed to start driver service: {startOutput}\n");
+                                    AppendToConsole("[RECOVERY] Try starting the service manually or reinstall the driver\n");
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception serviceEx)
+            {
+                AppendToConsole($"[WARNING] Could not check driver service status: {serviceEx.Message}\n");
+                // Continue anyway, we'll try to connect to the pipe
+            }
+
+            // If we already know the driver is not installed, return immediately
+            if (driverNotInstalled)
+            {
+                return false;
+            }
+
+            // If service is not running and we couldn't start it,
+            // check if we should continue trying to connect
+            if (!driverServiceRunning)
+            {
+                // If the service explicitly doesn't exist, don't try to connect to the pipe
+                if (!serviceOutput.Contains("specified service does not exist"))
+                {
+                    // Only attempt to connect to the pipe if the service exists but might be in some other state
+                    AppendToConsole("[INFO] Driver service may not be running, but will attempt pipe connection anyway\n");
+                }
+                else
+                {
+                    // Driver doesn't exist, no point in trying to connect
+                    AppendToConsole("[INFO] Driver service doesn't exist - skipping pipe connection attempt\n");
+                    return false;
+                }
+            }
+
+            // Now try to connect to the named pipe
             while (attempt < maxAttempts)
             {
                 try
                 {
                     using (var pipeClient = new NamedPipeClientStream(".", PIPE_NAME, PipeDirection.InOut))
                     {
-                        await pipeClient.ConnectAsync(2000);
-                        // We'll remove the logging here and only show it at the end
-                        return true;
+                        AppendToConsole($"[INFO] Attempting to connect to driver pipe (Attempt {attempt + 1}/{maxAttempts})...\n");
+                        
+                        // Use timeout for connect
+                        var connectTask = pipeClient.ConnectAsync(2000);
+                        
+                        // Wait for the connection with a timeout
+                        if (await Task.WhenAny(connectTask, Task.Delay(3000)) == connectTask)
+                        {
+                            // Connection successful
+                            AppendToConsole("[SUCCESS] Connected to driver pipe\n");
+                            
+                            // If we successfully connect, we know the driver is installed,
+                            // so clear the flag in case it was previously set
+                            driverNotInstalled = false;
+                            
+                            return true;
+                        }
+                        else
+                        {
+                            // Connection timed out
+                            throw new TimeoutException("Connection timed out after 3 seconds");
+                        }
+                    }
+                }
+                catch (TimeoutException tex)
+                {
+                    attempt++;
+                    AppendToConsole($"[WARNING] Connection timeout: {tex.Message} (Attempt {attempt}/{maxAttempts})\n");
+                }
+                catch (IOException ioEx)
+                {
+                    attempt++;
+                    AppendToConsole($"[ERROR] Pipe communication error: {ioEx.Message} (Attempt {attempt}/{maxAttempts})\n");
+                    
+                    // Check specifically for "The pipe has been ended" which suggests driver is shutting down
+                    if (ioEx.Message.Contains("pipe has been ended") || ioEx.Message.Contains("pipe is broken"))
+                    {
+                        AppendToConsole("[INFO] The driver may be shutting down or restarting\n");
                     }
                 }
                 catch (Exception ex)
                 {
                     attempt++;
                     AppendToConsole($"[ERROR] Connection failed: {ex.Message} (Attempt {attempt}/{maxAttempts})\n");
-                    AppendToConsole("Note: This may also occur if the driver is off or restarting.\n");
-
-                    if (attempt >= maxAttempts)
-                    {
-                        AppendToConsole("[ERROR] Unable to connect after multiple attempts.\n");
-                        return false;
-                    }
-
-                    await Task.Delay(2000);
                 }
+
+                if (attempt >= maxAttempts)
+                {
+                    AppendToConsole("[ERROR] Unable to connect after multiple attempts\n");
+                    AppendToConsole("[RECOVERY] Please check if the driver is installed and running:\n");
+                    AppendToConsole("  1. Verify driver installation in Device Manager\n");
+                    AppendToConsole("  2. Check Windows Services for VirtualDisplayDriver service\n");
+                    AppendToConsole("  3. Try restarting your computer\n");
+                    return false;
+                }
+
+                // Wait before next attempt
+                AppendToConsole("[INFO] Waiting before retry...\n");
+                await Task.Delay(2000);
             }
 
             return false;
@@ -1088,8 +1435,12 @@ namespace VDD_Control
 
         private async Task<string?> SendCommandToDriver(string command)
         {
-            if (!await TryConnectToDriver()) // No need to check if command sent is not equal to restart driver 
+            bool driverConnected = await TryConnectToDriver();
+            
+            if (!driverConnected) 
             {
+                // We can't check serviceOutput here since it's not accessible from this method
+                // Instead, simply set failure message
                 return "[ERROR] Connection failed: The driver may be off or restarting.";
             }
 
@@ -1139,10 +1490,19 @@ namespace VDD_Control
         }
 
         // Query the driver for the current status of a feature
+        // Track if we've determined the driver is not installed to avoid redundant connections
+        private bool driverNotInstalled = false;
+
         private async Task<bool> GetDriverFeatureStatus(string featureName)
         {
             try
             {
+                // If we already know the driver is not installed, use XML settings
+                if (driverNotInstalled)
+                {
+                    return GetFeatureStatusFromXml(featureName);
+                }
+
                 // First check if logging is enabled
                 bool shouldUseXml = !LOGGING_STATE;
 
@@ -1157,6 +1517,14 @@ namespace VDD_Control
                 // If logging is enabled, try to get status from driver
                 string? response = await SendCommandToDriver("STATUS");
 
+                // Check if the error indicates the driver isn't installed
+                if (response != null && response.Contains("not installed"))
+                {
+                    // Mark driver as not installed to avoid future attempts
+                    driverNotInstalled = true;
+                    return GetFeatureStatusFromXml(featureName);
+                }
+                
                 if (string.IsNullOrEmpty(response) || response.StartsWith("[ERROR]"))
                 {
                     // If there's an error or no response, fall back to XML settings
@@ -1270,22 +1638,40 @@ namespace VDD_Control
                     // Driver not connected, use XML settings if available
                     if (IXCLI != null)
                     {
-                        AppendToConsole("[INFO] Driver not connected. Using XML settings for menu items.\n");
+                        try
+                        {
+                            AppendToConsole("[INFO] Driver not connected. Using XML settings for menu items.\n");
 
-                        // Set menu items based on XML settings
-                        SDR10_STATE = IXCLI.SDR10bit;
-                        HDR10PLUS_STATE = IXCLI.HDRPlus;
-                        CUSTOMEDID_STATE = IXCLI.CustomEdid;
-                        HARDWARECURSOR_STATE = IXCLI.HardwareCursor;
-                        PREVENTEDIDSPOOF_STATE = IXCLI.PreventSpoof;
-                        EDIDCEAOVERRRIDE_STATE = IXCLI.EdidCeaOverride;
+                            // Set menu items based on XML settings
+                            SDR10_STATE = IXCLI.SDR10bit;
+                            HDR10PLUS_STATE = IXCLI.HDRPlus;
+                            CUSTOMEDID_STATE = IXCLI.CustomEdid;
+                            HARDWARECURSOR_STATE = IXCLI.HardwareCursor;
+                            PREVENTEDIDSPOOF_STATE = IXCLI.PreventSpoof;
+                            EDIDCEAOVERRRIDE_STATE = IXCLI.EdidCeaOverride;
 
-                        // Log current states for debugging
-                        // Simplified logging - removed detailed state logging
+                            // Log current states for debugging
+                            // Simplified logging - removed detailed state logging
 
-                        // Update UI to match
-                        UpdateAllMenuItemsWithStates();
-                        AppendToConsole("[INFO] Menu items set from XML settings.\n");
+                            // Update UI to match
+                            UpdateAllMenuItemsWithStates();
+                            AppendToConsole("[INFO] Menu items set from XML settings.\n");
+                        }
+                        catch (Exception ex)
+                        {
+                            AppendToConsole($"[ERROR] Failed to read XML settings: {ex.Message}\n");
+                            
+                            // Set defaults since we couldn't read the settings
+                            SDR10_STATE = false;
+                            HDR10PLUS_STATE = false;
+                            CUSTOMEDID_STATE = false;
+                            HARDWARECURSOR_STATE = false;
+                            PREVENTEDIDSPOOF_STATE = false;
+                            EDIDCEAOVERRRIDE_STATE = false;
+                            
+                            // Update UI to show defaults
+                            UpdateAllMenuItemsWithStates();
+                        }
                     }
                     else
                     {
@@ -1402,17 +1788,48 @@ namespace VDD_Control
         // Helper method to update task progress bar in a thread-safe way
         private void UpdateTaskProgress(string taskName, int progressValue, int maxValue = 100)
         {
-            if (this.InvokeRequired)
-            {
-                this.BeginInvoke(new Action(() => UpdateTaskProgress(taskName, progressValue, maxValue)));
+            if (IsDisposed)
                 return;
-            }
+                
+            try
+            {
+                if (this.InvokeRequired)
+                {
+                    // Use Invoke instead of BeginInvoke for synchronous updates
+                    // This ensures the task is completed before continuing
+                    this.Invoke(new Action(() => UpdateTaskProgress(taskName, progressValue, maxValue)));
+                    return;
+                }
 
-            // We're now on the UI thread
-            taskGroupBox.Text = $"Task Progress: {taskName}";
-            taskProgressBar.Maximum = maxValue;
-            taskProgressBar.Value = progressValue;
-            Application.DoEvents(); // Ensure UI updates
+                // Check if controls are valid
+                if (taskGroupBox == null || taskProgressBar == null)
+                    return;
+
+                // We're now on the UI thread
+                taskGroupBox.Text = string.IsNullOrEmpty(taskName) ? 
+                    "Task Progress" : $"Task Progress: {taskName}";
+                
+                taskProgressBar.Maximum = maxValue;
+                
+                // Ensure value is within valid range
+                int validProgress = Math.Max(0, Math.Min(progressValue, maxValue));
+                taskProgressBar.Value = validProgress;
+                
+                // Only call DoEvents when really necessary
+                if (progressValue % 20 == 0 || progressValue == 0 || progressValue == maxValue)
+                {
+                    Application.DoEvents(); // Ensure UI updates at milestone points
+                }
+            }
+            catch (InvalidOperationException invEx)
+            {
+                // This can happen if the form is closing or was already disposed
+                System.Diagnostics.Debug.WriteLine($"UpdateTaskProgress error: {invEx.Message}");
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"UpdateTaskProgress unexpected error: {ex.Message}");
+            }
         }
 
         private async Task restartDriverToolStripMenuItem_Click(object sender, EventArgs e)
@@ -1985,8 +2402,7 @@ namespace VDD_Control
             try
             {
                 // Initialize a process to execute PowerShell
-                // Redo all of this.
-                Process process = new Process
+                using (Process process = new Process
                 {
                     StartInfo = new ProcessStartInfo
                     {
@@ -1997,28 +2413,29 @@ namespace VDD_Control
                         UseShellExecute = false,
                         CreateNoWindow = true
                     }
-                };
-
-                // Start the process and capture output
-                process.Start();
-
-                string output = process.StandardOutput.ReadToEnd();
-                string error = process.StandardError.ReadToEnd();
-
-                process.WaitForExit();
-
-                // Display output in richTextBox1
-                if (!string.IsNullOrWhiteSpace(output))
+                })
                 {
-                    mainConsole.AppendText("Display Information:\n\n" + output);
-                }
-                else if (!string.IsNullOrWhiteSpace(error))
-                {
-                    mainConsole.AppendText("Error:\n\n" + error);
-                }
-                else
-                {
-                    mainConsole.AppendText("No output received from the PowerShell command.");
+                    // Start the process and capture output
+                    process.Start();
+
+                    string output = process.StandardOutput.ReadToEnd();
+                    string error = process.StandardError.ReadToEnd();
+
+                    process.WaitForExit();
+
+                    // Display output in richTextBox1
+                    if (!string.IsNullOrWhiteSpace(output))
+                    {
+                        mainConsole.AppendText("Display Information:\n\n" + output);
+                    }
+                    else if (!string.IsNullOrWhiteSpace(error))
+                    {
+                        mainConsole.AppendText("Error:\n\n" + error);
+                    }
+                    else 
+                    {
+                        mainConsole.AppendText("No output received from the PowerShell command.");
+                    }
                 }
             }
             catch (Exception ex)
@@ -2034,8 +2451,7 @@ namespace VDD_Control
             try
             {
                 // Initialize a process to execute PowerShell
-                // Redo all of this.
-                Process process = new Process
+                using (Process process = new Process
                 {
                     StartInfo = new ProcessStartInfo
                     {
@@ -2046,28 +2462,29 @@ namespace VDD_Control
                         UseShellExecute = false,
                         CreateNoWindow = true
                     }
-                };
-
-                // Start the process and capture output
-                process.Start();
-
-                string output = process.StandardOutput.ReadToEnd();
-                string error = process.StandardError.ReadToEnd();
-
-                process.WaitForExit();
-
-                // Display output in richTextBox1
-                if (!string.IsNullOrWhiteSpace(output))
+                })
                 {
-                    mainConsole.AppendText("Display Information:\n\n" + output);
-                }
-                else if (!string.IsNullOrWhiteSpace(error))
-                {
-                    mainConsole.AppendText("Error:\n\n" + error);
-                }
-                else
-                {
-                    mainConsole.AppendText("No output received from the PowerShell command.");
+                    // Start the process and capture output
+                    process.Start();
+
+                    string output = process.StandardOutput.ReadToEnd();
+                    string error = process.StandardError.ReadToEnd();
+
+                    process.WaitForExit();
+
+                    // Display output in richTextBox1
+                    if (!string.IsNullOrWhiteSpace(output))
+                    {
+                        mainConsole.AppendText("Audio Information:\n\n" + output);
+                    }
+                    else if (!string.IsNullOrWhiteSpace(error))
+                    {
+                        mainConsole.AppendText("Error:\n\n" + error);
+                    }
+                    else
+                    {
+                        mainConsole.AppendText("No output received from the PowerShell command.");
+                    }
                 }
             }
             catch (Exception ex)
@@ -2085,8 +2502,11 @@ namespace VDD_Control
                 UpdateTaskProgress("Getting GPU Information", 10);
                 mainConsole.AppendText("Gathering GPU information...\n");
 
+                string output;
+                string error;
+
                 // Initialize a process to execute PowerShell
-                Process process = new Process
+                using (Process process = new Process
                 {
                     StartInfo = new ProcessStartInfo
                     {
@@ -2097,21 +2517,22 @@ namespace VDD_Control
                         UseShellExecute = false,
                         CreateNoWindow = true
                     }
-                };
+                })
+                {
+                    UpdateTaskProgress("Getting GPU Information", 30);
 
-                UpdateTaskProgress("Getting GPU Information", 30);
+                    // Start the process and capture output
+                    process.Start();
 
-                // Start the process and capture output
-                process.Start();
+                    UpdateTaskProgress("Getting GPU Information", 50);
 
-                UpdateTaskProgress("Getting GPU Information", 50);
+                    output = await process.StandardOutput.ReadToEndAsync();
+                    error = await process.StandardError.ReadToEndAsync();
 
-                string output = await process.StandardOutput.ReadToEndAsync();
-                string error = await process.StandardError.ReadToEndAsync();
+                    UpdateTaskProgress("Getting GPU Information", 80);
 
-                UpdateTaskProgress("Getting GPU Information", 80);
-
-                await Task.Run(() => process.WaitForExit());
+                    await Task.Run(() => process.WaitForExit());
+                }
 
                 // Use BeginInvoke to update progress on UI thread
                 this.BeginInvoke(new Action(() => UpdateTaskProgress("Getting GPU Information", 90)));
@@ -2177,22 +2598,31 @@ namespace VDD_Control
             Application.Exit();
         }
 
-        private void xMLOptionsEditorToolStripMenuItem_Click(object sender, EventArgs e)
+        private async void xMLOptionsEditorToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            // Show progress in task bar
-            UpdateTaskProgress("Opening XML Editor", 50);
-
-            // Launch XML Editor
-            XMLEditor form2 = new XMLEditor();
-            form2.Show();
-
-            // Complete progress
-            UpdateTaskProgress("Opening XML Editor", 100);
-            Task.Delay(500).ContinueWith(_ =>
+            try
             {
-                // Reset progress bar after a delay
-                this.BeginInvoke(new Action(() => UpdateTaskProgress("", 0)));
-            });
+                // Show progress in task bar
+                UpdateTaskProgress("Opening XML Editor", 50);
+
+                // Use the consolidated XML Editor form management
+                ShowXMLEditorWindow();
+
+                // Complete progress
+                UpdateTaskProgress("Opening XML Editor", 100);
+                
+                // Use proper await pattern instead of ContinueWith
+                await Task.Delay(500);
+                
+                // Update progress directly since we're now back on the UI thread
+                UpdateTaskProgress("", 0);
+            }
+            catch (Exception ex)
+            {
+                AppendToConsole($"[ERROR] Failed to open XML Editor: {ex.Message}\n");
+                UpdateTaskProgress("", 0); // Reset progress
+                System.Diagnostics.Debug.WriteLine($"XML Editor error: {ex.Message}");
+            }
         }
 
         private void toolStripMenuItem1_Click(object sender, EventArgs e)
@@ -3125,14 +3555,20 @@ namespace VDD_Control
         }
 
         // Logging Control Commands
-        private async void SetDebugLoggingCommand(bool state)
+        private async Task SetDebugLoggingCommandAsync(bool state)
         {
-            DEVLOGGING_STATE = state;
-            string action = state ? "ON" : "OFF";
-            AppendToConsole($"[ACTION] Toggling Debug Logging to {action}...\n");
-
+            if (IsDisposed)
+                return;
+                
             try
             {
+                DEVLOGGING_STATE = state;
+                string action = state ? "ON" : "OFF";
+                AppendToConsole($"[ACTION] Toggling Debug Logging to {action}...\n");
+
+                bool xmlUpdateSuccessful = false;
+                bool driverUpdateSuccessful = false;
+
                 // Update the XML settings first
                 if (IXCLI != null)
                 {
@@ -3143,31 +3579,123 @@ namespace VDD_Control
                         string xmlPath = Path.Combine(registryFilePath, "vdd_settings.xml");
                         IXCLI.SaveToXml(xmlPath);
                         AppendToConsole($"[SUCCESS] Updated XML settings for Debug Logging: {state}\n");
+                        xmlUpdateSuccessful = true;
                     }
                     catch (Exception xmlEx)
                     {
                         AppendToConsole($"[WARNING] Could not save XML settings: {xmlEx.Message}\n");
+                        // Try alternate location
+                        try
+                        {
+                            string localXmlPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "vdd_settings.xml");
+                            IXCLI.SaveToXml(localXmlPath);
+                            AppendToConsole($"[SUCCESS] Saved XML settings to alternate location: {localXmlPath}\n");
+                            xmlUpdateSuccessful = true;
+                        }
+                        catch (Exception altEx)
+                        {
+                            AppendToConsole($"[ERROR] Failed to save to alternate location: {altEx.Message}\n");
+                        }
                     }
                 }
 
-                // Now update the driver
-                string command = state ? "LOG_DEBUG true" : "LOG_DEBUG false";
-                string? response = await SendCommandToDriver(command);
+                // Update the driver
+                try
+                {
+                    string command = state ? "LOG_DEBUG true" : "LOG_DEBUG false";
+                    string? response = await SendCommandToDriver(command);
+                    
+                    if (response != null && !response.StartsWith("[ERROR]"))
+                    {
+                        driverUpdateSuccessful = true;
+                        AppendToConsole($"[SUCCESS] Driver debug logging setting updated\n");
+                    }
+                    else
+                    {
+                        AppendToConsole($"[WARNING] Driver response indicated an issue: {response}\n");
+                    }
+                }
+                catch (Exception driverEx)
+                {
+                    AppendToConsole($"[ERROR] Failed to send command to driver: {driverEx.Message}\n");
+                }
+
+                // Update UI on the UI thread
+                if (InvokeRequired)
+                {
+                    Invoke(new Action(() => {
+                        // Set menu item checked state to match
+                        if (devModeLoggingToolStripMenuItem != null)
+                            devModeLoggingToolStripMenuItem.Checked = state;
+                        if (devModeLoggingToolStripMenuItem1 != null)
+                            devModeLoggingToolStripMenuItem1.Checked = state;
+                    }));
+                }
+                else
+                {
+                    // Set menu item checked state to match
+                    if (devModeLoggingToolStripMenuItem != null)
+                        devModeLoggingToolStripMenuItem.Checked = state;
+                    if (devModeLoggingToolStripMenuItem1 != null)
+                        devModeLoggingToolStripMenuItem1.Checked = state;
+                }
+
+                // Provide appropriate feedback
+                if (xmlUpdateSuccessful && driverUpdateSuccessful)
+                {
+                    AppendToConsole($"[SUCCESS] Debug Logging is now {action}\n");
+                }
+                else if (xmlUpdateSuccessful)
+                {
+                    AppendToConsole($"[WARNING] Debug Logging setting saved to XML only, driver update failed\n");
+                }
+                else if (driverUpdateSuccessful)
+                {
+                    AppendToConsole($"[WARNING] Debug Logging changed in driver only, XML save failed\n");
+                }
+                else
+                {
+                    AppendToConsole($"[ERROR] Failed to change Debug Logging setting\n");
+                }
             }
             catch (Exception ex)
             {
-                AppendToConsole($"[ERROR] Could not set debug logging: {ex.Message}\n");
+                AppendToConsole($"[ERROR] Failed to set debug logging: {ex.Message}\n");
+                if (ex.InnerException != null)
+                {
+                    AppendToConsole($"[DETAIL] Inner exception: {ex.InnerException.Message}\n");
+                }
+            }
+        }
+        
+        // Keep the void method for backward compatibility, but now it properly calls the async Task method
+        private async void SetDebugLoggingCommand(bool state)
+        {
+            try
+            {
+                await SetDebugLoggingCommandAsync(state);
+            }
+            catch (Exception ex)
+            {
+                AppendToConsole($"[ERROR] Unexpected error in SetDebugLoggingCommand: {ex.Message}\n");
+                System.Diagnostics.Debug.WriteLine($"SetDebugLoggingCommand error: {ex.Message}");
             }
         }
 
-        private async void SetLoggingCommand(bool state)
+        private async Task SetLoggingCommandAsync(bool state)
         {
-            LOGGING_STATE = state;
-            string action = state ? "ON" : "OFF";
-            AppendToConsole($"[ACTION] Toggling General Logging to {action}...\n");
-
+            if (IsDisposed)
+                return;
+                
             try
             {
+                LOGGING_STATE = state;
+                string action = state ? "ON" : "OFF";
+                AppendToConsole($"[ACTION] Toggling General Logging to {action}...\n");
+
+                bool xmlUpdateSuccessful = false;
+                bool driverUpdateSuccessful = false;
+
                 // Update the XML settings first
                 if (IXCLI != null)
                 {
@@ -3178,40 +3706,170 @@ namespace VDD_Control
                         string xmlPath = Path.Combine(registryFilePath, "vdd_settings.xml");
                         IXCLI.SaveToXml(xmlPath);
                         AppendToConsole($"[SUCCESS] Updated XML settings for Logging: {state}\n");
+                        xmlUpdateSuccessful = true;
                     }
                     catch (Exception xmlEx)
                     {
                         AppendToConsole($"[WARNING] Could not save XML settings: {xmlEx.Message}\n");
+                        // Try alternate location
+                        try
+                        {
+                            string localXmlPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "vdd_settings.xml");
+                            IXCLI.SaveToXml(localXmlPath);
+                            AppendToConsole($"[SUCCESS] Saved XML settings to alternate location: {localXmlPath}\n");
+                            xmlUpdateSuccessful = true;
+                        }
+                        catch (Exception altEx)
+                        {
+                            AppendToConsole($"[ERROR] Failed to save to alternate location: {altEx.Message}\n");
+                        }
                     }
                 }
 
                 // Now update the driver
-                string command = state ? "LOGGING true" : "LOGGING false";
-                string? response = await SendCommandToDriver(command);
+                try
+                {
+                    string command = state ? "LOGGING true" : "LOGGING false";
+                    string? response = await SendCommandToDriver(command);
+                    
+                    if (response != null && !response.StartsWith("[ERROR]"))
+                    {
+                        driverUpdateSuccessful = true;
+                        AppendToConsole($"[SUCCESS] Driver logging setting updated\n");
+                    }
+                    else
+                    {
+                        AppendToConsole($"[WARNING] Driver response indicated an issue: {response}\n");
+                    }
+                }
+                catch (Exception driverEx)
+                {
+                    AppendToConsole($"[ERROR] Failed to send command to driver: {driverEx.Message}\n");
+                }
+
+                // Update UI on the UI thread
+                if (InvokeRequired)
+                {
+                    Invoke(new Action(() => {
+                        // Set menu item checked state to match
+                        if (userModeLoggingToolStripMenuItem != null)
+                            userModeLoggingToolStripMenuItem.Checked = state;
+                        if (userModeLoggingToolStripMenuItem1 != null)
+                            userModeLoggingToolStripMenuItem1.Checked = state;
+                    }));
+                }
+                else
+                {
+                    // Set menu item checked state to match
+                    if (userModeLoggingToolStripMenuItem != null)
+                        userModeLoggingToolStripMenuItem.Checked = state;
+                    if (userModeLoggingToolStripMenuItem1 != null)
+                        userModeLoggingToolStripMenuItem1.Checked = state;
+                }
+
+                // Provide appropriate feedback
+                if (xmlUpdateSuccessful && driverUpdateSuccessful)
+                {
+                    AppendToConsole($"[SUCCESS] Logging is now {action}\n");
+                }
+                else if (xmlUpdateSuccessful)
+                {
+                    AppendToConsole($"[WARNING] Logging setting saved to XML only, driver update failed\n");
+                }
+                else if (driverUpdateSuccessful)
+                {
+                    AppendToConsole($"[WARNING] Logging changed in driver only, XML save failed\n");
+                }
+                else
+                {
+                    AppendToConsole($"[ERROR] Failed to change Logging setting\n");
+                }
             }
             catch (Exception ex)
             {
                 AppendToConsole($"[ERROR] Could not set logging: {ex.Message}\n");
+                if (ex.InnerException != null)
+                {
+                    AppendToConsole($"[DETAIL] Inner exception: {ex.InnerException.Message}\n");
+                }
+            }
+        }
+        
+        // Keep the void method for backward compatibility, but now it properly calls the async Task method
+        private async void SetLoggingCommand(bool state)
+        {
+            try
+            {
+                await SetLoggingCommandAsync(state);
+            }
+            catch (Exception ex)
+            {
+                AppendToConsole($"[ERROR] Unexpected error in SetLoggingCommand: {ex.Message}\n");
+                System.Diagnostics.Debug.WriteLine($"SetLoggingCommand error: {ex.Message}");
             }
         }
 
         // Runtime Information Commands
-        private async void GetD3DDeviceGPUCommand()
+        private async Task GetD3DDeviceGPUCommandAsync()
         {
-            AppendToConsole("[ACTION] Retrieving D3D GPU information...\n");
-            UpdateTaskProgress("Getting D3D GPU Info", 50);
-
+            if (IsDisposed)
+                return;
+                
             try
             {
+                // Thread-safe console updates
+                AppendToConsole("[ACTION] Retrieving D3D GPU information...\n");
+                UpdateTaskProgress("Getting D3D GPU Info", 50);
+
+                // Send command to driver
                 string? response = await SendCommandToDriver("D3DDEVICEGPU");
+                
+                // Complete progress after operation success
                 UpdateTaskProgress("Getting D3D GPU Info", 100);
+                
+                // Use proper await pattern
                 await Task.Delay(1000);
-                UpdateTaskProgress("", 0);
+                
+                // Update UI operations in a thread-safe way
+                if (InvokeRequired)
+                {
+                    await Task.Run(() => this.Invoke(new Action(() => 
+                        UpdateTaskProgress("", 0))));
+                }
+                else
+                {
+                    UpdateTaskProgress("", 0);
+                }
             }
             catch (Exception ex)
             {
                 AppendToConsole($"[ERROR] Failed to get D3D GPU info: {ex.Message}\n");
-                UpdateTaskProgress("Getting D3D GPU Info", 0);
+                
+                // Reset progress in case of error
+                if (InvokeRequired)
+                {
+                    await Task.Run(() => this.Invoke(new Action(() => 
+                        UpdateTaskProgress("Getting D3D GPU Info", 0))));
+                }
+                else
+                {
+                    UpdateTaskProgress("Getting D3D GPU Info", 0);
+                }
+            }
+        }
+        
+        // Backward compatibility wrapper
+        private async void GetD3DDeviceGPUCommand()
+        {
+            try
+            {
+                await GetD3DDeviceGPUCommandAsync();
+            }
+            catch (Exception ex)
+            {
+                AppendToConsole($"[ERROR] Unexpected error in GetD3DDeviceGPUCommand: {ex.Message}\n");
+                System.Diagnostics.Debug.WriteLine($"GetD3DDeviceGPUCommand error: {ex.Message}");
+                UpdateTaskProgress("", 0); // Reset progress in case of error
             }
         }
 
@@ -3293,27 +3951,49 @@ namespace VDD_Control
         }
         private async Task SendCommandFromInput()
         {
-            if (string.IsNullOrWhiteSpace(userInput.Text))
+            if (IsDisposed || userInput == null || string.IsNullOrWhiteSpace(userInput.Text))
                 return;
 
+            // Capture input text and clear it immediately to prevent double submissions
             string command = userInput.Text.Trim();
+            
+            // Thread-safe UI update
+            if (InvokeRequired)
+            {
+                Invoke(new Action(() => userInput.Text = string.Empty));
+            }
+            else
+            {
+                userInput.Text = string.Empty;
+            }
+            
+            // Log the command
             AppendToConsole($"[COMMAND] {command}\n");
 
-            // Handle special commands
-            if (command.Equals("HELP", StringComparison.OrdinalIgnoreCase))
+            try
             {
-                DisplayHelpCommand();
-                userInput.Text = string.Empty;
-                return;
-            }
+                // Handle special commands
+                if (command.Equals("HELP", StringComparison.OrdinalIgnoreCase))
+                {
+                    DisplayHelpCommand();
+                    return;
+                }
 
-            // Parse command parts
-            string[] parts = command.Split(' ');
-            string baseCommand = parts[0].ToUpper();
+                // Parse command parts
+                string[] parts = command.Split(' ');
+                string baseCommand = parts[0].ToUpper();
 
-            // Handle all pipeline commands
-            switch (baseCommand)
-            {
+                // Use a SemaphoreSlim to limit concurrent command execution
+                // This prevents race conditions when multiple commands affect the same state
+                using (var commandSemaphore = new SemaphoreSlim(1, 1))
+                {
+                    await commandSemaphore.WaitAsync();
+                    
+                    try
+                    {
+                        // Handle all pipeline commands
+                        switch (baseCommand)
+                        {
                 // Driver Control Commands
                 case "RESTART_DRIVER":
                     // Using the existing Device Manager restart
@@ -3534,6 +4214,32 @@ namespace VDD_Control
                         UpdateTaskProgress("", 0);
                     }
                     break;
+                }
+                    }
+                    finally
+                    {
+                        // Release the semaphore to allow other commands to execute
+                        commandSemaphore.Release();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                AppendToConsole($"[ERROR] Failed to process command: {ex.Message}\n");
+                System.Diagnostics.Debug.WriteLine($"SendCommandFromInput error: {ex.Message}");
+                
+                // Make sure the input is cleared even if an error occurs
+                if (userInput != null && !IsDisposed)
+                {
+                    if (InvokeRequired)
+                    {
+                        Invoke(new Action(() => userInput.Text = string.Empty));
+                    }
+                    else
+                    {
+                        userInput.Text = string.Empty;
+                    }
+                }
             }
         }
 
@@ -3697,22 +4403,52 @@ namespace VDD_Control
         // Helper method to append text to console and ensure scrolling
         private void AppendToConsole(string text)
         {
-            // Append the text to the console
-            mainConsole.AppendText(text);
+            if (mainConsole == null || IsDisposed)
+                return;
 
-            // Ensure the console scrolls to show the latest text
-            mainConsole.SelectionStart = mainConsole.Text.Length;
-            mainConsole.ScrollToCaret();
-            mainConsole.Refresh(); // Force a UI refresh to ensure scrolling happens immediately
+            try
+            {
+                // Check if we need to invoke this on the UI thread
+                if (mainConsole.InvokeRequired)
+                {
+                    mainConsole.BeginInvoke(new Action<string>(AppendToConsole), text);
+                    return;
+                }
+
+                // Append the text to the console
+                mainConsole.AppendText(text);
+
+                // Ensure the console scrolls to show the latest text
+                mainConsole.SelectionStart = mainConsole.Text.Length;
+                mainConsole.ScrollToCaret();
+                mainConsole.Refresh(); // Force a UI refresh to ensure scrolling happens immediately
+            }
+            catch (Exception ex)
+            {
+                // Log to debug output since we can't use the console itself
+                System.Diagnostics.Debug.WriteLine($"Error appending to console: {ex.Message}");
+            }
         }
 
         // Method to display ASCII art animation with proper line-by-line delay
         private async Task DisplayAsciiArtAnimation()
         {
-            // Clear the console first
-            mainConsole.Clear();
+            if (mainConsole == null || IsDisposed)
+                return;
 
-            const int lineDelay = 40; // milliseconds between lines
+            try
+            {
+                // Check if we need to invoke on UI thread
+                if (mainConsole.InvokeRequired)
+                {
+                    mainConsole.Invoke(new Action(async () => await DisplayAsciiArtAnimation()));
+                    return;
+                }
+
+                // Clear the console first
+                mainConsole.Clear();
+
+                const int lineDelay = 40; // milliseconds between lines
 
             // Array of ASCII art lines for animation with explicit line-by-line display
             string[] asciiArtLines = new string[]
@@ -3784,6 +4520,11 @@ namespace VDD_Control
             mainConsole.SelectionStart = mainConsole.Text.Length;
             mainConsole.ScrollToCaret();
             mainConsole.Update();
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error displaying ASCII art: {ex.Message}");
+            }
         }
 
         private void royalMenuStrip1_ItemClicked(object sender, ToolStripItemClickedEventArgs e)
@@ -4080,47 +4821,72 @@ namespace VDD_Control
         }
         private void UpdateAllMenuItemsWithStates()
         {
-            // Simplified debug logging
-            AppendToConsole($"[DEBUG] Updating menu items\n");
+            if (IsDisposed)
+                return;
 
-            // Update primary menu items
-            sDR10bitToolStripMenuItem.Checked = SDR10_STATE;
-            hDRToolStripMenuItem.Checked = HDR10PLUS_STATE;
-            customEDIDToolStripMenuItem.Checked = CUSTOMEDID_STATE;
-            hardwareCursorToolStripMenuItem.Checked = HARDWARECURSOR_STATE;
-            preventMonitorSpoofToolStripMenuItem.Checked = PREVENTEDIDSPOOF_STATE;
-            eDIDCEAOverrideToolStripMenuItem.Checked = EDIDCEAOVERRRIDE_STATE;
+            try
+            {
+                // Check if we need to invoke on UI thread
+                if (InvokeRequired)
+                {
+                    BeginInvoke(new Action(UpdateAllMenuItemsWithStates));
+                    return;
+                }
 
-            // Update secondary menu items (if they exist)
-            if (sDR10bitToolStripMenuItem1 != null)
-                sDR10bitToolStripMenuItem1.Checked = SDR10_STATE;
-            if (hDRToolStripMenuItem1 != null)
-                hDRToolStripMenuItem1.Checked = HDR10PLUS_STATE;
-            if (customEDIDToolStripMenuItem1 != null)
-                customEDIDToolStripMenuItem1.Checked = CUSTOMEDID_STATE;
-            if (hardwareCursorToolStripMenuItem1 != null)
-                hardwareCursorToolStripMenuItem1.Checked = HARDWARECURSOR_STATE;
-            if (preventMonitorSpoofToolStripMenuItem1 != null)
-                preventMonitorSpoofToolStripMenuItem1.Checked = PREVENTEDIDSPOOF_STATE;
-            if (eDIDCEAOverrideToolStripMenuItem1 != null)
-                eDIDCEAOverrideToolStripMenuItem1.Checked = EDIDCEAOVERRRIDE_STATE;
+                // Simplified debug logging
+                AppendToConsole($"[DEBUG] Updating menu items\n");
 
-            // Update logging menu items
-            if (userModeLoggingToolStripMenuItem != null)
-                userModeLoggingToolStripMenuItem.Checked = LOGGING_STATE;
-            if (devModeLoggingToolStripMenuItem != null)
-                devModeLoggingToolStripMenuItem.Checked = DEVLOGGING_STATE;
-            if (userModeLoggingToolStripMenuItem1 != null)
-                userModeLoggingToolStripMenuItem1.Checked = LOGGING_STATE;
-            if (devModeLoggingToolStripMenuItem1 != null)
-                devModeLoggingToolStripMenuItem1.Checked = DEVLOGGING_STATE;
+                // Update primary menu items - add null checks for all items
+                if (sDR10bitToolStripMenuItem != null)
+                    sDR10bitToolStripMenuItem.Checked = SDR10_STATE;
+                if (hDRToolStripMenuItem != null)
+                    hDRToolStripMenuItem.Checked = HDR10PLUS_STATE;
+                if (customEDIDToolStripMenuItem != null)
+                    customEDIDToolStripMenuItem.Checked = CUSTOMEDID_STATE;
+                if (hardwareCursorToolStripMenuItem != null)
+                    hardwareCursorToolStripMenuItem.Checked = HARDWARECURSOR_STATE;
+                if (preventMonitorSpoofToolStripMenuItem != null)
+                    preventMonitorSpoofToolStripMenuItem.Checked = PREVENTEDIDSPOOF_STATE;
+                if (eDIDCEAOverrideToolStripMenuItem != null)
+                    eDIDCEAOverrideToolStripMenuItem.Checked = EDIDCEAOVERRRIDE_STATE;
 
-            // Removed detailed logging of menu states
+                // Update secondary menu items (if they exist)
+                if (sDR10bitToolStripMenuItem1 != null)
+                    sDR10bitToolStripMenuItem1.Checked = SDR10_STATE;
+                if (hDRToolStripMenuItem1 != null)
+                    hDRToolStripMenuItem1.Checked = HDR10PLUS_STATE;
+                if (customEDIDToolStripMenuItem1 != null)
+                    customEDIDToolStripMenuItem1.Checked = CUSTOMEDID_STATE;
+                if (hardwareCursorToolStripMenuItem1 != null)
+                    hardwareCursorToolStripMenuItem1.Checked = HARDWARECURSOR_STATE;
+                if (preventMonitorSpoofToolStripMenuItem1 != null)
+                    preventMonitorSpoofToolStripMenuItem1.Checked = PREVENTEDIDSPOOF_STATE;
+                if (eDIDCEAOverrideToolStripMenuItem1 != null)
+                    eDIDCEAOverrideToolStripMenuItem1.Checked = EDIDCEAOVERRRIDE_STATE;
 
-            // Force UI update
-            mainVisibleMenuStrip.Invalidate();
-            mainVisibleMenuStrip.Update();
-            Application.DoEvents();
+                // Update logging menu items
+                if (userModeLoggingToolStripMenuItem != null)
+                    userModeLoggingToolStripMenuItem.Checked = LOGGING_STATE;
+                if (devModeLoggingToolStripMenuItem != null)
+                    devModeLoggingToolStripMenuItem.Checked = DEVLOGGING_STATE;
+                if (userModeLoggingToolStripMenuItem1 != null)
+                    userModeLoggingToolStripMenuItem1.Checked = LOGGING_STATE;
+                if (devModeLoggingToolStripMenuItem1 != null)
+                    devModeLoggingToolStripMenuItem1.Checked = DEVLOGGING_STATE;
+
+                // Force UI update with null check
+                if (mainVisibleMenuStrip != null)
+                {
+                    mainVisibleMenuStrip.Invalidate();
+                    mainVisibleMenuStrip.Update();
+                }
+                
+                Application.DoEvents();
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error updating menu items: {ex.Message}");
+            }
         }
         private void userModeLoggingToolStripMenuItem1_Click(object sender, EventArgs e)
         {
@@ -4128,11 +4894,28 @@ namespace VDD_Control
         }
         private void SyncAllMenuItemsWithState()
         {
-            // This ensures all menu items are in sync with internal state
-            UpdateAllMenuItemsWithStates();
+            if (IsDisposed)
+                return;
+                
+            try
+            {
+                // Check if we need to invoke on UI thread
+                if (InvokeRequired)
+                {
+                    BeginInvoke(new Action(SyncAllMenuItemsWithState));
+                    return;
+                }
+                
+                // This ensures all menu items are in sync with internal state
+                UpdateAllMenuItemsWithStates();
 
-            // Hide GPU select items as they're deprecated
-            HideSelectGPUMenuItems();
+                // Hide GPU select items as they're deprecated
+                HideSelectGPUMenuItems();
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error syncing menu items: {ex.Message}");
+            }
         }
         private void devModeLoggingToolStripMenuItem1_Click(object sender, EventArgs e)
         {
@@ -4166,6 +4949,60 @@ namespace VDD_Control
 
             // Show the form
             communityScriptsForm.ShowDialog(this);
+        }
+        
+        /// <summary>
+        /// Disposes all child forms when the main form is closing
+        /// </summary>
+        private void DisposeChildForms()
+        {
+            try
+            {
+                // Dispose Community Scripts form if it exists
+                if (communityScriptsForm != null && !communityScriptsForm.IsDisposed)
+                {
+                    try
+                    {
+                        communityScriptsForm.Close();
+                        communityScriptsForm.Dispose();
+                        communityScriptsForm = null;
+                    }
+                    catch (Exception ex)
+                    {
+                        // Just log, don't rethrow as we're in cleanup code
+                        AppendToConsole($"[WARNING] Error disposing Community Scripts form: {ex.Message}\n");
+                    }
+                }
+                
+                // XML Editor form is handled in XMLEditorIntegration.cs through the xmlEditorForm variable
+                // We could call the DisposeXMLEditorForm method, but we'll use reflection for safety
+                try
+                {
+                    // Verify if the xmlEditorForm property exists via reflection
+                    var fieldInfo = this.GetType().GetField("xmlEditorForm", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
+                    
+                    if (fieldInfo != null)
+                    {
+                        var xmlEditor = fieldInfo.GetValue(this) as Form;
+                        if (xmlEditor != null && !xmlEditor.IsDisposed)
+                        {
+                            xmlEditor.Close();
+                            xmlEditor.Dispose();
+                            fieldInfo.SetValue(this, null);
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    // Just log, don't rethrow as we're in cleanup code
+                    AppendToConsole($"[WARNING] Error disposing XML Editor form: {ex.Message}\n");
+                }
+            }
+            catch (Exception ex)
+            {
+                // Just log, don't rethrow as we're in cleanup code
+                AppendToConsole($"[WARNING] Error during form disposal: {ex.Message}\n");
+            }
         }
     }
 }
