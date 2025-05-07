@@ -38,9 +38,11 @@ namespace VDD_Control
         public mainWindow()
         {
             InitializeComponent();
+            InitializeStandardControls(); // Replace ReaLTaiizor controls with standard controls
             SetupMinimizeToTrayMenu();
             InitializeXMLEditorMenuItems(); // Initialize XML Editor menu items
             InitializeOptionsMenu(); // Initialize Options menu
+            InitializeTrayOptionsMenu(); // Initialize Options menu in the tray
 
             ToolStripMenuItem restartItem = GetRestartDriverToolStripMenuItem(); // This is now safe
             string settingsPath = LocateSettingsFile();

@@ -167,36 +167,24 @@ namespace VDD_Control
                 SCRIPTS_FOLDER, 
                 selectedScript);
                 
-            // Display a security warning and confirmation dialog
-            string scriptType = GetScriptTypeDescription(selectedScript);
-            string warningMessage = 
-                $"WARNING: You are about to execute a {scriptType}.\n\n" +
-                "Running scripts from external sources can be a security risk. " +
-                "The script will run with your current user permissions and could potentially:\n\n" +
-                "• Access or modify your files\n" +
-                "• Install software\n" +
-                "• Communicate with external servers\n" +
-                "• Make system changes\n\n" +
-                "Are you sure you want to continue?";
-                
+            // Simple confirmation dialog without security warnings
             DialogResult result = MessageBox.Show(
-                warningMessage,
-                "Security Warning",
+                $"Do you want to run {selectedScript}?",
+                "Run Script",
                 MessageBoxButtons.YesNo,
-                MessageBoxIcon.Warning,
-                MessageBoxDefaultButton.Button2); // Default to "No"
+                MessageBoxIcon.Question);
                 
             if (result != DialogResult.Yes)
             {
                 return; // User canceled execution
             }
             
-            // Perform basic security scan
-            if (!PerformBasicSecurityScan(scriptPath, selectedScript))
+            // Always allow script execution
+            if (!File.Exists(scriptPath))
             {
                 MessageBox.Show(
-                    "The script failed the basic security scan. Execution aborted.",
-                    "Security Warning",
+                    "The script file could not be found.",
+                    "Error",
                     MessageBoxButtons.OK,
                     MessageBoxIcon.Error);
                 return;
@@ -384,85 +372,26 @@ namespace VDD_Control
                 return "script file";
         }
         
-        // Perform a basic security scan on the script
+        // This method always returns true, allowing all scripts to run without security checks
         private bool PerformBasicSecurityScan(string filePath, string fileName)
         {
             try
             {
-                // Check if file exists
+                // Check if file exists (only basic check)
                 if (!File.Exists(filePath))
                 {
                     MessageBox.Show($"File not found: {filePath}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     return false;
                 }
                 
-                // Check file size - limit to 5MB
-                FileInfo fileInfo = new FileInfo(filePath);
-                if (fileInfo.Length > 5 * 1024 * 1024) // 5MB
-                {
-                    MessageBox.Show(
-                        "Script file is too large (>5MB). This could indicate malicious content.",
-                        "Security Warning",
-                        MessageBoxButtons.OK,
-                        MessageBoxIcon.Warning);
-                    return false;
-                }
-                
-                // Basic content scan for PowerShell, BAT and CMD files
-                if (fileName.EndsWith(".ps1", StringComparison.OrdinalIgnoreCase) ||
-                    fileName.EndsWith(".bat", StringComparison.OrdinalIgnoreCase) ||
-                    fileName.EndsWith(".cmd", StringComparison.OrdinalIgnoreCase))
-                {
-                    string content = File.ReadAllText(filePath);
-                    
-                    // Check for potentially dangerous commands
-                    string[] dangerousPatterns = new[] {
-                        "Invoke-Expression", "IEX ", "DownloadString",
-                        "DownloadFile", "Net.WebClient",
-                        "System.Reflection", "GetConstructor", "AddScript",
-                        "Start-Process", "-WindowStyle Hidden",
-                        "Set-MpPreference", "DisableRealTimeMonitoring",
-                        "netsh firewall", "netsh advfirewall",
-                        "reg delete", "reg add",
-                        "del %windir%", "rmdir /s /q %windir%", 
-                        "format", "deltree", "rd /s /q"
-                    };
-                    
-                    List<string> foundPatterns = new List<string>();
-                    foreach (string pattern in dangerousPatterns)
-                    {
-                        if (content.Contains(pattern, StringComparison.OrdinalIgnoreCase))
-                        {
-                            foundPatterns.Add(pattern);
-                        }
-                    }
-                    
-                    if (foundPatterns.Count > 0)
-                    {
-                        string warningList = string.Join("\n• ", foundPatterns);
-                        DialogResult result = MessageBox.Show(
-                            $"Warning: This script contains potentially dangerous commands:\n\n• {warningList}\n\n" +
-                            "These commands could modify system settings or pose security risks.\n\n" +
-                            "Do you still want to run this script?",
-                            "Security Warning",
-                            MessageBoxButtons.YesNo,
-                            MessageBoxIcon.Warning,
-                            MessageBoxDefaultButton.Button2); // Default to No
-                            
-                        if (result != DialogResult.Yes)
-                        {
-                            return false;
-                        }
-                    }
-                }
-                
+                // Always return true - no security checks
                 return true;
             }
             catch (Exception ex)
             {
                 MessageBox.Show(
-                    $"Error scanning script: {ex.Message}",
-                    "Security Scan Error",
+                    $"Error checking file: {ex.Message}",
+                    "Error",
                     MessageBoxButtons.OK,
                     MessageBoxIcon.Error);
                 return false;
@@ -515,21 +444,8 @@ namespace VDD_Control
                             // Get download URL
                             string downloadUrl = item.GetProperty("download_url").GetString();
                             
-                            // For security, don't download .exe files larger than 2MB
-                            if (fileName.EndsWith(".exe", StringComparison.OrdinalIgnoreCase))
-                            {
-                                // Get file size from header if available
-                                HttpResponseMessage headResponse = await client.SendAsync(
-                                    new HttpRequestMessage(HttpMethod.Head, downloadUrl));
-                                    
-                                if (headResponse.Content.Headers.ContentLength.HasValue && 
-                                    headResponse.Content.Headers.ContentLength.Value > 2 * 1024 * 1024)
-                                {
-                                    scriptSyncResults.Add($"Skipped {fileName}: Executable too large (>2MB)");
-                                    skippedCount++;
-                                    continue;
-                                }
-                            }
+                            // Download all files regardless of size
+                            // No size restrictions for executables
                             
                             // Download the file content
                             HttpResponseMessage fileResponse = await client.GetAsync(downloadUrl);
@@ -538,37 +454,8 @@ namespace VDD_Control
                             // Get file content
                             byte[] fileContent = await fileResponse.Content.ReadAsByteArrayAsync();
                             
-                            // For script files, perform a security check before saving
-                            if (fileName.EndsWith(".ps1", StringComparison.OrdinalIgnoreCase) ||
-                                fileName.EndsWith(".bat", StringComparison.OrdinalIgnoreCase) ||
-                                fileName.EndsWith(".cmd", StringComparison.OrdinalIgnoreCase))
-                            {
-                                string textContent = System.Text.Encoding.UTF8.GetString(fileContent);
-                                
-                                // Check for potentially dangerous commands
-                                string[] highRiskPatterns = new[] {
-                                    "format", "deltree", "rd /s /q %windir%", 
-                                    "del %windir%", "rmdir /s /q %windir%",
-                                    "del /f /s /q %systemroot%"
-                                };
-                                
-                                bool containsHighRisk = false;
-                                foreach (string pattern in highRiskPatterns)
-                                {
-                                    if (textContent.Contains(pattern, StringComparison.OrdinalIgnoreCase))
-                                    {
-                                        containsHighRisk = true;
-                                        break;
-                                    }
-                                }
-                                
-                                if (containsHighRisk)
-                                {
-                                    scriptSyncResults.Add($"Skipped {fileName}: Contains potentially dangerous commands");
-                                    skippedCount++;
-                                    continue;
-                                }
-                            }
+                            // Download all script files without security checks
+                            // Removed security checks for script files
                             
                             // Save the validated file to the scripts directory
                             string filePath = Path.Combine(scriptsDirectory, fileName);

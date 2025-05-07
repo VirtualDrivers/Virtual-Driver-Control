@@ -891,6 +891,7 @@ namespace VDD_Control
             minButton.TabIndex = 33;
             minButton.Text = "foreverMinimize1";
             minButton.TextColor = Color.FromArgb(243, 243, 243);
+            minButton.Click += minButton_Click;
             // 
             // closeButton
             // 
@@ -907,6 +908,7 @@ namespace VDD_Control
             closeButton.TabIndex = 3;
             closeButton.Text = "foreverClose1";
             closeButton.TextColor = Color.FromArgb(243, 243, 243);
+            closeButton.Click += closeButton_Click;
             // 
             // scriptsToolStripMenuItem
             // 

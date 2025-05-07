@@ -2,6 +2,8 @@ using System;
 using System.Windows.Forms;
 using System.IO;
 using Microsoft.Win32;
+using System.Reflection;
+using System.Diagnostics;
 
 namespace VDD_Control
 {
@@ -9,6 +11,7 @@ namespace VDD_Control
     {
         private ToolStripMenuItem optionsToolStripMenuItem;
         private ToolStripMenuItem locateDriverInstallationToolStripMenuItem;
+        private ToolStripMenuItem runOnStartupToolStripMenuItem;
         
         /// <summary>
         /// Initializes Options menu items and adds them to the main menu
@@ -31,9 +34,23 @@ namespace VDD_Control
                 Text = "Locate Driver Installation"
             };
             locateDriverInstallationToolStripMenuItem.Click += locateDriverInstallationToolStripMenuItem_Click;
+
+            // Create Run on Startup menu item
+            runOnStartupToolStripMenuItem = new ToolStripMenuItem
+            {
+                Name = "runOnStartupToolStripMenuItem",
+                Size = new System.Drawing.Size(220, 22),
+                Text = "Run on Startup",
+                CheckOnClick = true
+            };
+            runOnStartupToolStripMenuItem.Click += runOnStartupToolStripMenuItem_Click;
+            
+            // Check if app is already set to run at startup and update the menu item checked state
+            runOnStartupToolStripMenuItem.Checked = IsRunAtStartupEnabled();
             
             // Add items to Options menu
             optionsToolStripMenuItem.DropDownItems.Add(locateDriverInstallationToolStripMenuItem);
+            optionsToolStripMenuItem.DropDownItems.Add(runOnStartupToolStripMenuItem);
             
             // Add Options menu to main menu
             if (menuToolStripMenuItem != null && menuToolStripMenuItem.DropDownItems != null)
@@ -75,6 +92,94 @@ namespace VDD_Control
                     
                     mainConsole.AppendText("[INFO] Added Options menu to main menu\n");
                 }
+            }
+        }
+
+        /// <summary>
+        /// Checks if the application is configured to run at startup
+        /// </summary>
+        /// <returns>True if the application is set to run at startup, otherwise false</returns>
+        private bool IsRunAtStartupEnabled()
+        {
+            try
+            {
+                using (RegistryKey? key = Registry.CurrentUser.OpenSubKey(@"SOFTWARE\Microsoft\Windows\CurrentVersion\Run", false))
+                {
+                    if (key != null)
+                    {
+                        string? value = key.GetValue("VirtualDriverControl") as string;
+                        if (!string.IsNullOrEmpty(value))
+                        {
+                            return true;
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                mainConsole.AppendText($"[WARNING] Error checking startup registry: {ex.Message}\n");
+            }
+            
+            return false;
+        }
+
+        /// <summary>
+        /// Enables or disables running the application at startup
+        /// </summary>
+        /// <param name="enable">True to enable run at startup, false to disable</param>
+        private void SetRunAtStartup(bool enable)
+        {
+            try
+            {
+                using (RegistryKey key = Registry.CurrentUser.OpenSubKey(@"SOFTWARE\Microsoft\Windows\CurrentVersion\Run", true))
+                {
+                    if (key != null)
+                    {
+                        if (enable)
+                        {
+                            string appPath = Process.GetCurrentProcess().MainModule.FileName;
+                            key.SetValue("VirtualDriverControl", $"\"{appPath}\"");
+                            mainConsole.AppendText("[INFO] Added application to startup\n");
+                        }
+                        else
+                        {
+                            key.DeleteValue("VirtualDriverControl", false);
+                            mainConsole.AppendText("[INFO] Removed application from startup\n");
+                        }
+                    }
+                }
+            }
+            catch (UnauthorizedAccessException)
+            {
+                MessageBox.Show(
+                    "Cannot update registry - insufficient permissions. Try running the application as administrator.",
+                    "Registry Access Error",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Error);
+            }
+            catch (Exception ex)
+            {
+                mainConsole.AppendText($"[ERROR] Error updating startup registry: {ex.Message}\n");
+                MessageBox.Show(
+                    $"Error updating startup registry: {ex.Message}",
+                    "Registry Error",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Error);
+            }
+        }
+
+        /// <summary>
+        /// Event handler for Run On Startup menu item click
+        /// </summary>
+        private void runOnStartupToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            bool isChecked = ((ToolStripMenuItem)sender).Checked;
+            SetRunAtStartup(isChecked);
+            
+            // Update tray menu item to match
+            if (runOnStartupTrayMenuItem != null)
+            {
+                runOnStartupTrayMenuItem.Checked = isChecked;
             }
         }
         
