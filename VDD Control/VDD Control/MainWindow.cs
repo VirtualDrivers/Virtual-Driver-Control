@@ -1783,8 +1783,8 @@ namespace VDD_Control
         }
         private async void RestartDriverHandler(object sender, EventArgs e)
         {
-            // Don't use fire-and-forget pattern, instead properly await the Task
-            await restartDriverToolStripMenuItem_Click(sender, e);
+            // Use the pipeline RELOAD_DRIVER command instead of PowerShell restart
+            ReloadDriverCommand();
         }
 
         // Helper method to update task progress bar in a thread-safe way
@@ -1836,179 +1836,8 @@ namespace VDD_Control
 
         private async Task restartDriverToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            AppendToConsole("[ACTION] Restarting driver using Device Manager...\n");
-            UpdateTaskProgress("Restarting Driver", 10);
-
-            try
-            {
-                // First disable the driver
-                AppendToConsole("[INFO] Disabling Virtual Display Driver...\n");
-                bool disableSuccess = await DisableDriverWithDeviceManager();
-
-                if (!disableSuccess)
-                {
-                    AppendToConsole("[WARNING] Could not disable the driver through standard methods. Trying direct approach...\n");
-
-                    // Try a more direct approach as a last resort
-                    string directDisableCommand = @"
-                        # Direct disable of ROOT\DISPLAY\0001
-                        try {
-                            $device = Get-PnpDevice -Class Display | Where-Object { $_.InstanceId -eq 'ROOT\DISPLAY\0001' }
-                            if ($device) {
-                                Write-Output ""Found display device ROOT\DISPLAY\0001, attempting direct disable...""
-                                Disable-PnpDevice -InstanceId 'ROOT\DISPLAY\0001' -Confirm:$false -ErrorAction Stop
-                                Write-Output ""SUCCESS: Direct disable succeeded""
-                            } else {
-                                Write-Output ""FAILURE: Could not find ROOT\DISPLAY\0001""
-                            }
-                        } catch {
-                            Write-Output ""FAILURE: $($_.Exception.Message)""
-                        }";
-
-                    string directResult = await RunPowerShellCommand(directDisableCommand);
-
-                    if (directResult.Contains("SUCCESS"))
-                    {
-                        AppendToConsole("[SUCCESS] Driver disabled using alternative approach.\n");
-                        disableSuccess = true;
-                    }
-                    else
-                    {
-                        AppendToConsole("[ERROR] Failed to disable the driver. Cannot restart.\n");
-                        UpdateTaskProgress("Restarting Driver", 0);
-                        return;
-                    }
-                }
-
-                UpdateTaskProgress("Restarting Driver", 40);
-
-                // Give some time for the disable operation to complete
-                AppendToConsole("[INFO] Waiting for disable operation to complete (5 seconds)...\n");
-                await Task.Delay(5000);
-
-                // Now enable the driver
-                AppendToConsole("[INFO] Enabling Virtual Display Driver...\n");
-                bool enableSuccess = await EnableDriverWithDeviceManager();
-
-                if (!enableSuccess)
-                {
-                    AppendToConsole("[WARNING] Failed to enable the driver through standard methods. Trying direct approach...\n");
-
-                    // Try a more direct approach as a last resort
-                    string directEnableCommand = @"
-                        # Try all possible approaches to enable the display device
-                        $success = $false
-                        
-                        # Approach 1: Try ROOT\DISPLAY\0001
-                        try {
-                            Write-Output ""Approach 1: Trying ROOT\DISPLAY\0001""
-                            Enable-PnpDevice -InstanceId 'ROOT\DISPLAY\0001' -Confirm:$false -ErrorAction Stop
-                            Write-Output ""SUCCESS: ROOT\DISPLAY\0001 enabled""
-                            $success = $true
-                        } catch {
-                            Write-Output ""Approach 1 failed: $($_.Exception.Message)""
-                        }
-                        
-                        # Approach 2: Try any disabled display device
-                        if (-not $success) {
-                            try {
-                                $device = Get-PnpDevice -Class Display -Status 'Error','Disabled' | Select-Object -First 1
-                                if ($device) {
-                                    Write-Output ""Approach 2: Trying $($device.InstanceId)""
-                                    Enable-PnpDevice -InstanceId $device.InstanceId -Confirm:$false -ErrorAction Stop
-                                    Write-Output ""SUCCESS: $($device.InstanceId) enabled""
-                                    $success = $true
-                                } else {
-                                    Write-Output ""Approach 2 failed: No disabled display devices found""
-                                }
-                            } catch {
-                                Write-Output ""Approach 2 failed: $($_.Exception.Message)""
-                            }
-                        }
-                        
-                        # Approach 3: Try to scan for hardware changes and then enable
-                        if (-not $success) {
-                            try {
-                                Write-Output ""Approach 3: Scanning for hardware changes""
-                                $null = pnputil /scan-devices
-                                Start-Sleep -Seconds 3
-                                
-                                # Try to find and enable ROOT\DISPLAY\0001 again
-                                Enable-PnpDevice -InstanceId 'ROOT\DISPLAY\0001' -Confirm:$false -ErrorAction Stop
-                                Write-Output ""SUCCESS: Scan and enable worked""
-                                $success = $true
-                            } catch {
-                                Write-Output ""Approach 3 failed: $($_.Exception.Message)""
-                            }
-                        }
-                        
-                        if ($success) {
-                            Write-Output ""OVERALL_SUCCESS: At least one approach worked""
-                        } else {
-                            Write-Output ""OVERALL_FAILURE: All approaches failed""
-                        }";
-
-                    string directResult = await RunPowerShellCommand(directEnableCommand);
-
-                    if (directResult.Contains("SUCCESS"))
-                    {
-                        AppendToConsole("[SUCCESS] Driver enabled using alternative approach.\n");
-                        enableSuccess = true;
-                    }
-                    else
-                    {
-                        AppendToConsole("[ERROR] All attempts to enable the driver failed. Restart incomplete.\n");
-                        UpdateTaskProgress("Restarting Driver", 0);
-                        return;
-                    }
-                }
-
-                UpdateTaskProgress("Restarting Driver", 70);
-
-                // Wait for the driver to fully initialize
-                AppendToConsole("[INFO] Waiting for driver to initialize (10 seconds)...\n");
-                await Task.Delay(10000);
-                UpdateTaskProgress("Restarting Driver", 80);
-
-                AppendToConsole("[INFO] Attempting to connect to restarted driver...\n");
-
-                // Make multiple reconnection attempts
-                bool reconnected = false;
-                for (int attempt = 1; attempt <= 5; attempt++)
-                {
-                    if (await TryConnectToDriver())
-                    {
-                        reconnected = true;
-                        break;
-                    }
-                    else
-                    {
-                        AppendToConsole($"[INFO] Connection attempt {attempt}/5 failed. Retrying after delay...\n");
-                        await Task.Delay(2000); // Wait between reconnection attempts
-                    }
-                }
-
-                if (reconnected)
-                {
-                    AppendToConsole("[SUCCESS] Driver restarted and reconnected successfully.\n");
-                    UpdateTaskProgress("Restarting Driver", 100);
-                    await Task.Delay(1000); // Show 100% for a moment
-                    this.BeginInvoke(new Action(() => UpdateTaskProgress("", 0))); // Clear task progress
-                }
-                else
-                {
-                    AppendToConsole("[INFO] Driver appears restarted, but connection could not be established.\n");
-                    AppendToConsole("[INFO] This is normal if the driver is in a different mode or if reconnection was too quick.\n");
-                    UpdateTaskProgress("Restarting Driver", 100);
-                    await Task.Delay(1000); // Show 100% for a moment
-                    this.BeginInvoke(new Action(() => UpdateTaskProgress("", 0))); // Clear task progress
-                }
-            }
-            catch (Exception ex)
-            {
-                AppendToConsole($"[ERROR] Error restarting driver: {ex.Message}\n");
-                UpdateTaskProgress("Restarting Driver", 0);
-            }
+            // Use the pipeline RELOAD_DRIVER command instead of PowerShell restart
+            ReloadDriverCommand();
         }
 
         private async Task<bool> DisableDriverWithDeviceManager()
@@ -3429,9 +3258,8 @@ namespace VDD_Control
 
         private void restartDriverToolStripMenuItem2_Click(object sender, EventArgs e)
         {
-            // Call the restartDriverToolStripMenuItem_Click method directly
-            // Can't await an async void method
-            _ = restartDriverToolStripMenuItem_Click(sender, e);
+            // Use the pipeline RELOAD_DRIVER command instead of PowerShell restart
+            ReloadDriverCommand();
         }
 
         private void userModeLoggingToolStripMenuItem_Click(object sender, EventArgs e)
@@ -3503,8 +3331,8 @@ namespace VDD_Control
             helpText.AppendLine("Available Commands:");
             helpText.AppendLine("------------------");
             helpText.AppendLine("HELP                   - Displays this help information");
-            helpText.AppendLine("RESTART_DRIVER         - Restarts the system virtual distplay driver");
-            helpText.AppendLine("RELOAD_DRIVER          - Asks the driver to reload itself.");
+            helpText.AppendLine("RESTART_DRIVER         - Reloads the driver using the pipeline");
+            helpText.AppendLine("RELOAD_DRIVER          - Asks the driver to reload itself");
             helpText.AppendLine("SDR10 [true/false]     - Enable/disable SDR 10-bit mode");
             helpText.AppendLine("HDRPLUS [true/false]   - Enable/disable HDR+ mode");
             helpText.AppendLine("CUSTOMEDID [true/false]- Enable/disable custom EDID");
@@ -3998,9 +3826,9 @@ namespace VDD_Control
                         {
                 // Driver Control Commands
                 case "RESTART_DRIVER":
-                    // Using the existing Device Manager restart
+                    // Use the pipeline RELOAD_DRIVER command instead of PowerShell restart
                     userInput.Text = string.Empty;
-                    await restartDriverToolStripMenuItem_Click(null, EventArgs.Empty);
+                    ReloadDriverCommand();
                     return;
 
                 case "RELOAD_DRIVER":
@@ -4546,9 +4374,9 @@ namespace VDD_Control
 
         private async void restartAllButton_Click(object sender, EventArgs e)
         {
-            // Use the existing restart method but ensure we await it properly
+            // Use the pipeline RELOAD_DRIVER command instead of PowerShell restart
             AppendToConsole("[INFO] Restart button clicked. Initiating driver restart...\n");
-            await restartDriverToolStripMenuItem_Click(sender, e);
+            ReloadDriverCommand();
             AppendToConsole("[INFO] Restart operation complete.\n");
         }
 
