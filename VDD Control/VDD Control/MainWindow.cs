@@ -1260,85 +1260,6 @@ namespace VDD_Control
         {
             const int maxAttempts = 5;
             int attempt = 0;
-            bool driverServiceRunning = false;
-            string serviceOutput = "";
-
-            // First, check if the driver service is running
-            try
-            {
-                using (Process process = new Process
-                {
-                    StartInfo = new ProcessStartInfo
-                    {
-                        FileName = "sc.exe",
-                        Arguments = "query VirtualDisplayDriver",
-                        RedirectStandardOutput = true,
-                        UseShellExecute = false,
-                        CreateNoWindow = true
-                    }
-                })
-                {
-                    process.Start();
-                    serviceOutput = await process.StandardOutput.ReadToEndAsync();
-                    await process.WaitForExitAsync();
-                    
-                    // Check if service exists and is running
-                    driverServiceRunning = serviceOutput.Contains("STATE") && serviceOutput.Contains("RUNNING");
-                    
-                    if (!driverServiceRunning)
-                    {
-                        if (serviceOutput.Contains("specified service does not exist"))
-                        {
-                            AppendToConsole("[ERROR] Virtual Display Driver service is not installed\n");
-                            AppendToConsole("[RECOVERY] Please install the driver first\n");
-                            
-                            // Set the flag to indicate driver is not installed
-                            driverNotInstalled = true;
-                        }
-                        else if (serviceOutput.Contains("STOPPED"))
-                        {
-                            AppendToConsole("[WARNING] Virtual Display Driver service is installed but stopped\n");
-                            AppendToConsole("[RECOVERY] Attempting to start the service...\n");
-                            
-                            // Try to start the service
-                            using (Process startProcess = new Process
-                            {
-                                StartInfo = new ProcessStartInfo
-                                {
-                                    FileName = "sc.exe",
-                                    Arguments = "start VirtualDisplayDriver",
-                                    RedirectStandardOutput = true,
-                                    UseShellExecute = false,
-                                    CreateNoWindow = true
-                                }
-                            })
-                            {
-                                startProcess.Start();
-                                string startOutput = await startProcess.StandardOutput.ReadToEndAsync();
-                                await startProcess.WaitForExitAsync();
-                                
-                                if (startOutput.Contains("SUCCESS") || startOutput.Contains("started"))
-                                {
-                                    AppendToConsole("[SUCCESS] Started the driver service\n");
-                                    AppendToConsole("[INFO] Waiting for service to initialize...\n");
-                                    await Task.Delay(3000); // Wait for service to initialize
-                                    driverServiceRunning = true;
-                                }
-                                else
-                                {
-                                    AppendToConsole($"[ERROR] Failed to start driver service: {startOutput}\n");
-                                    AppendToConsole("[RECOVERY] Try starting the service manually or reinstall the driver\n");
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-            catch (Exception serviceEx)
-            {
-                AppendToConsole($"[WARNING] Could not check driver service status: {serviceEx.Message}\n");
-                // Continue anyway, we'll try to connect to the pipe
-            }
 
             // If we already know the driver is not installed, return immediately
             if (driverNotInstalled)
@@ -1346,25 +1267,10 @@ namespace VDD_Control
                 return false;
             }
 
-            // If service is not running and we couldn't start it,
-            // check if we should continue trying to connect
-            if (!driverServiceRunning)
-            {
-                // If the service explicitly doesn't exist, don't try to connect to the pipe
-                if (!serviceOutput.Contains("specified service does not exist"))
-                {
-                    // Only attempt to connect to the pipe if the service exists but might be in some other state
-                    AppendToConsole("[INFO] Driver service may not be running, but will attempt pipe connection anyway\n");
-                }
-                else
-                {
-                    // Driver doesn't exist, no point in trying to connect
-                    AppendToConsole("[INFO] Driver service doesn't exist - skipping pipe connection attempt\n");
-                    return false;
-                }
-            }
+            // Skip service checks and directly try to connect to the named pipe
+            AppendToConsole("[INFO] Attempting to connect to driver via named pipe...\n");
 
-            // Now try to connect to the named pipe
+            // Try to connect to the named pipe
             while (attempt < maxAttempts)
             {
                 try
@@ -1419,10 +1325,10 @@ namespace VDD_Control
 
                 if (attempt >= maxAttempts)
                 {
-                    AppendToConsole("[ERROR] Unable to connect after multiple attempts\n");
+                    AppendToConsole("[ERROR] Unable to connect to the driver after multiple attempts\n");
                     AppendToConsole("[RECOVERY] Please check if the driver is installed and running:\n");
                     AppendToConsole("  1. Verify driver installation in Device Manager\n");
-                    AppendToConsole("  2. Check Windows Services for VirtualDisplayDriver service\n");
+                    AppendToConsole("  2. Make sure the driver is running and has created the named pipe\n");
                     AppendToConsole("  3. Try restarting your computer\n");
                     return false;
                 }
@@ -1518,14 +1424,6 @@ namespace VDD_Control
 
                 // If logging is enabled, try to get status from driver
                 string? response = await SendCommandToDriver("STATUS");
-
-                // Check if the error indicates the driver isn't installed
-                if (response != null && response.Contains("not installed"))
-                {
-                    // Mark driver as not installed to avoid future attempts
-                    driverNotInstalled = true;
-                    return GetFeatureStatusFromXml(featureName);
-                }
                 
                 if (string.IsNullOrEmpty(response) || response.StartsWith("[ERROR]"))
                 {
@@ -4428,7 +4326,7 @@ namespace VDD_Control
             // Add version information
             Label versionLabel = new Label
             {
-                Text = "Version 25.5.2",
+                Text = "Version 25.5.19",
                 Font = new Font("Consolas", 10),
                 ForeColor = Color.White,
                 TextAlign = ContentAlignment.MiddleCenter,
