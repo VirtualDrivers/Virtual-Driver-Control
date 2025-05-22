@@ -1143,12 +1143,14 @@ namespace VDD_Control
             // Try to connect to the driver once at initialization
             if (await TryConnectToDriver())
             {
-                AppendToConsole("[SUCCESS] Connected to the driver.\n");
+                AppendToConsole("[SUCCESS] Virtual Display Driver is installed and running.\n");
                 // Icon is already updated to Connected state in TryConnectToDriver() method
             }
             else
             {
-                AppendToConsole("[WARNING] Could not verify driver connection. Ensure the driver is running.\n");
+                AppendToConsole("[WARNING] Virtual Display Driver is not detected or not responding.\n");
+                AppendToConsole("[INFO] The driver may not be installed, or may be starting up.\n");
+                AppendToConsole("[INFO] You can still configure settings - they will be applied when the driver starts.\n");
                 // Icon is already updated to Disconnected state in TryConnectToDriver() method
             }
         }
@@ -1353,17 +1355,35 @@ namespace VDD_Control
                         // Wait for the connection with a timeout
                         if (await Task.WhenAny(connectTask, Task.Delay(3000)) == connectTask)
                         {
-                            // Connection successful
-                            AppendToConsole("[SUCCESS] Connected to driver pipe\n");
-                            
-                            // If we successfully connect, we know the driver is installed,
-                            // so clear the flag in case it was previously set
-                            driverNotInstalled = false;
-                            
-                            // Update icon to connected state
-                            UpdateNotificationIcon(ConnectionStatus.Connected);
-                            
-                            return true;
+                            // Connection successful - but let's verify we can actually write to the pipe
+                            try
+                            {
+                                // Try to write a simple test command to verify the pipe is actually functional
+                                var utf16LeEncoding = new UnicodeEncoding(bigEndian: false, byteOrderMark: false);
+                                using (var writer = new StreamWriter(pipeClient, utf16LeEncoding, leaveOpen: true))
+                                {
+                                    await writer.WriteLineAsync("PING");
+                                    await writer.FlushAsync();
+                                }
+                                
+                                // If we can write without exception, the pipe is valid
+                                AppendToConsole("[SUCCESS] Connected to Virtual Display Driver pipe\n");
+                                
+                                // If we successfully connect, we know the driver is installed,
+                                // so clear the flag in case it was previously set
+                                driverNotInstalled = false;
+                                
+                                // Update icon to connected state
+                                UpdateNotificationIcon(ConnectionStatus.Connected);
+                                
+                                return true;
+                            }
+                            catch (Exception writeEx)
+                            {
+                                AppendToConsole($"[ERROR] Pipe exists but cannot communicate: {writeEx.Message}\n");
+                                UpdateNotificationIcon(ConnectionStatus.Disconnected);
+                                return false;
+                            }
                         }
                         else
                         {
