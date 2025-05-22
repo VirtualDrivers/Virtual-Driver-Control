@@ -20,6 +20,8 @@
 
   <ItemGroup>
     <Content Include="Virtual Display Driver.ico" />
+    <Content Include="VDD_Red.ico" />
+    <Content Include="VDD_Yellow.ico" />
   </ItemGroup>
 
   <ItemGroup>

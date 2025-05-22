@@ -212,7 +212,7 @@ namespace VDD_Control
             if (notificationIcon == null)
             {
                 // Use the existing notificationIcon control from the form
-                notificationIcon.Text = "Virtual Display Driver Control";
+                notificationIcon.Text = "Virtual Driver Control";
 
                 // Make sure the context menu has Show option
                 bool hasShowOption = false;
@@ -383,7 +383,7 @@ namespace VDD_Control
             // Display notification
             notificationIcon.ShowBalloonTip(
                 2000,
-                "Virtual Display Driver Control",
+                "Virtual Driver Control",
                 "Application minimized to tray. Double-click to restore.",
                 ToolTipIcon.Info
             );
@@ -1134,16 +1134,22 @@ namespace VDD_Control
                 AppendToConsole("An error occurred while retrieving system information:\n" + ex.Message + "\n"); // This really shouldn't happen. But probably will.
             }
 
-            AppendToConsole("Virtual Display Driver Control Initialized.\n");
+            AppendToConsole("Virtual Driver Control Initialized.\n");
 
+
+            // Set initial icon to connecting state
+            UpdateNotificationIcon(ConnectionStatus.Connecting);
+            
             // Try to connect to the driver once at initialization
             if (await TryConnectToDriver())
             {
                 AppendToConsole("[SUCCESS] Connected to the driver.\n");
+                // Icon is already updated to Connected state in TryConnectToDriver() method
             }
             else
             {
                 AppendToConsole("[WARNING] Could not verify driver connection. Ensure the driver is running.\n");
+                // Icon is already updated to Disconnected state in TryConnectToDriver() method
             }
         }
 
@@ -1256,6 +1262,64 @@ namespace VDD_Control
             return foundPath;
         }
 
+        // Method to update application icons based on connection status
+        private void UpdateNotificationIcon(ConnectionStatus status)
+        {
+            Icon statusIcon;
+            string statusText = "Virtual Driver Control"; // Default value to prevent unassigned variable error
+
+            // Use embedded resources directly instead of file system
+            switch (status)
+            {
+                case ConnectionStatus.Connected:
+                    statusIcon = Properties.Resources.IconGreen;
+                    statusText = "Virtual Driver Control - Connected";
+                    break;
+                case ConnectionStatus.Connecting:
+                    statusIcon = Properties.Resources.IconYellow;
+                    statusText = "Virtual Driver Control - Connecting...";
+                    break;
+                case ConnectionStatus.Disconnected:
+                    statusIcon = Properties.Resources.IconRed;
+                    statusText = "Virtual Driver Control - Disconnected";
+                    break;
+                default:
+                    statusIcon = Properties.Resources.IconGreen;
+                    statusText = "Virtual Driver Control";
+                    break;
+            }
+            
+            try
+            {
+                // Update system tray icon - keep status in the tooltip
+                notificationIcon.Icon = statusIcon;
+                notificationIcon.Text = statusText;
+                
+                // Update the main form icon
+                this.Icon = statusIcon;
+                
+                // Update form title - just the app name without status
+                mainTheme.Text = "Virtual Driver Control";
+                
+                // Ensure UI updates are processed
+                Application.DoEvents();
+            }
+            catch (Exception ex)
+            {
+                // Silently handle any exceptions without console output to keep the output clean
+                System.Diagnostics.Debug.WriteLine($"Error updating icon: {ex.Message}");
+            }
+        }
+
+        // Enum for connection status to make code more readable
+        private enum ConnectionStatus
+        {
+            Connected,
+            Connecting,
+            Disconnected
+        }
+        
+
         private async Task<bool> TryConnectToDriver()
         {
             const int maxAttempts = 5;
@@ -1264,11 +1328,15 @@ namespace VDD_Control
             // If we already know the driver is not installed, return immediately
             if (driverNotInstalled)
             {
+                UpdateNotificationIcon(ConnectionStatus.Disconnected);
                 return false;
             }
 
             // Skip service checks and directly try to connect to the named pipe
             AppendToConsole("[INFO] Attempting to connect to driver via named pipe...\n");
+            
+            // Set icon to connecting state
+            UpdateNotificationIcon(ConnectionStatus.Connecting);
 
             // Try to connect to the named pipe
             while (attempt < maxAttempts)
@@ -1291,6 +1359,9 @@ namespace VDD_Control
                             // If we successfully connect, we know the driver is installed,
                             // so clear the flag in case it was previously set
                             driverNotInstalled = false;
+                            
+                            // Update icon to connected state
+                            UpdateNotificationIcon(ConnectionStatus.Connected);
                             
                             return true;
                         }
@@ -1330,6 +1401,10 @@ namespace VDD_Control
                     AppendToConsole("  1. Verify driver installation in Device Manager\n");
                     AppendToConsole("  2. Make sure the driver is running and has created the named pipe\n");
                     AppendToConsole("  3. Try restarting your computer\n");
+                    
+                    // Update icon to disconnected state
+                    UpdateNotificationIcon(ConnectionStatus.Disconnected);
+                    
                     return false;
                 }
 
@@ -1343,10 +1418,16 @@ namespace VDD_Control
 
         private async Task<string?> SendCommandToDriver(string command)
         {
+            // Set icon to connecting state when we try to send a command
+            UpdateNotificationIcon(ConnectionStatus.Connecting);
+            
             bool driverConnected = await TryConnectToDriver();
             
             if (!driverConnected) 
             {
+                // Update icon to disconnected state
+                UpdateNotificationIcon(ConnectionStatus.Disconnected);
+                
                 // We can't check serviceOutput here since it's not accessible from this method
                 // Instead, simply set failure message
                 return "[ERROR] Connection failed: The driver may be off or restarting.";
@@ -1375,6 +1456,8 @@ namespace VDD_Control
                         {
                             if ((DateTime.UtcNow - startTime).TotalSeconds > 5)
                             {
+                                // If timeout occurs, update icon to show disconnected state
+                                UpdateNotificationIcon(ConnectionStatus.Disconnected);
                                 return null; // Handle whatever error handling here, I've just returned null for now
                             }
                             response = await reader.ReadLineAsync();
@@ -1384,6 +1467,9 @@ namespace VDD_Control
                         {
                             int index = response.IndexOf("[COMPANION]") + 11;
                             response = response.Substring(index).Trim();
+                            
+                            // Since we got a valid response, ensure the connected icon is shown
+                            UpdateNotificationIcon(ConnectionStatus.Connected);
                         }
                         //AppendToConsole($"[{command}] Response: {response}\n");
 
@@ -1393,6 +1479,8 @@ namespace VDD_Control
             }
             catch (Exception ex)
             {
+                // If an exception occurs during communication, update icon to show disconnected state
+                UpdateNotificationIcon(ConnectionStatus.Disconnected);
                 return $"[ERROR] Sending command failed: {ex.Message}";
             }
         }
@@ -1786,6 +1874,14 @@ namespace VDD_Control
                 if (result == "SUCCESS" || result.Contains("SUCCESS"))
                 {
                     AppendToConsole("[INFO] Driver disabled successfully through Device Manager.\n");
+                    
+                    // Flag driver as not installed to avoid connection attempts
+                    driverNotInstalled = true;
+                    
+                    // Set icon to red to indicate driver is disabled
+                    UpdateNotificationIcon(ConnectionStatus.Disconnected);
+                    AppendToConsole("[DEBUG] Set icon to disconnected state after disabling driver\n");
+                    
                     return true;
                 }
                 else if (result == "CANCELLED")
@@ -2918,6 +3014,11 @@ namespace VDD_Control
                 {
                     AppendToConsole("[SUCCESS] Virtual Display Driver disabled successfully.\n");
                     UpdateTaskProgress("Disabling Driver", 100);
+                    
+                    // Explicitly set icon to red (disconnected) when driver is disabled
+                    UpdateNotificationIcon(ConnectionStatus.Disconnected);
+                    AppendToConsole("[DEBUG] Updated icon to disconnected status after disabling driver\n");
+                    
                     await Task.Delay(1000); // Show 100% for a moment
                     this.BeginInvoke(new Action(() => UpdateTaskProgress("", 0))); // Clear task progress
                 }
@@ -2925,6 +3026,9 @@ namespace VDD_Control
                 {
                     AppendToConsole("[ERROR] Failed to disable Virtual Display Driver.\n");
                     UpdateTaskProgress("Disabling Driver", 0);
+                    
+                    // Try to check actual connection status after failed disable attempt
+                    TryConnectToDriver().ConfigureAwait(false);
                 }
             }
             catch (Exception ex)
@@ -3138,6 +3242,11 @@ namespace VDD_Control
                 {
                     AppendToConsole("[SUCCESS] Virtual Display Driver disabled successfully.\n");
                     UpdateTaskProgress("Disabling Driver", 100);
+                    
+                    // Explicitly set icon to red (disconnected) when driver is disabled
+                    UpdateNotificationIcon(ConnectionStatus.Disconnected);
+                    AppendToConsole("[DEBUG] Updated icon to disconnected status after disabling driver\n");
+                    
                     await Task.Delay(1000); // Show 100% for a moment
                     this.BeginInvoke(new Action(() => UpdateTaskProgress("", 0))); // Clear task progress
                 }
@@ -3145,6 +3254,9 @@ namespace VDD_Control
                 {
                     AppendToConsole("[ERROR] Failed to disable Virtual Display Driver.\n");
                     UpdateTaskProgress("Disabling Driver", 0);
+                    
+                    // Try to check actual connection status after failed disable attempt
+                    TryConnectToDriver().ConfigureAwait(false);
                 }
             }
             catch (Exception ex)
@@ -3248,6 +3360,9 @@ namespace VDD_Control
         {
             AppendToConsole("[ACTION] Reloading driver...\n");
             UpdateTaskProgress("Reloading Driver", 50);
+            
+            // Set icon to connecting (yellow) during driver reload
+            UpdateNotificationIcon(ConnectionStatus.Connecting);
 
             try
             {
@@ -3255,11 +3370,21 @@ namespace VDD_Control
                 UpdateTaskProgress("Reloading Driver", 100);
                 await Task.Delay(1000);
                 UpdateTaskProgress("", 0);
+                
+                // After reload, verify connection and update icon accordingly
+                bool connected = await TryConnectToDriver();
+                if (!connected)
+                {
+                    AppendToConsole("[WARNING] Driver reloaded but connection could not be verified. Check driver status.\n");
+                }
             }
             catch (Exception ex)
             {
                 AppendToConsole($"[ERROR] Failed to reload driver: {ex.Message}\n");
                 UpdateTaskProgress("Reloading Driver", 0);
+                
+                // Set icon to disconnected (red) on error
+                UpdateNotificationIcon(ConnectionStatus.Disconnected);
             }
         }
 
