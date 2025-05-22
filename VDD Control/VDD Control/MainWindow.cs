@@ -32,6 +32,10 @@ namespace VDD_Control
         private bool LOGGING_STATE = false;
         private bool DEVLOGGING_STATE = false;
 
+        // Connection monitoring
+        private System.Windows.Forms.Timer? connectionCheckTimer;
+        private bool lastKnownConnectionState = false;
+
         //Above can be changed when the reading logic is implemented, Perhaps have a call function to dynamically retrieve each function based off input parameter 
 
 
@@ -1144,6 +1148,7 @@ namespace VDD_Control
             if (await TryConnectToDriver())
             {
                 AppendToConsole("[SUCCESS] Virtual Display Driver is installed and running.\n");
+                lastKnownConnectionState = true;
                 // Icon is already updated to Connected state in TryConnectToDriver() method
             }
             else
@@ -1151,7 +1156,95 @@ namespace VDD_Control
                 AppendToConsole("[WARNING] Virtual Display Driver is not detected or not responding.\n");
                 AppendToConsole("[INFO] The driver may not be installed, or may be starting up.\n");
                 AppendToConsole("[INFO] You can still configure settings - they will be applied when the driver starts.\n");
+                lastKnownConnectionState = false;
                 // Icon is already updated to Disconnected state in TryConnectToDriver() method
+            }
+            
+            // Initialize and start the connection check timer
+            InitializeConnectionCheckTimer();
+        }
+
+        private void InitializeConnectionCheckTimer()
+        {
+            connectionCheckTimer = new System.Windows.Forms.Timer();
+            connectionCheckTimer.Interval = 15000; // 15 seconds
+            connectionCheckTimer.Tick += async (sender, e) => await CheckConnectionStatus();
+            connectionCheckTimer.Start();
+        }
+        
+        private async Task CheckConnectionStatus()
+        {
+            // Don't run if form is disposed
+            if (IsDisposed)
+            {
+                connectionCheckTimer?.Stop();
+                return;
+            }
+            
+            try
+            {
+                // Perform a quick connection check without logging
+                bool isConnected = await QuickConnectionCheck();
+                
+                // Only log if the status has changed
+                if (isConnected != lastKnownConnectionState)
+                {
+                    lastKnownConnectionState = isConnected;
+                    
+                    if (isConnected)
+                    {
+                        AppendToConsole("[STATUS] Virtual Display Driver connected.\n");
+                        UpdateNotificationIcon(ConnectionStatus.Connected);
+                        driverNotInstalled = false; // Clear the flag when connected
+                    }
+                    else
+                    {
+                        AppendToConsole("[STATUS] Virtual Display Driver disconnected.\n");
+                        UpdateNotificationIcon(ConnectionStatus.Disconnected);
+                        driverNotInstalled = true;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                // Silently ignore errors during periodic checks
+                Debug.WriteLine($"Connection check error: {ex.Message}");
+            }
+        }
+        
+        private async Task<bool> QuickConnectionCheck()
+        {
+            try
+            {
+                using (var pipeClient = new NamedPipeClientStream(".", PIPE_NAME, PipeDirection.InOut))
+                {
+                    // Quick connect with short timeout
+                    var connectTask = pipeClient.ConnectAsync(500);
+                    
+                    if (await Task.WhenAny(connectTask, Task.Delay(1000)) == connectTask)
+                    {
+                        // Try to write to verify the pipe is functional
+                        try
+                        {
+                            var utf16LeEncoding = new UnicodeEncoding(bigEndian: false, byteOrderMark: false);
+                            using (var writer = new StreamWriter(pipeClient, utf16LeEncoding, leaveOpen: true))
+                            {
+                                await writer.WriteLineAsync("PING");
+                                await writer.FlushAsync();
+                            }
+                            return true;
+                        }
+                        catch
+                        {
+                            return false;
+                        }
+                    }
+                    return false;
+                }
+            }
+            catch
+            {
+                return false;
             }
         }
 

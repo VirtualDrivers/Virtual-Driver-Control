@@ -10,6 +10,10 @@ namespace VDD_Control
         /// </summary>
         private void closeButton_Click(object sender, EventArgs e)
         {
+            // Stop the connection check timer before closing
+            connectionCheckTimer?.Stop();
+            connectionCheckTimer?.Dispose();
+            
             // Close the application
             Application.Exit();
         }
