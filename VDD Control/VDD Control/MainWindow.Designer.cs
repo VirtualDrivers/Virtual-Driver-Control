@@ -713,7 +713,7 @@ namespace VDD_Control
             patreonMembersListBox.Font = new Font("Consolas", 8.25F, FontStyle.Regular, GraphicsUnit.Point);
             patreonMembersListBox.ForeColor = SystemColors.Window;
             patreonMembersListBox.FormattingEnabled = true;
-            patreonMembersListBox.Items.AddRange(new object[] { "- Gabriel Posso", "- Adam Cohen" });
+            patreonMembersListBox.Items.AddRange(new object[] { "- Gabriel Posso", "- Adam Cohen", "- Tara M" });
             patreonMembersListBox.Location = new Point(6, 22);
             patreonMembersListBox.Name = "patreonMembersListBox";
             patreonMembersListBox.Size = new Size(236, 78);
