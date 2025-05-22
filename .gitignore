@@ -405,3 +405,4 @@ CLAUDE.md
 ISSUES.md
 VDD Control/BuildPortable.bat
 *.exe
+/VDD Control/Virtual-Display-Driver
