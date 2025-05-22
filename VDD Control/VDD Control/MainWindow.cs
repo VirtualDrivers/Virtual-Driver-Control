@@ -4564,7 +4564,7 @@ namespace VDD_Control
             // Add version information
             Label versionLabel = new Label
             {
-                Text = "Version 25.5.19",
+                Text = "Version 25.5.22",
                 Font = new Font("Consolas", 10),
                 ForeColor = Color.White,
                 TextAlign = ContentAlignment.MiddleCenter,
@@ -4969,6 +4969,95 @@ namespace VDD_Control
                 // Just log, don't rethrow as we're in cleanup code
                 AppendToConsole($"[WARNING] Error during form disposal: {ex.Message}\n");
             }
+        }
+
+        // Windows Tools Event Handlers
+        private void displaySettingsToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                AppendToConsole("[ACTION] Opening Display Settings...\n");
+                Process.Start(new ProcessStartInfo
+                {
+                    FileName = "ms-settings:display",
+                    UseShellExecute = true
+                });
+            }
+            catch (Exception ex)
+            {
+                AppendToConsole($"[ERROR] Failed to open Display Settings: {ex.Message}\n");
+            }
+        }
+
+        private void displaySettingsToolStripMenuItem1_Click(object sender, EventArgs e)
+        {
+            displaySettingsToolStripMenuItem_Click(sender, e);
+        }
+
+        private void deviceManagerToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                AppendToConsole("[ACTION] Opening Device Manager...\n");
+                Process.Start(new ProcessStartInfo
+                {
+                    FileName = "devmgmt.msc",
+                    UseShellExecute = true
+                });
+            }
+            catch (Exception ex)
+            {
+                AppendToConsole($"[ERROR] Failed to open Device Manager: {ex.Message}\n");
+            }
+        }
+
+        private void deviceManagerToolStripMenuItem1_Click(object sender, EventArgs e)
+        {
+            deviceManagerToolStripMenuItem_Click(sender, e);
+        }
+
+        private void soundSettingsToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                AppendToConsole("[ACTION] Opening Sound Settings...\n");
+                Process.Start(new ProcessStartInfo
+                {
+                    FileName = "ms-settings:sound",
+                    UseShellExecute = true
+                });
+            }
+            catch (Exception ex)
+            {
+                AppendToConsole($"[ERROR] Failed to open Sound Settings: {ex.Message}\n");
+            }
+        }
+
+        private void soundSettingsToolStripMenuItem1_Click(object sender, EventArgs e)
+        {
+            soundSettingsToolStripMenuItem_Click(sender, e);
+        }
+
+        private void systemInformationToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                AppendToConsole("[ACTION] Opening System Information...\n");
+                Process.Start(new ProcessStartInfo
+                {
+                    FileName = "msinfo32.exe",
+                    UseShellExecute = true
+                });
+            }
+            catch (Exception ex)
+            {
+                AppendToConsole($"[ERROR] Failed to open System Information: {ex.Message}\n");
+            }
+        }
+
+        private void systemInformationToolStripMenuItem1_Click(object sender, EventArgs e)
+        {
+            systemInformationToolStripMenuItem_Click(sender, e);
         }
     }
 }

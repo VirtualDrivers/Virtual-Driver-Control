@@ -42,6 +42,11 @@ namespace VDD_Control
             getGPUInformationToolStripMenuItem1 = new ToolStripMenuItem();
             getCPUInformationToolStripMenuItem1 = new ToolStripMenuItem();
             getAudioInformationToolStripMenuItem1 = new ToolStripMenuItem();
+            windowsToolsToolStripMenuItem1 = new ToolStripMenuItem();
+            displaySettingsToolStripMenuItem1 = new ToolStripMenuItem();
+            deviceManagerToolStripMenuItem1 = new ToolStripMenuItem();
+            soundSettingsToolStripMenuItem1 = new ToolStripMenuItem();
+            systemInformationToolStripMenuItem1 = new ToolStripMenuItem();
             virtualDisplayDriverToolStripMenuItem1 = new ToolStripMenuItem();
             sDR10bitToolStripMenuItem1 = new ToolStripMenuItem();
             hDRToolStripMenuItem1 = new ToolStripMenuItem();
@@ -119,6 +124,11 @@ namespace VDD_Control
             sunshineScriptsToolStripMenuItem = new ToolStripMenuItem();
             communityScriptsToolStripMenuItem = new ToolStripMenuItem();
             sunshineScriptsToolStripMenuItem1 = new ToolStripMenuItem();
+            windowsToolsToolStripMenuItem = new ToolStripMenuItem();
+            displaySettingsToolStripMenuItem = new ToolStripMenuItem();
+            deviceManagerToolStripMenuItem = new ToolStripMenuItem();
+            soundSettingsToolStripMenuItem = new ToolStripMenuItem();
+            systemInformationToolStripMenuItem = new ToolStripMenuItem();
             loggingToolStripMenuItem1 = new ToolStripMenuItem();
             userModeLoggingToolStripMenuItem1 = new ToolStripMenuItem();
             devModeLoggingToolStripMenuItem1 = new ToolStripMenuItem();
@@ -162,7 +172,7 @@ namespace VDD_Control
             // 
             // toolsToolStripMenuItem1
             // 
-            toolsToolStripMenuItem1.DropDownItems.AddRange(new ToolStripItem[] { getDisplayInformationToolStripMenuItem1, getGPUInformationToolStripMenuItem1, getCPUInformationToolStripMenuItem1, getAudioInformationToolStripMenuItem1, communityScriptsToolStripMenuItem });
+            toolsToolStripMenuItem1.DropDownItems.AddRange(new ToolStripItem[] { getDisplayInformationToolStripMenuItem1, getGPUInformationToolStripMenuItem1, getCPUInformationToolStripMenuItem1, getAudioInformationToolStripMenuItem1, communityScriptsToolStripMenuItem, windowsToolsToolStripMenuItem1 });
             toolsToolStripMenuItem1.Name = "toolsToolStripMenuItem1";
             toolsToolStripMenuItem1.Size = new Size(183, 22);
             toolsToolStripMenuItem1.Text = "Tools";
@@ -194,6 +204,41 @@ namespace VDD_Control
             getAudioInformationToolStripMenuItem1.Size = new Size(199, 22);
             getAudioInformationToolStripMenuItem1.Text = "Get Audio Information";
             getAudioInformationToolStripMenuItem1.Click += getAudioInformationToolStripMenuItem1_Click_1;
+            // 
+            // windowsToolsToolStripMenuItem1
+            // 
+            windowsToolsToolStripMenuItem1.DropDownItems.AddRange(new ToolStripItem[] { displaySettingsToolStripMenuItem1, deviceManagerToolStripMenuItem1, soundSettingsToolStripMenuItem1, systemInformationToolStripMenuItem1 });
+            windowsToolsToolStripMenuItem1.Name = "windowsToolsToolStripMenuItem1";
+            windowsToolsToolStripMenuItem1.Size = new Size(199, 22);
+            windowsToolsToolStripMenuItem1.Text = "Windows Tools";
+            // 
+            // displaySettingsToolStripMenuItem1
+            // 
+            displaySettingsToolStripMenuItem1.Name = "displaySettingsToolStripMenuItem1";
+            displaySettingsToolStripMenuItem1.Size = new Size(219, 22);
+            displaySettingsToolStripMenuItem1.Text = "Display Settings";
+            displaySettingsToolStripMenuItem1.Click += displaySettingsToolStripMenuItem1_Click;
+            // 
+            // deviceManagerToolStripMenuItem1
+            // 
+            deviceManagerToolStripMenuItem1.Name = "deviceManagerToolStripMenuItem1";
+            deviceManagerToolStripMenuItem1.Size = new Size(219, 22);
+            deviceManagerToolStripMenuItem1.Text = "Device Manager";
+            deviceManagerToolStripMenuItem1.Click += deviceManagerToolStripMenuItem1_Click;
+            // 
+            // soundSettingsToolStripMenuItem1
+            // 
+            soundSettingsToolStripMenuItem1.Name = "soundSettingsToolStripMenuItem1";
+            soundSettingsToolStripMenuItem1.Size = new Size(219, 22);
+            soundSettingsToolStripMenuItem1.Text = "Sound Settings";
+            soundSettingsToolStripMenuItem1.Click += soundSettingsToolStripMenuItem1_Click;
+            // 
+            // systemInformationToolStripMenuItem1
+            // 
+            systemInformationToolStripMenuItem1.Name = "systemInformationToolStripMenuItem1";
+            systemInformationToolStripMenuItem1.Size = new Size(219, 22);
+            systemInformationToolStripMenuItem1.Text = "System Information";
+            systemInformationToolStripMenuItem1.Click += systemInformationToolStripMenuItem1_Click;
             // 
             // virtualDisplayDriverToolStripMenuItem1
             // 
@@ -530,7 +575,7 @@ namespace VDD_Control
             // 
             // toolsToolStripMenuItem
             // 
-            toolsToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { getGPUInformationToolStripMenuItem, getCPUInformationToolStripMenuItem, getDisplayInformationToolStripMenuItem2, getAudioInformationToolStripMenuItem, scriptsToolStripMenuItem });
+            toolsToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { getGPUInformationToolStripMenuItem, getCPUInformationToolStripMenuItem, getDisplayInformationToolStripMenuItem2, getAudioInformationToolStripMenuItem, scriptsToolStripMenuItem, windowsToolsToolStripMenuItem });
             toolsToolStripMenuItem.ForeColor = SystemColors.ButtonFace;
             toolsToolStripMenuItem.Name = "toolsToolStripMenuItem";
             toolsToolStripMenuItem.Size = new Size(47, 20);
@@ -571,6 +616,43 @@ namespace VDD_Control
             getAudioInformationToolStripMenuItem.Size = new Size(199, 22);
             getAudioInformationToolStripMenuItem.Text = "Get Audio Information";
             getAudioInformationToolStripMenuItem.Click += getAudioInformationToolStripMenuItem_Click;
+            // 
+            // windowsToolsToolStripMenuItem
+            // 
+            windowsToolsToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { displaySettingsToolStripMenuItem, deviceManagerToolStripMenuItem, soundSettingsToolStripMenuItem, systemInformationToolStripMenuItem });
+            windowsToolsToolStripMenuItem.DisplayStyle = ToolStripItemDisplayStyle.Text;
+            windowsToolsToolStripMenuItem.Font = new Font("Segoe UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
+            windowsToolsToolStripMenuItem.Name = "windowsToolsToolStripMenuItem";
+            windowsToolsToolStripMenuItem.Size = new Size(199, 22);
+            windowsToolsToolStripMenuItem.Text = "Windows Tools";
+            // 
+            // displaySettingsToolStripMenuItem
+            // 
+            displaySettingsToolStripMenuItem.Name = "displaySettingsToolStripMenuItem";
+            displaySettingsToolStripMenuItem.Size = new Size(219, 22);
+            displaySettingsToolStripMenuItem.Text = "Display Settings";
+            displaySettingsToolStripMenuItem.Click += displaySettingsToolStripMenuItem_Click;
+            // 
+            // deviceManagerToolStripMenuItem
+            // 
+            deviceManagerToolStripMenuItem.Name = "deviceManagerToolStripMenuItem";
+            deviceManagerToolStripMenuItem.Size = new Size(219, 22);
+            deviceManagerToolStripMenuItem.Text = "Device Manager";
+            deviceManagerToolStripMenuItem.Click += deviceManagerToolStripMenuItem_Click;
+            // 
+            // soundSettingsToolStripMenuItem
+            // 
+            soundSettingsToolStripMenuItem.Name = "soundSettingsToolStripMenuItem";
+            soundSettingsToolStripMenuItem.Size = new Size(219, 22);
+            soundSettingsToolStripMenuItem.Text = "Sound Settings";
+            soundSettingsToolStripMenuItem.Click += soundSettingsToolStripMenuItem_Click;
+            // 
+            // systemInformationToolStripMenuItem
+            // 
+            systemInformationToolStripMenuItem.Name = "systemInformationToolStripMenuItem";
+            systemInformationToolStripMenuItem.Size = new Size(219, 22);
+            systemInformationToolStripMenuItem.Text = "System Information";
+            systemInformationToolStripMenuItem.Click += systemInformationToolStripMenuItem_Click;
             // 
             // mainConsole
             // 
@@ -1086,5 +1168,15 @@ namespace VDD_Control
         private ToolStripMenuItem loggingToolStripMenuItem1;
         private ToolStripMenuItem userModeLoggingToolStripMenuItem1;
         private ToolStripMenuItem devModeLoggingToolStripMenuItem1;
+        private ToolStripMenuItem windowsToolsToolStripMenuItem;
+        private ToolStripMenuItem windowsToolsToolStripMenuItem1;
+        private ToolStripMenuItem displaySettingsToolStripMenuItem;
+        private ToolStripMenuItem displaySettingsToolStripMenuItem1;
+        private ToolStripMenuItem deviceManagerToolStripMenuItem;
+        private ToolStripMenuItem deviceManagerToolStripMenuItem1;
+        private ToolStripMenuItem soundSettingsToolStripMenuItem;
+        private ToolStripMenuItem soundSettingsToolStripMenuItem1;
+        private ToolStripMenuItem systemInformationToolStripMenuItem;
+        private ToolStripMenuItem systemInformationToolStripMenuItem1;
     }
 }
