@@ -67,6 +67,14 @@ namespace VDD_Control
             enableDriverToolStripMenuItem3 = new ToolStripMenuItem();
             disableDriverToolStripMenuItem3 = new ToolStripMenuItem();
             restartDriverToolStripMenuItem3 = new ToolStripMenuItem();
+            installDriverToolStripMenuItem = new ToolStripMenuItem();
+            installDriverToolStripMenuItem1 = new ToolStripMenuItem();
+            installDriverToolStripMenuItem2 = new ToolStripMenuItem();
+            installDriverToolStripMenuItem3 = new ToolStripMenuItem();
+            uninstallDriverToolStripMenuItem = new ToolStripMenuItem();
+            uninstallDriverToolStripMenuItem1 = new ToolStripMenuItem();
+            uninstallDriverToolStripMenuItem2 = new ToolStripMenuItem();
+            uninstallDriverToolStripMenuItem3 = new ToolStripMenuItem();
             menuToolStripMenuItem = new ToolStripMenuItem();
             toolStripMenuItem1 = new ToolStripMenuItem();
             exitToolStripMenuItem = new ToolStripMenuItem();
@@ -305,7 +313,7 @@ namespace VDD_Control
             // 
             // systemToolStripMenuItem1
             // 
-            systemToolStripMenuItem1.DropDownItems.AddRange(new ToolStripItem[] { enableDriverToolStripMenuItem2, disableDriverToolStripMenuItem2, restartDriverToolStripMenuItem2 });
+            systemToolStripMenuItem1.DropDownItems.AddRange(new ToolStripItem[] { enableDriverToolStripMenuItem2, disableDriverToolStripMenuItem2, restartDriverToolStripMenuItem2, installDriverToolStripMenuItem2, uninstallDriverToolStripMenuItem2 });
             systemToolStripMenuItem1.Name = "systemToolStripMenuItem1";
             systemToolStripMenuItem1.Size = new Size(194, 22);
             systemToolStripMenuItem1.Text = "System";
@@ -331,6 +339,20 @@ namespace VDD_Control
             restartDriverToolStripMenuItem2.Text = "Restart Driver";
             restartDriverToolStripMenuItem2.Click += restartDriverToolStripMenuItem2_Click;
             // 
+            // installDriverToolStripMenuItem2
+            // 
+            installDriverToolStripMenuItem2.Name = "installDriverToolStripMenuItem2";
+            installDriverToolStripMenuItem2.Size = new Size(146, 22);
+            installDriverToolStripMenuItem2.Text = "Install Driver";
+            installDriverToolStripMenuItem2.Click += InstallDriverHandler;
+            // 
+            // uninstallDriverToolStripMenuItem2
+            // 
+            uninstallDriverToolStripMenuItem2.Name = "uninstallDriverToolStripMenuItem2";
+            uninstallDriverToolStripMenuItem2.Size = new Size(146, 22);
+            uninstallDriverToolStripMenuItem2.Text = "Uninstall Driver";
+            uninstallDriverToolStripMenuItem2.Click += UninstallDriverHandler;
+            // 
             // aboutToolStripMenuItem1
             // 
             aboutToolStripMenuItem1.Name = "aboutToolStripMenuItem1";
@@ -354,7 +376,7 @@ namespace VDD_Control
             // 
             // systemToolStripMenuItem2
             // 
-            systemToolStripMenuItem2.DropDownItems.AddRange(new ToolStripItem[] { enableDriverToolStripMenuItem3, disableDriverToolStripMenuItem3, restartDriverToolStripMenuItem3 });
+            systemToolStripMenuItem2.DropDownItems.AddRange(new ToolStripItem[] { enableDriverToolStripMenuItem3, disableDriverToolStripMenuItem3, restartDriverToolStripMenuItem3, installDriverToolStripMenuItem3, uninstallDriverToolStripMenuItem3 });
             systemToolStripMenuItem2.Name = "systemToolStripMenuItem2";
             systemToolStripMenuItem2.Size = new Size(112, 22);
             systemToolStripMenuItem2.Text = "System";
@@ -377,6 +399,20 @@ namespace VDD_Control
             restartDriverToolStripMenuItem3.Name = "restartDriverToolStripMenuItem3";
             restartDriverToolStripMenuItem3.Size = new Size(146, 22);
             restartDriverToolStripMenuItem3.Text = "Restart Driver";
+            // 
+            // installDriverToolStripMenuItem3
+            // 
+            installDriverToolStripMenuItem3.Name = "installDriverToolStripMenuItem3";
+            installDriverToolStripMenuItem3.Size = new Size(146, 22);
+            installDriverToolStripMenuItem3.Text = "Install Driver";
+            installDriverToolStripMenuItem3.Click += InstallDriverHandler;
+            // 
+            // uninstallDriverToolStripMenuItem3
+            // 
+            uninstallDriverToolStripMenuItem3.Name = "uninstallDriverToolStripMenuItem3";
+            uninstallDriverToolStripMenuItem3.Size = new Size(146, 22);
+            uninstallDriverToolStripMenuItem3.Text = "Uninstall Driver";
+            uninstallDriverToolStripMenuItem3.Click += UninstallDriverHandler;
             // 
             // menuToolStripMenuItem
             // 
@@ -471,7 +507,7 @@ namespace VDD_Control
             // 
             // enableToolStripMenuItem
             // 
-            enableToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { enableDriverToolStripMenuItem, disableDriverToolStripMenuItem, restartDriverToolStripMenuItem });
+            enableToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { enableDriverToolStripMenuItem, disableDriverToolStripMenuItem, restartDriverToolStripMenuItem, installDriverToolStripMenuItem, uninstallDriverToolStripMenuItem });
             enableToolStripMenuItem.Name = "enableToolStripMenuItem";
             enableToolStripMenuItem.Size = new Size(194, 22);
             enableToolStripMenuItem.Text = "System";
@@ -497,6 +533,20 @@ namespace VDD_Control
             restartDriverToolStripMenuItem.Size = new Size(146, 22);
             restartDriverToolStripMenuItem.Text = "Restart Driver";
             restartDriverToolStripMenuItem.Click += RestartDriverHandler;
+            // 
+            // installDriverToolStripMenuItem
+            // 
+            installDriverToolStripMenuItem.Name = "installDriverToolStripMenuItem";
+            installDriverToolStripMenuItem.Size = new Size(146, 22);
+            installDriverToolStripMenuItem.Text = "Install Driver";
+            installDriverToolStripMenuItem.Click += InstallDriverHandler;
+            // 
+            // uninstallDriverToolStripMenuItem
+            // 
+            uninstallDriverToolStripMenuItem.Name = "uninstallDriverToolStripMenuItem";
+            uninstallDriverToolStripMenuItem.Size = new Size(146, 22);
+            uninstallDriverToolStripMenuItem.Text = "Uninstall Driver";
+            uninstallDriverToolStripMenuItem.Click += UninstallDriverHandler;
             // 
             // loggingToolStripMenuItem
             // 
@@ -529,7 +579,7 @@ namespace VDD_Control
             // 
             // systemToolStripMenuItem
             // 
-            systemToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { enableDriverToolStripMenuItem1, disableDriverToolStripMenuItem1, restartDriverToolStripMenuItem1 });
+            systemToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { enableDriverToolStripMenuItem1, disableDriverToolStripMenuItem1, restartDriverToolStripMenuItem1, installDriverToolStripMenuItem1, uninstallDriverToolStripMenuItem1 });
             systemToolStripMenuItem.Name = "systemToolStripMenuItem";
             systemToolStripMenuItem.Size = new Size(112, 22);
             systemToolStripMenuItem.Text = "System";
@@ -553,6 +603,20 @@ namespace VDD_Control
             restartDriverToolStripMenuItem1.Size = new Size(146, 22);
             restartDriverToolStripMenuItem1.Text = "Restart Driver";
             restartDriverToolStripMenuItem1.Click += RestartDriverHandler;
+            // 
+            // installDriverToolStripMenuItem1
+            // 
+            installDriverToolStripMenuItem1.Name = "installDriverToolStripMenuItem1";
+            installDriverToolStripMenuItem1.Size = new Size(146, 22);
+            installDriverToolStripMenuItem1.Text = "Install Driver";
+            installDriverToolStripMenuItem1.Click += InstallDriverHandler;
+            // 
+            // uninstallDriverToolStripMenuItem1
+            // 
+            uninstallDriverToolStripMenuItem1.Name = "uninstallDriverToolStripMenuItem1";
+            uninstallDriverToolStripMenuItem1.Size = new Size(146, 22);
+            uninstallDriverToolStripMenuItem1.Text = "Uninstall Driver";
+            uninstallDriverToolStripMenuItem1.Click += UninstallDriverHandler;
             // 
             // aboutToolStripMenuItem
             // 
@@ -1123,6 +1187,14 @@ namespace VDD_Control
         private ToolStripMenuItem enableDriverToolStripMenuItem3;
         private ToolStripMenuItem disableDriverToolStripMenuItem3;
         private ToolStripMenuItem restartDriverToolStripMenuItem3;
+        private ToolStripMenuItem installDriverToolStripMenuItem;
+        private ToolStripMenuItem installDriverToolStripMenuItem1;
+        private ToolStripMenuItem installDriverToolStripMenuItem2;
+        private ToolStripMenuItem installDriverToolStripMenuItem3;
+        private ToolStripMenuItem uninstallDriverToolStripMenuItem;
+        private ToolStripMenuItem uninstallDriverToolStripMenuItem1;
+        private ToolStripMenuItem uninstallDriverToolStripMenuItem2;
+        private ToolStripMenuItem uninstallDriverToolStripMenuItem3;
         private ToolStripMenuItem exitToolStripMenuItem2;
         private RichTextBox mainConsole;
         private ToolStripMenuItem toolsToolStripMenuItem1;

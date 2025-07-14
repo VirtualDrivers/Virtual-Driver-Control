@@ -49,6 +49,17 @@ namespace VDD_Control
             InitializeTrayOptionsMenu(); // Initialize Options menu in the tray
 
             ToolStripMenuItem restartItem = GetRestartDriverToolStripMenuItem(); // This is now safe
+            
+            // Show admin status in console
+            if (IsRunningAsAdministrator())
+            {
+                AppendToConsole("[INFO] Application started with administrator privileges\n");
+            }
+            else
+            {
+                AppendToConsole("[WARNING] Application running without administrator privileges - some features may be limited\n");
+            }
+            
             string settingsPath = LocateSettingsFile();
 
             try
@@ -1886,6 +1897,16 @@ namespace VDD_Control
             ReloadDriverCommand();
         }
 
+        private async void InstallDriverHandler(object sender, EventArgs e)
+        {
+            InstallDriverCommand();
+        }
+
+        private async void UninstallDriverHandler(object sender, EventArgs e)
+        {
+            UninstallDriverCommand();
+        }
+
         // Helper method to update task progress bar in a thread-safe way
         private void UpdateTaskProgress(string taskName, int progressValue, int maxValue = 100)
         {
@@ -3456,6 +3477,8 @@ namespace VDD_Control
             helpText.AppendLine("HELP                   - Displays this help information");
             helpText.AppendLine("RESTART_DRIVER         - Reloads the driver using the pipeline");
             helpText.AppendLine("RELOAD_DRIVER          - Asks the driver to reload itself");
+            helpText.AppendLine("INSTALL_DRIVER         - Install the Virtual Display Driver");
+            helpText.AppendLine("UNINSTALL_DRIVER       - Uninstall the Virtual Display Driver");
             helpText.AppendLine("SDR10 [true/false]     - Enable/disable SDR 10-bit mode");
             helpText.AppendLine("HDRPLUS [true/false]   - Enable/disable HDR+ mode");
             helpText.AppendLine("CUSTOMEDID [true/false]- Enable/disable custom EDID");
@@ -3498,6 +3521,333 @@ namespace VDD_Control
                 
                 // Set icon to disconnected (red) on error
                 UpdateNotificationIcon(ConnectionStatus.Disconnected);
+            }
+        }
+
+        private async void InstallDriverCommand()
+        {
+            AppendToConsole("[ACTION] Installing Virtual Display Driver...\n");
+            UpdateTaskProgress("Installing Driver", 25);
+
+            try
+            {
+                // Check if running as administrator
+                bool isAdmin = IsRunningAsAdministrator();
+                if (!isAdmin)
+                {
+                    AppendToConsole("[ERROR] Administrator privileges required for driver installation.\n");
+                    AppendToConsole("[INFO] Please run the application as administrator and try again.\n");
+                    UpdateTaskProgress("Installing Driver", 0);
+                    return;
+                }
+
+                // Get paths to required files
+                string currentDir = AppDomain.CurrentDomain.BaseDirectory;
+                string devconPath = Path.Combine(currentDir, "Dependencies", "devcon.exe");
+                string driverDir = Path.Combine(currentDir, "SignedDriverx86");
+                string infPath = Path.Combine(driverDir, "MttVDD.inf");
+
+                AppendToConsole($"[INFO] Working directory: {currentDir}\n");
+
+                // Verify files exist
+                if (!File.Exists(devconPath))
+                {
+                    AppendToConsole($"[ERROR] devcon.exe not found at: {devconPath}\n");
+                    UpdateTaskProgress("Installing Driver", 0);
+                    return;
+                }
+
+                if (!File.Exists(infPath))
+                {
+                    AppendToConsole($"[ERROR] Driver INF file not found at: {infPath}\n");
+                    UpdateTaskProgress("Installing Driver", 0);
+                    return;
+                }
+
+                AppendToConsole($"[INFO] Using devcon.exe from: {devconPath}\n");
+                AppendToConsole($"[INFO] Installing driver from: {infPath}\n");
+                
+                // Create C:\VirtualDisplayDriver folder and copy settings
+                string targetConfigDir = @"C:\VirtualDisplayDriver";
+                string sourceConfigPath = Path.Combine(driverDir, "vdd_settings.xml");
+                string targetConfigPath = Path.Combine(targetConfigDir, "vdd_settings.xml");
+
+                try
+                {
+                    if (!Directory.Exists(targetConfigDir))
+                    {
+                        Directory.CreateDirectory(targetConfigDir);
+                        AppendToConsole($"[INFO] Created directory: {targetConfigDir}\n");
+                    }
+
+                    if (File.Exists(sourceConfigPath))
+                    {
+                        File.Copy(sourceConfigPath, targetConfigPath, true);
+                        AppendToConsole($"[INFO] Copied configuration file to: {targetConfigPath}\n");
+                    }
+                    else
+                    {
+                        AppendToConsole($"[WARNING] vdd_settings.xml not found in driver directory\n");
+                    }
+                }
+                catch (Exception dirEx)
+                {
+                    AppendToConsole($"[WARNING] Failed to create config directory: {dirEx.Message}\n");
+                }
+                
+                UpdateTaskProgress("Installing Driver", 50);
+
+                // Run devcon install command
+                ProcessStartInfo startInfo = new ProcessStartInfo
+                {
+                    FileName = devconPath,
+                    Arguments = $"install \"{infPath}\" Root\\MttVDD",
+                    UseShellExecute = false,
+                    RedirectStandardOutput = true,
+                    RedirectStandardError = true,
+                    CreateNoWindow = true
+                };
+
+                AppendToConsole("[INFO] Running driver installation command...\n");
+                
+                using (Process process = new Process())
+                {
+                    process.StartInfo = startInfo;
+                    
+                    try
+                    {
+                        process.Start();
+
+                        string output = await process.StandardOutput.ReadToEndAsync();
+                        string error = await process.StandardError.ReadToEndAsync();
+
+                        process.WaitForExit();
+
+                        UpdateTaskProgress("Installing Driver", 90);
+
+                        if (process.ExitCode == 0)
+                        {
+                            AppendToConsole("[SUCCESS] Driver installation completed successfully!\n");
+                            if (!string.IsNullOrEmpty(output))
+                            {
+                                AppendToConsole($"[OUTPUT] {output}\n");
+                            }
+                            
+                            // Try to connect to the newly installed driver
+                            AppendToConsole("[INFO] Attempting to connect to installed driver...\n");
+                            await Task.Delay(2000); // Give driver time to initialize
+                            
+                            bool connected = await TryConnectToDriver();
+                            if (connected)
+                            {
+                                AppendToConsole("[SUCCESS] Successfully connected to installed driver!\n");
+                                UpdateNotificationIcon(ConnectionStatus.Connected);
+                            }
+                            else
+                            {
+                                AppendToConsole("[WARNING] Driver installed but connection could not be established.\n");
+                                AppendToConsole("[INFO] You may need to restart the system or enable the driver manually.\n");
+                            }
+                        }
+                        else
+                        {
+                            AppendToConsole($"[ERROR] Driver installation failed with exit code: {process.ExitCode}\n");
+                            if (!string.IsNullOrEmpty(error))
+                            {
+                                AppendToConsole($"[ERROR] {error}\n");
+                            }
+                            if (!string.IsNullOrEmpty(output))
+                            {
+                                AppendToConsole($"[OUTPUT] {output}\n");
+                            }
+                        }
+                    }
+                    catch (Exception processEx)
+                    {
+                        AppendToConsole($"[ERROR] Failed to start process: {processEx.Message}\n");
+                        UpdateTaskProgress("Installing Driver", 0);
+                        return;
+                    }
+                }
+
+                UpdateTaskProgress("Installing Driver", 100);
+                await Task.Delay(1000);
+                UpdateTaskProgress("", 0);
+            }
+            catch (Exception ex)
+            {
+                AppendToConsole($"[ERROR] Failed to install driver: {ex.Message}\n");
+                UpdateTaskProgress("Installing Driver", 0);
+            }
+        }
+
+        private bool IsRunningAsAdministrator()
+        {
+            try
+            {
+                var identity = System.Security.Principal.WindowsIdentity.GetCurrent();
+                var principal = new System.Security.Principal.WindowsPrincipal(identity);
+                return principal.IsInRole(System.Security.Principal.WindowsBuiltInRole.Administrator);
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        private async void UninstallDriverCommand()
+        {
+            AppendToConsole("[ACTION] Uninstalling Virtual Display Driver...\n");
+            UpdateTaskProgress("Uninstalling Driver", 25);
+
+            try
+            {
+                // Check if running as administrator
+                bool isAdmin = IsRunningAsAdministrator();
+                if (!isAdmin)
+                {
+                    AppendToConsole("[ERROR] Administrator privileges required for driver uninstallation.\n");
+                    AppendToConsole("[INFO] Please run the application as administrator and try again.\n");
+                    UpdateTaskProgress("Uninstalling Driver", 0);
+                    return;
+                }
+
+                // Get paths to required files
+                string currentDir = AppDomain.CurrentDomain.BaseDirectory;
+                string devconPath = Path.Combine(currentDir, "Dependencies", "devcon.exe");
+
+                AppendToConsole($"[INFO] Working directory: {currentDir}\n");
+
+                // Verify devcon.exe exists
+                if (!File.Exists(devconPath))
+                {
+                    AppendToConsole($"[ERROR] devcon.exe not found at: {devconPath}\n");
+                    UpdateTaskProgress("Uninstalling Driver", 0);
+                    return;
+                }
+
+                AppendToConsole($"[INFO] Using devcon.exe from: {devconPath}\n");
+                
+                UpdateTaskProgress("Uninstalling Driver", 50);
+
+                // Run devcon remove command to uninstall the driver
+                ProcessStartInfo startInfo = new ProcessStartInfo
+                {
+                    FileName = devconPath,
+                    Arguments = "remove Root\\MttVDD",
+                    UseShellExecute = false,
+                    RedirectStandardOutput = true,
+                    RedirectStandardError = true,
+                    CreateNoWindow = true
+                };
+
+                AppendToConsole("[INFO] Running driver uninstallation command...\n");
+                
+                using (Process process = new Process())
+                {
+                    process.StartInfo = startInfo;
+                    
+                    try
+                    {
+                        process.Start();
+
+                        string output = await process.StandardOutput.ReadToEndAsync();
+                        string error = await process.StandardError.ReadToEndAsync();
+
+                        process.WaitForExit();
+
+                        UpdateTaskProgress("Uninstalling Driver", 90);
+
+                        if (process.ExitCode == 0)
+                        {
+                            AppendToConsole("[SUCCESS] Driver uninstallation completed successfully!\n");
+                            if (!string.IsNullOrEmpty(output))
+                            {
+                                AppendToConsole($"[OUTPUT] {output}\n");
+                            }
+                            
+                            // Update UI to reflect driver removal
+                            AppendToConsole("[INFO] Driver has been removed from the system.\n");
+                            UpdateNotificationIcon(ConnectionStatus.Disconnected);
+                            
+                            // Ask if user wants to remove configuration folder
+                            string configDir = @"C:\VirtualDisplayDriver";
+                            if (Directory.Exists(configDir))
+                            {
+                                AppendToConsole($"[INFO] Configuration folder still exists at: {configDir}\n");
+                                AppendToConsole("[INFO] You can manually delete this folder if you no longer need the settings.\n");
+                            }
+                        }
+                        else
+                        {
+                            AppendToConsole($"[ERROR] Driver uninstallation failed with exit code: {process.ExitCode}\n");
+                            if (!string.IsNullOrEmpty(error))
+                            {
+                                AppendToConsole($"[ERROR] {error}\n");
+                            }
+                            if (!string.IsNullOrEmpty(output))
+                            {
+                                AppendToConsole($"[OUTPUT] {output}\n");
+                            }
+                            
+                            // Additional uninstall attempt using hardware ID
+                            AppendToConsole("[INFO] Attempting alternative uninstall method...\n");
+                            ProcessStartInfo altStartInfo = new ProcessStartInfo
+                            {
+                                FileName = devconPath,
+                                Arguments = "remove MttVDD",
+                                UseShellExecute = false,
+                                RedirectStandardOutput = true,
+                                RedirectStandardError = true,
+                                CreateNoWindow = true
+                            };
+
+                            using (Process altProcess = new Process())
+                            {
+                                altProcess.StartInfo = altStartInfo;
+                                altProcess.Start();
+                                
+                                string altOutput = await altProcess.StandardOutput.ReadToEndAsync();
+                                string altError = await altProcess.StandardError.ReadToEndAsync();
+                                
+                                altProcess.WaitForExit();
+                                
+                                if (altProcess.ExitCode == 0)
+                                {
+                                    AppendToConsole("[SUCCESS] Alternative uninstall method succeeded!\n");
+                                    if (!string.IsNullOrEmpty(altOutput))
+                                    {
+                                        AppendToConsole($"[OUTPUT] {altOutput}\n");
+                                    }
+                                    UpdateNotificationIcon(ConnectionStatus.Disconnected);
+                                }
+                                else
+                                {
+                                    AppendToConsole($"[ERROR] Alternative uninstall also failed with exit code: {altProcess.ExitCode}\n");
+                                    if (!string.IsNullOrEmpty(altError))
+                                    {
+                                        AppendToConsole($"[ERROR] {altError}\n");
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    catch (Exception processEx)
+                    {
+                        AppendToConsole($"[ERROR] Failed to start process: {processEx.Message}\n");
+                        UpdateTaskProgress("Uninstalling Driver", 0);
+                        return;
+                    }
+                }
+
+                UpdateTaskProgress("Uninstalling Driver", 100);
+                await Task.Delay(1000);
+                UpdateTaskProgress("", 0);
+            }
+            catch (Exception ex)
+            {
+                AppendToConsole($"[ERROR] Failed to uninstall driver: {ex.Message}\n");
+                UpdateTaskProgress("Uninstalling Driver", 0);
             }
         }
 
@@ -3970,6 +4320,16 @@ namespace VDD_Control
                 case "RELOAD_DRIVER":
                     userInput.Text = string.Empty;
                     ReloadDriverCommand();
+                    return;
+
+                case "INSTALL_DRIVER":
+                    userInput.Text = string.Empty;
+                    InstallDriverCommand();
+                    return;
+
+                case "UNINSTALL_DRIVER":
+                    userInput.Text = string.Empty;
+                    UninstallDriverCommand();
                     return;
 
                 case "GETSETTINGS":
