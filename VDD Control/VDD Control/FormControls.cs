@@ -17,11 +17,7 @@ namespace VDD_Control
         {
             try
             {
-                // Remove existing ReaLTaiizor controls
-                if (mainTheme.Controls.Contains(closeButton))
-                {
-                    mainTheme.Controls.Remove(closeButton);
-                }
+                // Remove existing ReaLTaiizor controls (closeButton already removed from designer)
                 
                 if (mainTheme.Controls.Contains(minButton))
                 {

@@ -42,6 +42,7 @@ namespace VDD_Control
             getGPUInformationToolStripMenuItem1 = new ToolStripMenuItem();
             getCPUInformationToolStripMenuItem1 = new ToolStripMenuItem();
             getAudioInformationToolStripMenuItem1 = new ToolStripMenuItem();
+            communityScriptsToolStripMenuItem = new ToolStripMenuItem();
             windowsToolsToolStripMenuItem1 = new ToolStripMenuItem();
             displaySettingsToolStripMenuItem1 = new ToolStripMenuItem();
             deviceManagerToolStripMenuItem1 = new ToolStripMenuItem();
@@ -60,21 +61,24 @@ namespace VDD_Control
             enableDriverToolStripMenuItem2 = new ToolStripMenuItem();
             disableDriverToolStripMenuItem2 = new ToolStripMenuItem();
             restartDriverToolStripMenuItem2 = new ToolStripMenuItem();
-            aboutToolStripMenuItem1 = new ToolStripMenuItem();
-            exitToolStripMenuItem2 = new ToolStripMenuItem();
+            installDriverToolStripMenuItem2 = new ToolStripMenuItem();
+            uninstallDriverToolStripMenuItem2 = new ToolStripMenuItem();
+            loggingToolStripMenuItem1 = new ToolStripMenuItem();
+            userModeLoggingToolStripMenuItem1 = new ToolStripMenuItem();
+            devModeLoggingToolStripMenuItem1 = new ToolStripMenuItem();
             virtualAudioDriverToolStripMenuItem1 = new ToolStripMenuItem();
             systemToolStripMenuItem2 = new ToolStripMenuItem();
             enableDriverToolStripMenuItem3 = new ToolStripMenuItem();
             disableDriverToolStripMenuItem3 = new ToolStripMenuItem();
             restartDriverToolStripMenuItem3 = new ToolStripMenuItem();
+            installDriverToolStripMenuItem3 = new ToolStripMenuItem();
+            uninstallDriverToolStripMenuItem3 = new ToolStripMenuItem();
+            aboutToolStripMenuItem1 = new ToolStripMenuItem();
+            exitToolStripMenuItem2 = new ToolStripMenuItem();
             installDriverToolStripMenuItem = new ToolStripMenuItem();
             installDriverToolStripMenuItem1 = new ToolStripMenuItem();
-            installDriverToolStripMenuItem2 = new ToolStripMenuItem();
-            installDriverToolStripMenuItem3 = new ToolStripMenuItem();
             uninstallDriverToolStripMenuItem = new ToolStripMenuItem();
             uninstallDriverToolStripMenuItem1 = new ToolStripMenuItem();
-            uninstallDriverToolStripMenuItem2 = new ToolStripMenuItem();
-            uninstallDriverToolStripMenuItem3 = new ToolStripMenuItem();
             menuToolStripMenuItem = new ToolStripMenuItem();
             toolStripMenuItem1 = new ToolStripMenuItem();
             exitToolStripMenuItem = new ToolStripMenuItem();
@@ -106,6 +110,12 @@ namespace VDD_Control
             getCPUInformationToolStripMenuItem = new ToolStripMenuItem();
             getDisplayInformationToolStripMenuItem2 = new ToolStripMenuItem();
             getAudioInformationToolStripMenuItem = new ToolStripMenuItem();
+            scriptsToolStripMenuItem = new ToolStripMenuItem();
+            windowsToolsToolStripMenuItem = new ToolStripMenuItem();
+            displaySettingsToolStripMenuItem = new ToolStripMenuItem();
+            deviceManagerToolStripMenuItem = new ToolStripMenuItem();
+            soundSettingsToolStripMenuItem = new ToolStripMenuItem();
+            systemInformationToolStripMenuItem = new ToolStripMenuItem();
             mainConsole = new RichTextBox();
             gitLabel = new Label();
             discordLink = new LinkLabel();
@@ -124,22 +134,12 @@ namespace VDD_Control
             taskGroupBox = new GroupBox();
             taskProgressBar = new ReaLTaiizor.Controls.RibbonProgressBarCenter();
             mainTheme = new ReaLTaiizor.Forms.ThemeForm();
+            chatButtonRight1 = new ReaLTaiizor.Controls.ChatButtonRight();
             restartAllButton = new ReaLTaiizor.Controls.ChatButtonRight();
             enterButton = new ReaLTaiizor.Controls.ChatButtonRight();
             minButton = new ReaLTaiizor.Controls.ForeverMinimize();
-            closeButton = new ReaLTaiizor.Controls.ForeverClose();
-            scriptsToolStripMenuItem = new ToolStripMenuItem();
             sunshineScriptsToolStripMenuItem = new ToolStripMenuItem();
-            communityScriptsToolStripMenuItem = new ToolStripMenuItem();
             sunshineScriptsToolStripMenuItem1 = new ToolStripMenuItem();
-            windowsToolsToolStripMenuItem = new ToolStripMenuItem();
-            displaySettingsToolStripMenuItem = new ToolStripMenuItem();
-            deviceManagerToolStripMenuItem = new ToolStripMenuItem();
-            soundSettingsToolStripMenuItem = new ToolStripMenuItem();
-            systemInformationToolStripMenuItem = new ToolStripMenuItem();
-            loggingToolStripMenuItem1 = new ToolStripMenuItem();
-            userModeLoggingToolStripMenuItem1 = new ToolStripMenuItem();
-            devModeLoggingToolStripMenuItem1 = new ToolStripMenuItem();
             trayMenu.SuspendLayout();
             mainVisibleMenuStrip.SuspendLayout();
             patreonGroupBox.SuspendLayout();
@@ -161,7 +161,7 @@ namespace VDD_Control
             // 
             trayMenu.Items.AddRange(new ToolStripItem[] { menuToolStripMenuItem1, toolsToolStripMenuItem1, virtualDisplayDriverToolStripMenuItem1, virtualAudioDriverToolStripMenuItem1, aboutToolStripMenuItem1, exitToolStripMenuItem2 });
             trayMenu.Name = "contextMenuStrip1";
-            trayMenu.Size = new Size(184, 158);
+            trayMenu.Size = new Size(184, 136);
             trayMenu.Text = "Menu";
             // 
             // menuToolStripMenuItem1
@@ -213,6 +213,13 @@ namespace VDD_Control
             getAudioInformationToolStripMenuItem1.Text = "Get Audio Information";
             getAudioInformationToolStripMenuItem1.Click += getAudioInformationToolStripMenuItem1_Click_1;
             // 
+            // communityScriptsToolStripMenuItem
+            // 
+            communityScriptsToolStripMenuItem.Name = "communityScriptsToolStripMenuItem";
+            communityScriptsToolStripMenuItem.Size = new Size(199, 22);
+            communityScriptsToolStripMenuItem.Text = "Community Scripts";
+            communityScriptsToolStripMenuItem.Click += communityScriptsToolStripMenuItem_Click;
+            // 
             // windowsToolsToolStripMenuItem1
             // 
             windowsToolsToolStripMenuItem1.DropDownItems.AddRange(new ToolStripItem[] { displaySettingsToolStripMenuItem1, deviceManagerToolStripMenuItem1, soundSettingsToolStripMenuItem1, systemInformationToolStripMenuItem1 });
@@ -223,28 +230,28 @@ namespace VDD_Control
             // displaySettingsToolStripMenuItem1
             // 
             displaySettingsToolStripMenuItem1.Name = "displaySettingsToolStripMenuItem1";
-            displaySettingsToolStripMenuItem1.Size = new Size(219, 22);
+            displaySettingsToolStripMenuItem1.Size = new Size(178, 22);
             displaySettingsToolStripMenuItem1.Text = "Display Settings";
             displaySettingsToolStripMenuItem1.Click += displaySettingsToolStripMenuItem1_Click;
             // 
             // deviceManagerToolStripMenuItem1
             // 
             deviceManagerToolStripMenuItem1.Name = "deviceManagerToolStripMenuItem1";
-            deviceManagerToolStripMenuItem1.Size = new Size(219, 22);
+            deviceManagerToolStripMenuItem1.Size = new Size(178, 22);
             deviceManagerToolStripMenuItem1.Text = "Device Manager";
             deviceManagerToolStripMenuItem1.Click += deviceManagerToolStripMenuItem1_Click;
             // 
             // soundSettingsToolStripMenuItem1
             // 
             soundSettingsToolStripMenuItem1.Name = "soundSettingsToolStripMenuItem1";
-            soundSettingsToolStripMenuItem1.Size = new Size(219, 22);
+            soundSettingsToolStripMenuItem1.Size = new Size(178, 22);
             soundSettingsToolStripMenuItem1.Text = "Sound Settings";
             soundSettingsToolStripMenuItem1.Click += soundSettingsToolStripMenuItem1_Click;
             // 
             // systemInformationToolStripMenuItem1
             // 
             systemInformationToolStripMenuItem1.Name = "systemInformationToolStripMenuItem1";
-            systemInformationToolStripMenuItem1.Size = new Size(219, 22);
+            systemInformationToolStripMenuItem1.Size = new Size(178, 22);
             systemInformationToolStripMenuItem1.Text = "System Information";
             systemInformationToolStripMenuItem1.Click += systemInformationToolStripMenuItem1_Click;
             // 
@@ -321,51 +328,58 @@ namespace VDD_Control
             // enableDriverToolStripMenuItem2
             // 
             enableDriverToolStripMenuItem2.Name = "enableDriverToolStripMenuItem2";
-            enableDriverToolStripMenuItem2.Size = new Size(146, 22);
+            enableDriverToolStripMenuItem2.Size = new Size(154, 22);
             enableDriverToolStripMenuItem2.Text = "Enable Driver";
             enableDriverToolStripMenuItem2.Click += enableDriverToolStripMenuItem2_Click;
             // 
             // disableDriverToolStripMenuItem2
             // 
             disableDriverToolStripMenuItem2.Name = "disableDriverToolStripMenuItem2";
-            disableDriverToolStripMenuItem2.Size = new Size(146, 22);
+            disableDriverToolStripMenuItem2.Size = new Size(154, 22);
             disableDriverToolStripMenuItem2.Text = "Disable Driver";
             disableDriverToolStripMenuItem2.Click += disableDriverToolStripMenuItem2_Click;
             // 
             // restartDriverToolStripMenuItem2
             // 
             restartDriverToolStripMenuItem2.Name = "restartDriverToolStripMenuItem2";
-            restartDriverToolStripMenuItem2.Size = new Size(146, 22);
+            restartDriverToolStripMenuItem2.Size = new Size(154, 22);
             restartDriverToolStripMenuItem2.Text = "Restart Driver";
             restartDriverToolStripMenuItem2.Click += restartDriverToolStripMenuItem2_Click;
             // 
             // installDriverToolStripMenuItem2
             // 
             installDriverToolStripMenuItem2.Name = "installDriverToolStripMenuItem2";
-            installDriverToolStripMenuItem2.Size = new Size(146, 22);
+            installDriverToolStripMenuItem2.Size = new Size(154, 22);
             installDriverToolStripMenuItem2.Text = "Install Driver";
             installDriverToolStripMenuItem2.Click += InstallDriverHandler;
             // 
             // uninstallDriverToolStripMenuItem2
             // 
             uninstallDriverToolStripMenuItem2.Name = "uninstallDriverToolStripMenuItem2";
-            uninstallDriverToolStripMenuItem2.Size = new Size(146, 22);
+            uninstallDriverToolStripMenuItem2.Size = new Size(154, 22);
             uninstallDriverToolStripMenuItem2.Text = "Uninstall Driver";
             uninstallDriverToolStripMenuItem2.Click += UninstallDriverHandler;
             // 
-            // aboutToolStripMenuItem1
+            // loggingToolStripMenuItem1
             // 
-            aboutToolStripMenuItem1.Name = "aboutToolStripMenuItem1";
-            aboutToolStripMenuItem1.Size = new Size(183, 22);
-            aboutToolStripMenuItem1.Text = "About";
-            aboutToolStripMenuItem1.Click += aboutToolStripMenuItem1_Click;
+            loggingToolStripMenuItem1.DropDownItems.AddRange(new ToolStripItem[] { userModeLoggingToolStripMenuItem1, devModeLoggingToolStripMenuItem1 });
+            loggingToolStripMenuItem1.Name = "loggingToolStripMenuItem1";
+            loggingToolStripMenuItem1.Size = new Size(194, 22);
+            loggingToolStripMenuItem1.Text = "Logging";
             // 
-            // exitToolStripMenuItem2
+            // userModeLoggingToolStripMenuItem1
             // 
-            exitToolStripMenuItem2.Name = "exitToolStripMenuItem2";
-            exitToolStripMenuItem2.Size = new Size(183, 22);
-            exitToolStripMenuItem2.Text = "Exit";
-            exitToolStripMenuItem2.Click += exitToolStripMenuItem2_Click;
+            userModeLoggingToolStripMenuItem1.Name = "userModeLoggingToolStripMenuItem1";
+            userModeLoggingToolStripMenuItem1.Size = new Size(180, 22);
+            userModeLoggingToolStripMenuItem1.Text = "User-Mode Logging";
+            userModeLoggingToolStripMenuItem1.Click += userModeLoggingToolStripMenuItem1_Click;
+            // 
+            // devModeLoggingToolStripMenuItem1
+            // 
+            devModeLoggingToolStripMenuItem1.Name = "devModeLoggingToolStripMenuItem1";
+            devModeLoggingToolStripMenuItem1.Size = new Size(180, 22);
+            devModeLoggingToolStripMenuItem1.Text = "Dev-Mode Logging";
+            devModeLoggingToolStripMenuItem1.Click += devModeLoggingToolStripMenuItem1_Click;
             // 
             // virtualAudioDriverToolStripMenuItem1
             // 
@@ -413,6 +427,48 @@ namespace VDD_Control
             uninstallDriverToolStripMenuItem3.Size = new Size(146, 22);
             uninstallDriverToolStripMenuItem3.Text = "Uninstall VAD";
             uninstallDriverToolStripMenuItem3.Click += UninstallVADHandler;
+            // 
+            // aboutToolStripMenuItem1
+            // 
+            aboutToolStripMenuItem1.Name = "aboutToolStripMenuItem1";
+            aboutToolStripMenuItem1.Size = new Size(183, 22);
+            aboutToolStripMenuItem1.Text = "About";
+            aboutToolStripMenuItem1.Click += aboutToolStripMenuItem1_Click;
+            // 
+            // exitToolStripMenuItem2
+            // 
+            exitToolStripMenuItem2.Name = "exitToolStripMenuItem2";
+            exitToolStripMenuItem2.Size = new Size(183, 22);
+            exitToolStripMenuItem2.Text = "Exit";
+            exitToolStripMenuItem2.Click += exitToolStripMenuItem2_Click;
+            // 
+            // installDriverToolStripMenuItem
+            // 
+            installDriverToolStripMenuItem.Name = "installDriverToolStripMenuItem";
+            installDriverToolStripMenuItem.Size = new Size(154, 22);
+            installDriverToolStripMenuItem.Text = "Install Driver";
+            installDriverToolStripMenuItem.Click += InstallDriverHandler;
+            // 
+            // installDriverToolStripMenuItem1
+            // 
+            installDriverToolStripMenuItem1.Name = "installDriverToolStripMenuItem1";
+            installDriverToolStripMenuItem1.Size = new Size(146, 22);
+            installDriverToolStripMenuItem1.Text = "Install VAD";
+            installDriverToolStripMenuItem1.Click += InstallVADHandler;
+            // 
+            // uninstallDriverToolStripMenuItem
+            // 
+            uninstallDriverToolStripMenuItem.Name = "uninstallDriverToolStripMenuItem";
+            uninstallDriverToolStripMenuItem.Size = new Size(154, 22);
+            uninstallDriverToolStripMenuItem.Text = "Uninstall Driver";
+            uninstallDriverToolStripMenuItem.Click += UninstallDriverHandler;
+            // 
+            // uninstallDriverToolStripMenuItem1
+            // 
+            uninstallDriverToolStripMenuItem1.Name = "uninstallDriverToolStripMenuItem1";
+            uninstallDriverToolStripMenuItem1.Size = new Size(146, 22);
+            uninstallDriverToolStripMenuItem1.Text = "Uninstall VAD";
+            uninstallDriverToolStripMenuItem1.Click += UninstallVADHandler;
             // 
             // menuToolStripMenuItem
             // 
@@ -516,37 +572,23 @@ namespace VDD_Control
             // enableDriverToolStripMenuItem
             // 
             enableDriverToolStripMenuItem.Name = "enableDriverToolStripMenuItem";
-            enableDriverToolStripMenuItem.Size = new Size(146, 22);
+            enableDriverToolStripMenuItem.Size = new Size(154, 22);
             enableDriverToolStripMenuItem.Text = "Enable Driver";
             enableDriverToolStripMenuItem.Click += enableDriverToolStripMenuItem2_Click;
             // 
             // disableDriverToolStripMenuItem
             // 
             disableDriverToolStripMenuItem.Name = "disableDriverToolStripMenuItem";
-            disableDriverToolStripMenuItem.Size = new Size(146, 22);
+            disableDriverToolStripMenuItem.Size = new Size(154, 22);
             disableDriverToolStripMenuItem.Text = "Disable Driver";
             disableDriverToolStripMenuItem.Click += disableDriverToolStripMenuItem_Click;
             // 
             // restartDriverToolStripMenuItem
             // 
             restartDriverToolStripMenuItem.Name = "restartDriverToolStripMenuItem";
-            restartDriverToolStripMenuItem.Size = new Size(146, 22);
+            restartDriverToolStripMenuItem.Size = new Size(154, 22);
             restartDriverToolStripMenuItem.Text = "Restart Driver";
             restartDriverToolStripMenuItem.Click += RestartDriverHandler;
-            // 
-            // installDriverToolStripMenuItem
-            // 
-            installDriverToolStripMenuItem.Name = "installDriverToolStripMenuItem";
-            installDriverToolStripMenuItem.Size = new Size(146, 22);
-            installDriverToolStripMenuItem.Text = "Install Driver";
-            installDriverToolStripMenuItem.Click += InstallDriverHandler;
-            // 
-            // uninstallDriverToolStripMenuItem
-            // 
-            uninstallDriverToolStripMenuItem.Name = "uninstallDriverToolStripMenuItem";
-            uninstallDriverToolStripMenuItem.Size = new Size(146, 22);
-            uninstallDriverToolStripMenuItem.Text = "Uninstall Driver";
-            uninstallDriverToolStripMenuItem.Click += UninstallDriverHandler;
             // 
             // loggingToolStripMenuItem
             // 
@@ -603,20 +645,6 @@ namespace VDD_Control
             restartDriverToolStripMenuItem1.Size = new Size(146, 22);
             restartDriverToolStripMenuItem1.Text = "Restart Driver";
             restartDriverToolStripMenuItem1.Click += RestartDriverHandler;
-            // 
-            // installDriverToolStripMenuItem1
-            // 
-            installDriverToolStripMenuItem1.Name = "installDriverToolStripMenuItem1";
-            installDriverToolStripMenuItem1.Size = new Size(146, 22);
-            installDriverToolStripMenuItem1.Text = "Install VAD";
-            installDriverToolStripMenuItem1.Click += InstallVADHandler;
-            // 
-            // uninstallDriverToolStripMenuItem1
-            // 
-            uninstallDriverToolStripMenuItem1.Name = "uninstallDriverToolStripMenuItem1";
-            uninstallDriverToolStripMenuItem1.Size = new Size(146, 22);
-            uninstallDriverToolStripMenuItem1.Text = "Uninstall VAD";
-            uninstallDriverToolStripMenuItem1.Click += UninstallVADHandler;
             // 
             // aboutToolStripMenuItem
             // 
@@ -681,10 +709,17 @@ namespace VDD_Control
             getAudioInformationToolStripMenuItem.Text = "Get Audio Information";
             getAudioInformationToolStripMenuItem.Click += getAudioInformationToolStripMenuItem_Click;
             // 
+            // scriptsToolStripMenuItem
+            // 
+            scriptsToolStripMenuItem.Name = "scriptsToolStripMenuItem";
+            scriptsToolStripMenuItem.Size = new Size(199, 22);
+            scriptsToolStripMenuItem.Text = "Community Scripts";
+            scriptsToolStripMenuItem.Click += scriptsToolStripMenuItem_Click;
+            // 
             // windowsToolsToolStripMenuItem
             // 
-            windowsToolsToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { displaySettingsToolStripMenuItem, deviceManagerToolStripMenuItem, soundSettingsToolStripMenuItem, systemInformationToolStripMenuItem });
             windowsToolsToolStripMenuItem.DisplayStyle = ToolStripItemDisplayStyle.Text;
+            windowsToolsToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { displaySettingsToolStripMenuItem, deviceManagerToolStripMenuItem, soundSettingsToolStripMenuItem, systemInformationToolStripMenuItem });
             windowsToolsToolStripMenuItem.Font = new Font("Segoe UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
             windowsToolsToolStripMenuItem.Name = "windowsToolsToolStripMenuItem";
             windowsToolsToolStripMenuItem.Size = new Size(199, 22);
@@ -693,28 +728,28 @@ namespace VDD_Control
             // displaySettingsToolStripMenuItem
             // 
             displaySettingsToolStripMenuItem.Name = "displaySettingsToolStripMenuItem";
-            displaySettingsToolStripMenuItem.Size = new Size(219, 22);
+            displaySettingsToolStripMenuItem.Size = new Size(178, 22);
             displaySettingsToolStripMenuItem.Text = "Display Settings";
             displaySettingsToolStripMenuItem.Click += displaySettingsToolStripMenuItem_Click;
             // 
             // deviceManagerToolStripMenuItem
             // 
             deviceManagerToolStripMenuItem.Name = "deviceManagerToolStripMenuItem";
-            deviceManagerToolStripMenuItem.Size = new Size(219, 22);
+            deviceManagerToolStripMenuItem.Size = new Size(178, 22);
             deviceManagerToolStripMenuItem.Text = "Device Manager";
             deviceManagerToolStripMenuItem.Click += deviceManagerToolStripMenuItem_Click;
             // 
             // soundSettingsToolStripMenuItem
             // 
             soundSettingsToolStripMenuItem.Name = "soundSettingsToolStripMenuItem";
-            soundSettingsToolStripMenuItem.Size = new Size(219, 22);
+            soundSettingsToolStripMenuItem.Size = new Size(178, 22);
             soundSettingsToolStripMenuItem.Text = "Sound Settings";
             soundSettingsToolStripMenuItem.Click += soundSettingsToolStripMenuItem_Click;
             // 
             // systemInformationToolStripMenuItem
             // 
             systemInformationToolStripMenuItem.Name = "systemInformationToolStripMenuItem";
-            systemInformationToolStripMenuItem.Size = new Size(219, 22);
+            systemInformationToolStripMenuItem.Size = new Size(178, 22);
             systemInformationToolStripMenuItem.Text = "System Information";
             systemInformationToolStripMenuItem.Click += systemInformationToolStripMenuItem_Click;
             // 
@@ -854,12 +889,12 @@ namespace VDD_Control
             // 
             // patreonMembersListBox
             // 
-            patreonMembersListBox.BackColor = Color.FromArgb(32, 41, 50);
+            patreonMembersListBox.BackColor = Color.FromArgb(32, 32, 32);
             patreonMembersListBox.BorderStyle = BorderStyle.None;
             patreonMembersListBox.Font = new Font("Consolas", 8.25F, FontStyle.Regular, GraphicsUnit.Point);
             patreonMembersListBox.ForeColor = SystemColors.Window;
             patreonMembersListBox.FormattingEnabled = true;
-            patreonMembersListBox.Items.AddRange(new object[] { "- Gabriel Posso", "- Adam Cohen", "- Tara M" });
+            patreonMembersListBox.Items.AddRange(new object[] { "- Ágúst Ari Þórisson", "- Adam Cohen", "- Gabriel Posso" });
             patreonMembersListBox.Location = new Point(6, 22);
             patreonMembersListBox.Name = "patreonMembersListBox";
             patreonMembersListBox.Size = new Size(236, 78);
@@ -952,11 +987,11 @@ namespace VDD_Control
             // mainTheme
             // 
             mainTheme.AutoScroll = true;
-            mainTheme.BackColor = Color.FromArgb(32, 41, 50);
+            mainTheme.BackColor = Color.FromArgb(32, 32, 32);
+            mainTheme.Controls.Add(chatButtonRight1);
             mainTheme.Controls.Add(restartAllButton);
             mainTheme.Controls.Add(enterButton);
             mainTheme.Controls.Add(minButton);
-            mainTheme.Controls.Add(closeButton);
             mainTheme.Controls.Add(mainConsole);
             mainTheme.Controls.Add(resourcesGroupBox);
             mainTheme.Controls.Add(taskGroupBox);
@@ -966,7 +1001,7 @@ namespace VDD_Control
             mainTheme.Controls.Add(userInput);
             mainTheme.Dock = DockStyle.Fill;
             mainTheme.Font = new Font("Arial Rounded MT Bold", 9F, FontStyle.Regular, GraphicsUnit.Point);
-            mainTheme.ForeColor = Color.FromArgb(32, 41, 50);
+            mainTheme.ForeColor = Color.FromArgb(32, 32, 32);
             mainTheme.Image = (Image)resources.GetObject("mainTheme.Image");
             mainTheme.Location = new Point(0, 0);
             mainTheme.Name = "mainTheme";
@@ -980,6 +1015,27 @@ namespace VDD_Control
             mainTheme.Text = "Virtual Driver Control";
             mainTheme.Click += themeForm1_Click;
             // 
+            // chatButtonRight1
+            // 
+            chatButtonRight1.BackColor = Color.Transparent;
+            chatButtonRight1.Font = new Font("Consolas", 9.75F, FontStyle.Bold, GraphicsUnit.Point);
+            chatButtonRight1.ForeColor = Color.LightGray;
+            chatButtonRight1.Image = null;
+            chatButtonRight1.ImageAlign = ContentAlignment.MiddleLeft;
+            chatButtonRight1.InactiveColorA = Color.FromArgb(0, 120, 0);
+            chatButtonRight1.InactiveColorB = Color.FromArgb(0, 120, 0);
+            chatButtonRight1.Location = new Point(555, 460);
+            chatButtonRight1.Name = "chatButtonRight1";
+            chatButtonRight1.PressedColorA = Color.FromArgb(0, 80, 0);
+            chatButtonRight1.PressedColorB = Color.FromArgb(0, 80, 0);
+            chatButtonRight1.PressedContourColorA = Color.FromArgb(0, 80, 0);
+            chatButtonRight1.PressedContourColorB = Color.FromArgb(0, 80, 0);
+            chatButtonRight1.Size = new Size(118, 22);
+            chatButtonRight1.TabIndex = 36;
+            chatButtonRight1.Text = "Install Driver";
+            chatButtonRight1.TextAlignment = StringAlignment.Center;
+            chatButtonRight1.Click += new EventHandler(this.chatButtonRight1_Click);
+            // 
             // restartAllButton
             // 
             restartAllButton.BackColor = Color.Transparent;
@@ -989,15 +1045,15 @@ namespace VDD_Control
             restartAllButton.ImageAlign = ContentAlignment.MiddleLeft;
             restartAllButton.InactiveColorA = Color.FromArgb(0, 120, 0);
             restartAllButton.InactiveColorB = Color.FromArgb(0, 120, 0);
-            restartAllButton.Location = new Point(650, 460);
+            restartAllButton.Location = new Point(687, 460);
             restartAllButton.Name = "restartAllButton";
             restartAllButton.PressedColorA = Color.FromArgb(0, 80, 0);
             restartAllButton.PressedColorB = Color.FromArgb(0, 80, 0);
             restartAllButton.PressedContourColorA = Color.FromArgb(0, 80, 0);
             restartAllButton.PressedContourColorB = Color.FromArgb(0, 80, 0);
-            restartAllButton.Size = new Size(154, 22);
+            restartAllButton.Size = new Size(117, 22);
             restartAllButton.TabIndex = 35;
-            restartAllButton.Text = "Restart Driver(s)";
+            restartAllButton.Text = "Restart Driver";
             restartAllButton.TextAlignment = StringAlignment.Center;
             restartAllButton.Click += restartAllButton_Click;
             // 
@@ -1039,69 +1095,17 @@ namespace VDD_Control
             minButton.TextColor = Color.FromArgb(243, 243, 243);
             minButton.Click += minButton_Click;
             // 
-            // closeButton
-            // 
-            closeButton.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            closeButton.BackColor = Color.White;
-            closeButton.BaseColor = Color.FromArgb(45, 47, 49);
-            closeButton.DefaultLocation = true;
-            closeButton.DownColor = Color.FromArgb(30, 0, 0, 0);
-            closeButton.Font = new Font("Marlett", 10F, FontStyle.Regular, GraphicsUnit.Point);
-            closeButton.Location = new Point(786, 16);
-            closeButton.Name = "closeButton";
-            closeButton.OverColor = Color.FromArgb(30, 255, 255, 255);
-            closeButton.Size = new Size(18, 18);
-            closeButton.TabIndex = 3;
-            closeButton.Text = "foreverClose1";
-            closeButton.TextColor = Color.FromArgb(243, 243, 243);
-            closeButton.Click += closeButton_Click;
-            // 
-            // scriptsToolStripMenuItem
-            // 
-            scriptsToolStripMenuItem.Name = "scriptsToolStripMenuItem";
-            scriptsToolStripMenuItem.Size = new Size(199, 22);
-            scriptsToolStripMenuItem.Text = "Community Scripts";
-            scriptsToolStripMenuItem.Click += new EventHandler(scriptsToolStripMenuItem_Click);
-            // 
             // sunshineScriptsToolStripMenuItem
             // 
             sunshineScriptsToolStripMenuItem.Name = "sunshineScriptsToolStripMenuItem";
             sunshineScriptsToolStripMenuItem.Size = new Size(199, 22);
             sunshineScriptsToolStripMenuItem.Text = "Sunshine Scripts";
             // 
-            // communityScriptsToolStripMenuItem
-            // 
-            communityScriptsToolStripMenuItem.Name = "communityScriptsToolStripMenuItem";
-            communityScriptsToolStripMenuItem.Size = new Size(199, 22);
-            communityScriptsToolStripMenuItem.Text = "Community Scripts";
-            communityScriptsToolStripMenuItem.Click += new EventHandler(communityScriptsToolStripMenuItem_Click);
-            // 
             // sunshineScriptsToolStripMenuItem1
             // 
             sunshineScriptsToolStripMenuItem1.Name = "sunshineScriptsToolStripMenuItem1";
             sunshineScriptsToolStripMenuItem1.Size = new Size(199, 22);
             sunshineScriptsToolStripMenuItem1.Text = "Sunshine Scripts";
-            // 
-            // loggingToolStripMenuItem1
-            // 
-            loggingToolStripMenuItem1.DropDownItems.AddRange(new ToolStripItem[] { userModeLoggingToolStripMenuItem1, devModeLoggingToolStripMenuItem1 });
-            loggingToolStripMenuItem1.Name = "loggingToolStripMenuItem1";
-            loggingToolStripMenuItem1.Size = new Size(194, 22);
-            loggingToolStripMenuItem1.Text = "Logging";
-            // 
-            // userModeLoggingToolStripMenuItem1
-            // 
-            userModeLoggingToolStripMenuItem1.Name = "userModeLoggingToolStripMenuItem1";
-            userModeLoggingToolStripMenuItem1.Size = new Size(180, 22);
-            userModeLoggingToolStripMenuItem1.Text = "User-Mode Logging";
-            userModeLoggingToolStripMenuItem1.Click += userModeLoggingToolStripMenuItem1_Click;
-            // 
-            // devModeLoggingToolStripMenuItem1
-            // 
-            devModeLoggingToolStripMenuItem1.Name = "devModeLoggingToolStripMenuItem1";
-            devModeLoggingToolStripMenuItem1.Size = new Size(180, 22);
-            devModeLoggingToolStripMenuItem1.Text = "Dev-Mode Logging";
-            devModeLoggingToolStripMenuItem1.Click += devModeLoggingToolStripMenuItem1_Click;
             // 
             // mainWindow
             // 
@@ -1224,7 +1228,7 @@ namespace VDD_Control
         private TextBox userInput;
         private GroupBox taskGroupBox;
         private ReaLTaiizor.Forms.ThemeForm mainTheme;
-        private ReaLTaiizor.Controls.ForeverClose closeButton;
+        // private ReaLTaiizor.Controls.ForeverClose closeButton; // Removed - using standard controls
         private ReaLTaiizor.Controls.ForeverMinimize minButton;
         private ReaLTaiizor.Controls.ChatButtonRight enterButton;
         private ReaLTaiizor.Controls.ChatButtonRight restartAllButton;
@@ -1250,5 +1254,6 @@ namespace VDD_Control
         private ToolStripMenuItem soundSettingsToolStripMenuItem1;
         private ToolStripMenuItem systemInformationToolStripMenuItem;
         private ToolStripMenuItem systemInformationToolStripMenuItem1;
+        private ReaLTaiizor.Controls.ChatButtonRight chatButtonRight1;
     }
 }

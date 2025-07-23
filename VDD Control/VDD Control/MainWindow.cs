@@ -733,7 +733,7 @@ namespace VDD_Control
                 StartPosition = FormStartPosition.CenterParent,
                 MaximizeBox = false,
                 MinimizeBox = false,
-                BackColor = Color.FromArgb(32, 34, 37),
+                BackColor = Color.FromArgb(32, 32, 32),
                 ForeColor = Color.White
             };
 
@@ -1000,7 +1000,7 @@ namespace VDD_Control
         private void SetMenuItemStyle(ToolStripMenuItem item)
         {
             item.ForeColor = Color.White; // White text
-            item.BackColor = Color.FromArgb(32, 34, 37); // Default background
+            item.BackColor = Color.FromArgb(32, 32, 32); // Default background
 
             foreach (ToolStripItem subItem in item.DropDownItems)
             {
@@ -1215,7 +1215,16 @@ namespace VDD_Control
                     {
                         AppendToConsole("[STATUS] Virtual Display Driver disconnected.\n");
                         UpdateNotificationIcon(ConnectionStatus.Disconnected);
+                        
+                        // Check if we need to prompt for driver installation
+                        bool wasDriverNotInstalled = driverNotInstalled;
                         driverNotInstalled = true;
+                        
+                        // Only show prompt if driver status just changed from installed to not installed
+                        if (!wasDriverNotInstalled)
+                        {
+                            ShowDriverInstallPromptIfNeeded();
+                        }
                     }
                 }
             }
@@ -1264,7 +1273,7 @@ namespace VDD_Control
 
         class CustomColorTable : ProfessionalColorTable
         {
-            private static readonly Color BackgroundColor = Color.FromArgb(32, 34, 37); // Default background
+            private static readonly Color BackgroundColor = Color.FromArgb(32, 32, 32); // Default background
             private static readonly Color HoverColor = Color.FromArgb(25, 25, 25); // Hover background
             private static readonly Color TextColor = Color.White; // White text
             private static readonly Color BorderColor = Color.FromArgb(60, 60, 60); // Border color
@@ -1901,6 +1910,11 @@ namespace VDD_Control
         }
 
         private void InstallDriverHandler(object sender, EventArgs e)
+        {
+            InstallDriverCommand();
+        }
+
+        private void chatButtonRight1_Click(object sender, EventArgs e)
         {
             InstallDriverCommand();
         }
@@ -3781,6 +3795,9 @@ namespace VDD_Control
                 AppendToConsole($"[ERROR] Failed to install driver: {ex.Message}\n");
                 UpdateTaskProgress("Installing Driver", 0);
             }
+            finally
+            {
+            }
         }
 
         private bool IsRunningAsAdministrator()
@@ -3951,6 +3968,9 @@ namespace VDD_Control
                 AppendToConsole($"[ERROR] Failed to uninstall driver: {ex.Message}\n");
                 UpdateTaskProgress("Uninstalling Driver", 0);
             }
+            finally
+            {
+            }
         }
 
         private async void InstallVADCommand()
@@ -4118,6 +4138,9 @@ namespace VDD_Control
                 AppendToConsole($"[ERROR] Failed to install VAD: {ex.Message}\n");
                 UpdateTaskProgress("Installing VAD", 0);
             }
+            finally
+            {
+            }
         }
 
         private async void UninstallVADCommand()
@@ -4262,6 +4285,9 @@ namespace VDD_Control
             {
                 AppendToConsole($"[ERROR] Failed to uninstall VAD: {ex.Message}\n");
                 UpdateTaskProgress("Uninstalling VAD", 0);
+            }
+            finally
+            {
             }
         }
 
@@ -5328,7 +5354,7 @@ namespace VDD_Control
                 StartPosition = FormStartPosition.CenterParent,
                 MaximizeBox = false,
                 MinimizeBox = false,
-                BackColor = Color.FromArgb(32, 34, 37),
+                BackColor = Color.FromArgb(32, 32, 32),
                 ForeColor = Color.White,
                 AutoScroll = false // Disable scrolling as we'll size properly
             };
@@ -5348,7 +5374,7 @@ namespace VDD_Control
             // Add version information
             Label versionLabel = new Label
             {
-                Text = "Version 25.5.22",
+                Text = "Version 25.7.26",
                 Font = new Font("Consolas", 10),
                 ForeColor = Color.White,
                 TextAlign = ContentAlignment.MiddleCenter,
@@ -5843,5 +5869,56 @@ namespace VDD_Control
         {
             systemInformationToolStripMenuItem_Click(sender, e);
         }
+
+        private void ShowDriverInstallPromptIfNeeded()
+        {
+            try
+            {
+                // Check if user has previously chosen not to show this prompt
+                if (XMLController.GetDontShowDriverInstallPrompt())
+                {
+                    AppendToConsole("[INFO] Driver installation prompt disabled by user preference.\n");
+                    return;
+                }
+
+                // Use BeginInvoke to ensure we're on the UI thread
+                this.BeginInvoke(new Action(() =>
+                {
+                    try
+                    {
+                        AppendToConsole("[INFO] Showing driver installation prompt...\n");
+                        
+                        var (result, dontShowAgain) = DriverInstallPrompt.ShowPrompt(this);
+                        
+                        // Save the "don't show again" preference if checked
+                        if (dontShowAgain)
+                        {
+                            XMLController.SetDontShowDriverInstallPrompt(true);
+                            AppendToConsole("[INFO] Driver installation prompt disabled at user request.\n");
+                        }
+                        
+                        // Handle the user's choice
+                        if (result == DriverInstallPrompt.PromptResult.Install)
+                        {
+                            AppendToConsole("[ACTION] User chose to install the Virtual Display Driver.\n");
+                            InstallDriverCommand();
+                        }
+                        else
+                        {
+                            AppendToConsole("[INFO] User chose not to install the Virtual Display Driver.\n");
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        AppendToConsole($"[ERROR] Failed to show driver installation prompt: {ex.Message}\n");
+                    }
+                }));
+            }
+            catch (Exception ex)
+            {
+                AppendToConsole($"[ERROR] Error in ShowDriverInstallPromptIfNeeded: {ex.Message}\n");
+            }
+        }
+
     }
 }

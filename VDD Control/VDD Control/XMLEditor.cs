@@ -59,7 +59,22 @@ namespace VDD_Control
             
             // Fix for ForeverClose control - handle it directly
             // Explicitly handle close button click to avoid null reference exception
-            foreverClose.Click += (s, e) => this.Close();
+            if (foreverClose != null && foreverClose.Parent != null)
+            {
+                foreverClose.Click += (s, e) => this.Close();
+            }
+            else
+            {
+                // Fallback: ensure control is properly initialized after form load
+                this.Load += (s, e) =>
+                {
+                    if (foreverClose != null && foreverClose.Parent != null)
+                    {
+                        foreverClose.Click -= (sender, args) => this.Close(); // Remove any existing handler
+                        foreverClose.Click += (sender, args) => this.Close();
+                    }
+                };
+            }
             
             // Add handler for the form's FormClosing event
             this.FormClosing += (s, e) => 
@@ -636,7 +651,7 @@ namespace VDD_Control
                     Text = xmlContent,
                     Dock = DockStyle.Fill,
                     ReadOnly = true,
-                    BackColor = Color.FromArgb(20, 30, 40),
+                    BackColor = Color.FromArgb(3, 13, 17),
                     ForeColor = Color.White,
                     Font = new Font("Consolas", 11, FontStyle.Regular),
                     BorderStyle = BorderStyle.None,

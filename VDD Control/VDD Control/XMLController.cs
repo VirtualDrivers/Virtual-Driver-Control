@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
 using System.IO;
+using Microsoft.Win32;
 
 namespace VDD_Control
 {
@@ -391,6 +392,49 @@ namespace VDD_Control
             parent.AppendChild(element);
         }
 
+        // Static methods for managing application settings in the registry
+        private const string RegistryKeyPath = @"SOFTWARE\MikeTheTech\VirtualDisplayDriverControl";
+
+        public static bool GetDontShowDriverInstallPrompt()
+        {
+            try
+            {
+                using (RegistryKey key = Registry.CurrentUser.OpenSubKey(RegistryKeyPath, false))
+                {
+                    if (key != null)
+                    {
+                        object value = key.GetValue("DontShowDriverInstallPrompt");
+                        if (value != null && bool.TryParse(value.ToString(), out bool result))
+                        {
+                            return result;
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[ERROR] Failed to read registry setting: {ex.Message}");
+            }
+            return false; // Default to showing the prompt
+        }
+
+        public static void SetDontShowDriverInstallPrompt(bool dontShow)
+        {
+            try
+            {
+                using (RegistryKey key = Registry.CurrentUser.CreateSubKey(RegistryKeyPath, true))
+                {
+                    if (key != null)
+                    {
+                        key.SetValue("DontShowDriverInstallPrompt", dontShow.ToString());
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[ERROR] Failed to write registry setting: {ex.Message}");
+            }
+        }
 
     }
 }
