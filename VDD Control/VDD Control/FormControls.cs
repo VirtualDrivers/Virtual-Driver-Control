@@ -7,8 +7,8 @@ namespace VDD_Control
     public partial class mainWindow
     {
         // Custom close and minimize buttons to replace ReaLTaiizor controls
-        private Button customCloseButton;
-        private Button customMinButton;
+        private Button customCloseButton = null!;
+        private Button customMinButton = null!;
         
         /// <summary>
         /// Replaces ReaLTaiizor controls with standard Windows Forms controls

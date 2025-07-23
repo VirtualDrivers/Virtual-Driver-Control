@@ -8,7 +8,7 @@ namespace VDD_Control
     public partial class mainWindow
     {
         // Track the XML Editor form instance
-        private XMLEditor xmlEditorForm;
+        private XMLEditor? xmlEditorForm;
         
         //private ToolStripMenuItem xmlEditorToolStripMenuItem;
         //private ToolStripMenuItem xmlEditorToolStripMenuItem1;

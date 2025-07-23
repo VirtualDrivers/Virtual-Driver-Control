@@ -9,9 +9,9 @@ namespace VDD_Control
 {
     public partial class mainWindow
     {
-        private ToolStripMenuItem optionsToolStripMenuItem;
-        private ToolStripMenuItem locateDriverInstallationToolStripMenuItem;
-        private ToolStripMenuItem runOnStartupToolStripMenuItem;
+        private ToolStripMenuItem optionsToolStripMenuItem = null!;
+        private ToolStripMenuItem locateDriverInstallationToolStripMenuItem = null!;
+        private ToolStripMenuItem runOnStartupToolStripMenuItem = null!;
         
         /// <summary>
         /// Initializes Options menu items and adds them to the main menu

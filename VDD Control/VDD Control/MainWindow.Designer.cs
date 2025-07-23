@@ -159,9 +159,9 @@ namespace VDD_Control
             // 
             // trayMenu
             // 
-            trayMenu.Items.AddRange(new ToolStripItem[] { menuToolStripMenuItem1, toolsToolStripMenuItem1, virtualDisplayDriverToolStripMenuItem1, aboutToolStripMenuItem1, exitToolStripMenuItem2 });
+            trayMenu.Items.AddRange(new ToolStripItem[] { menuToolStripMenuItem1, toolsToolStripMenuItem1, virtualDisplayDriverToolStripMenuItem1, virtualAudioDriverToolStripMenuItem1, aboutToolStripMenuItem1, exitToolStripMenuItem2 });
             trayMenu.Name = "contextMenuStrip1";
-            trayMenu.Size = new Size(184, 136);
+            trayMenu.Size = new Size(184, 158);
             trayMenu.Text = "Menu";
             // 
             // menuToolStripMenuItem1
@@ -404,15 +404,15 @@ namespace VDD_Control
             // 
             installDriverToolStripMenuItem3.Name = "installDriverToolStripMenuItem3";
             installDriverToolStripMenuItem3.Size = new Size(146, 22);
-            installDriverToolStripMenuItem3.Text = "Install Driver";
-            installDriverToolStripMenuItem3.Click += InstallDriverHandler;
+            installDriverToolStripMenuItem3.Text = "Install VAD";
+            installDriverToolStripMenuItem3.Click += InstallVADHandler;
             // 
             // uninstallDriverToolStripMenuItem3
             // 
             uninstallDriverToolStripMenuItem3.Name = "uninstallDriverToolStripMenuItem3";
             uninstallDriverToolStripMenuItem3.Size = new Size(146, 22);
-            uninstallDriverToolStripMenuItem3.Text = "Uninstall Driver";
-            uninstallDriverToolStripMenuItem3.Click += UninstallDriverHandler;
+            uninstallDriverToolStripMenuItem3.Text = "Uninstall VAD";
+            uninstallDriverToolStripMenuItem3.Click += UninstallVADHandler;
             // 
             // menuToolStripMenuItem
             // 
@@ -608,15 +608,15 @@ namespace VDD_Control
             // 
             installDriverToolStripMenuItem1.Name = "installDriverToolStripMenuItem1";
             installDriverToolStripMenuItem1.Size = new Size(146, 22);
-            installDriverToolStripMenuItem1.Text = "Install Driver";
-            installDriverToolStripMenuItem1.Click += InstallDriverHandler;
+            installDriverToolStripMenuItem1.Text = "Install VAD";
+            installDriverToolStripMenuItem1.Click += InstallVADHandler;
             // 
             // uninstallDriverToolStripMenuItem1
             // 
             uninstallDriverToolStripMenuItem1.Name = "uninstallDriverToolStripMenuItem1";
             uninstallDriverToolStripMenuItem1.Size = new Size(146, 22);
-            uninstallDriverToolStripMenuItem1.Text = "Uninstall Driver";
-            uninstallDriverToolStripMenuItem1.Click += UninstallDriverHandler;
+            uninstallDriverToolStripMenuItem1.Text = "Uninstall VAD";
+            uninstallDriverToolStripMenuItem1.Click += UninstallVADHandler;
             // 
             // aboutToolStripMenuItem
             // 
@@ -630,10 +630,10 @@ namespace VDD_Control
             // 
             mainVisibleMenuStrip.BackColor = Color.FromArgb(32, 34, 37);
             mainVisibleMenuStrip.Dock = DockStyle.None;
-            mainVisibleMenuStrip.Items.AddRange(new ToolStripItem[] { menuToolStripMenuItem, toolsToolStripMenuItem, virtualDisplayDriverToolStripMenuItem, aboutToolStripMenuItem });
+            mainVisibleMenuStrip.Items.AddRange(new ToolStripItem[] { menuToolStripMenuItem, toolsToolStripMenuItem, virtualDisplayDriverToolStripMenuItem, virtualAudioDriverToolStripMenuItem, aboutToolStripMenuItem });
             mainVisibleMenuStrip.Location = new Point(255, 22);
             mainVisibleMenuStrip.Name = "mainVisibleMenuStrip";
-            mainVisibleMenuStrip.Size = new Size(285, 24);
+            mainVisibleMenuStrip.Size = new Size(407, 24);
             mainVisibleMenuStrip.TabIndex = 1;
             mainVisibleMenuStrip.Text = "mainVisibleToolstrip";
             // 

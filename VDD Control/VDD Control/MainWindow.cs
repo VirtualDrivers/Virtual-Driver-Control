@@ -9,6 +9,7 @@ using System.Windows.Forms;
 using System.Drawing;
 using System.ComponentModel; // For Win32Exception
 using System.Xml; // For XmlException
+using System.Runtime.InteropServices; // For RuntimeInformation
 
 namespace VDD_Control
 {
@@ -217,7 +218,9 @@ namespace VDD_Control
                 selectGPUToolStripMenuItem1.Visible = false;
         }
         // Fields for system tray functionality
+        #pragma warning disable CS0169 // The field is never used
         private NotifyIcon? trayIcon;
+        #pragma warning restore CS0169
         private bool minimizeToTray = false; // Default to disabled - feature currently hidden
 
         // Set up minimize to tray functionality
@@ -1891,20 +1894,30 @@ namespace VDD_Control
                 }
             }
         }
-        private async void RestartDriverHandler(object sender, EventArgs e)
+        private void RestartDriverHandler(object sender, EventArgs e)
         {
             // Use the pipeline RELOAD_DRIVER command instead of PowerShell restart
             ReloadDriverCommand();
         }
 
-        private async void InstallDriverHandler(object sender, EventArgs e)
+        private void InstallDriverHandler(object sender, EventArgs e)
         {
             InstallDriverCommand();
         }
 
-        private async void UninstallDriverHandler(object sender, EventArgs e)
+        private void UninstallDriverHandler(object sender, EventArgs e)
         {
             UninstallDriverCommand();
+        }
+
+        private void InstallVADHandler(object sender, EventArgs e)
+        {
+            InstallVADCommand();
+        }
+
+        private void UninstallVADHandler(object sender, EventArgs e)
+        {
+            UninstallVADCommand();
         }
 
         // Helper method to update task progress bar in a thread-safe way
@@ -3162,7 +3175,7 @@ namespace VDD_Control
                     UpdateTaskProgress("Disabling Driver", 0);
                     
                     // Try to check actual connection status after failed disable attempt
-                    TryConnectToDriver().ConfigureAwait(false);
+                    _ = TryConnectToDriver().ConfigureAwait(false);
                 }
             }
             catch (Exception ex)
@@ -3193,7 +3206,7 @@ namespace VDD_Control
         }
 
         // Helper method to create a default XML file when none is found
-        private async Task<bool> TryCreateDefaultXmlFile()
+        private Task<bool> TryCreateDefaultXmlFile()
         {
             AppendToConsole("[INFO] Attempting to create default XML settings file...\n");
 
@@ -3214,12 +3227,12 @@ namespace VDD_Control
                     // Copy the sample XML to the driver directory
                     File.Copy(sampleXmlPath, targetXmlPath, true);
                     AppendToConsole($"[SUCCESS] Created default XML at: {targetXmlPath}\n");
-                    return true;
+                    return Task.FromResult(true);
                 }
                 catch (Exception ex)
                 {
                     AppendToConsole($"[ERROR] Failed to copy XML file: {ex.Message}\n");
-                    return false;
+                    return Task.FromResult(false);
                 }
             }
             else
@@ -3242,18 +3255,18 @@ namespace VDD_Control
                         // Copy the XML to the driver directory
                         File.Copy(projectXmlPath, targetXmlPath, true);
                         AppendToConsole($"[SUCCESS] Created default XML at: {targetXmlPath}\n");
-                        return true;
+                        return Task.FromResult(true);
                     }
                     catch (Exception ex)
                     {
                         AppendToConsole($"[ERROR] Failed to copy XML file: {ex.Message}\n");
-                        return false;
+                        return Task.FromResult(false);
                     }
                 }
                 else
                 {
                     AppendToConsole("[WARNING] No sample XML file found to create default settings\n");
-                    return false;
+                    return Task.FromResult(false);
                 }
             }
         }
@@ -3390,7 +3403,7 @@ namespace VDD_Control
                     UpdateTaskProgress("Disabling Driver", 0);
                     
                     // Try to check actual connection status after failed disable attempt
-                    TryConnectToDriver().ConfigureAwait(false);
+                    _ = TryConnectToDriver().ConfigureAwait(false);
                 }
             }
             catch (Exception ex)
@@ -3479,6 +3492,8 @@ namespace VDD_Control
             helpText.AppendLine("RELOAD_DRIVER          - Asks the driver to reload itself");
             helpText.AppendLine("INSTALL_DRIVER         - Install the Virtual Display Driver");
             helpText.AppendLine("UNINSTALL_DRIVER       - Uninstall the Virtual Display Driver");
+            helpText.AppendLine("INSTALL_VAD            - Install the Virtual Audio Driver (x86 only)");
+            helpText.AppendLine("UNINSTALL_VAD          - Uninstall the Virtual Audio Driver");
             helpText.AppendLine("SDR10 [true/false]     - Enable/disable SDR 10-bit mode");
             helpText.AppendLine("HDRPLUS [true/false]   - Enable/disable HDR+ mode");
             helpText.AppendLine("CUSTOMEDID [true/false]- Enable/disable custom EDID");
@@ -3524,6 +3539,11 @@ namespace VDD_Control
             }
         }
 
+        private string GetSystemArchitecture()
+        {
+            return Environment.Is64BitOperatingSystem && RuntimeInformation.ProcessArchitecture == Architecture.Arm64 ? "ARM64" : "x86";
+        }
+
         private async void InstallDriverCommand()
         {
             AppendToConsole("[ACTION] Installing Virtual Display Driver...\n");
@@ -3541,27 +3561,93 @@ namespace VDD_Control
                     return;
                 }
 
-                // Get paths to required files
+                // Detect system architecture and get paths to required files
+                string architecture = GetSystemArchitecture();
                 string currentDir = AppDomain.CurrentDomain.BaseDirectory;
                 string devconPath = Path.Combine(currentDir, "Dependencies", "devcon.exe");
-                string driverDir = Path.Combine(currentDir, "SignedDriverx86");
+                string driverDir = Path.Combine(currentDir, "SignedDrivers", architecture, "VDD");
                 string infPath = Path.Combine(driverDir, "MttVDD.inf");
 
                 AppendToConsole($"[INFO] Working directory: {currentDir}\n");
+                AppendToConsole($"[INFO] Detected system architecture: {architecture}\n");
+                AppendToConsole($"[INFO] Expected driver path: SignedDrivers\\{architecture}\\VDD\\\n");
 
-                // Verify files exist
+                // Verify files exist with detailed logging
+                AppendToConsole("[INFO] Verifying required files...\n");
+                
                 if (!File.Exists(devconPath))
                 {
                     AppendToConsole($"[ERROR] devcon.exe not found at: {devconPath}\n");
+                    AppendToConsole("[ERROR] Make sure the Dependencies folder contains devcon.exe\n");
                     UpdateTaskProgress("Installing Driver", 0);
                     return;
                 }
+                AppendToConsole($"[✓] Found devcon.exe at: {devconPath}\n");
+
+                if (!Directory.Exists(driverDir))
+                {
+                    AppendToConsole($"[ERROR] Driver directory not found at: {driverDir}\n");
+                    AppendToConsole($"[ERROR] Expected structure: SignedDrivers\\{architecture}\\VDD\\\n");
+                    
+                    // List available architectures for debugging
+                    string signedDriversPath = Path.Combine(currentDir, "SignedDrivers");
+                    if (Directory.Exists(signedDriversPath))
+                    {
+                        AppendToConsole("[INFO] Available architectures found:\n");
+                        var availableArchs = Directory.GetDirectories(signedDriversPath);
+                        foreach (var archDir in availableArchs)
+                        {
+                            string archName = Path.GetFileName(archDir);
+                            string vddPath = Path.Combine(archDir, "VDD");
+                            if (Directory.Exists(vddPath))
+                            {
+                                AppendToConsole($"[INFO] - {archName} (VDD folder exists)\n");
+                            }
+                            else
+                            {
+                                AppendToConsole($"[INFO] - {archName} (missing VDD folder)\n");
+                            }
+                        }
+                    }
+                    else
+                    {
+                        AppendToConsole($"[ERROR] SignedDrivers folder not found at: {signedDriversPath}\n");
+                    }
+                    
+                    UpdateTaskProgress("Installing Driver", 0);
+                    return;
+                }
+                AppendToConsole($"[✓] Found driver directory: {driverDir}\n");
 
                 if (!File.Exists(infPath))
                 {
                     AppendToConsole($"[ERROR] Driver INF file not found at: {infPath}\n");
+                    AppendToConsole("[ERROR] Required driver files: MttVDD.inf, MttVDD.dll, mttvdd.cat\n");
                     UpdateTaskProgress("Installing Driver", 0);
                     return;
+                }
+                AppendToConsole($"[✓] Found driver INF: {infPath}\n");
+
+                // Check for additional required driver files
+                string dllPath = Path.Combine(driverDir, "MttVDD.dll");
+                string catPath = Path.Combine(driverDir, "mttvdd.cat");
+                
+                if (!File.Exists(dllPath))
+                {
+                    AppendToConsole($"[ERROR] Driver DLL not found at: {dllPath}\n");
+                    UpdateTaskProgress("Installing Driver", 0);
+                    return;
+                }
+                AppendToConsole($"[✓] Found driver DLL: {dllPath}\n");
+
+                if (!File.Exists(catPath))
+                {
+                    AppendToConsole($"[WARNING] Driver catalog file not found at: {catPath}\n");
+                    AppendToConsole("[WARNING] Installation may fail without proper signatures\n");
+                }
+                else
+                {
+                    AppendToConsole($"[✓] Found driver catalog: {catPath}\n");
                 }
 
                 AppendToConsole($"[INFO] Using devcon.exe from: {devconPath}\n");
@@ -3569,25 +3655,33 @@ namespace VDD_Control
                 
                 // Create C:\VirtualDisplayDriver folder and copy settings
                 string targetConfigDir = @"C:\VirtualDisplayDriver";
-                string sourceConfigPath = Path.Combine(driverDir, "vdd_settings.xml");
+                string sourceConfigPath = Path.Combine(currentDir, "Dependencies", "vdd_settings.xml");
                 string targetConfigPath = Path.Combine(targetConfigDir, "vdd_settings.xml");
 
+                AppendToConsole("[INFO] Setting up driver configuration...\n");
+                
                 try
                 {
                     if (!Directory.Exists(targetConfigDir))
                     {
                         Directory.CreateDirectory(targetConfigDir);
-                        AppendToConsole($"[INFO] Created directory: {targetConfigDir}\n");
+                        AppendToConsole($"[✓] Created directory: {targetConfigDir}\n");
+                    }
+                    else
+                    {
+                        AppendToConsole($"[✓] Directory already exists: {targetConfigDir}\n");
                     }
 
                     if (File.Exists(sourceConfigPath))
                     {
                         File.Copy(sourceConfigPath, targetConfigPath, true);
-                        AppendToConsole($"[INFO] Copied configuration file to: {targetConfigPath}\n");
+                        AppendToConsole($"[✓] Copied configuration file to: {targetConfigPath}\n");
                     }
                     else
                     {
-                        AppendToConsole($"[WARNING] vdd_settings.xml not found in driver directory\n");
+                        AppendToConsole($"[WARNING] Starter vdd_settings.xml not found at: {sourceConfigPath}\n");
+                        AppendToConsole("[WARNING] Build script may not have copied the configuration file properly\n");
+                        AppendToConsole("[INFO] Driver will use default settings if no existing config found\n");
                     }
                 }
                 catch (Exception dirEx)
@@ -3596,6 +3690,14 @@ namespace VDD_Control
                 }
                 
                 UpdateTaskProgress("Installing Driver", 50);
+
+                // Pre-installation summary
+                AppendToConsole("[INFO] ===== INSTALLATION SUMMARY =====\n");
+                AppendToConsole($"[INFO] Architecture: {architecture}\n");
+                AppendToConsole($"[INFO] DevCon tool: {devconPath}\n");
+                AppendToConsole($"[INFO] Driver path: {driverDir}\n");
+                AppendToConsole($"[INFO] Config source: {sourceConfigPath}\n");
+                AppendToConsole("[INFO] ================================\n");
 
                 // Run devcon install command
                 ProcessStartInfo startInfo = new ProcessStartInfo
@@ -3848,6 +3950,318 @@ namespace VDD_Control
             {
                 AppendToConsole($"[ERROR] Failed to uninstall driver: {ex.Message}\n");
                 UpdateTaskProgress("Uninstalling Driver", 0);
+            }
+        }
+
+        private async void InstallVADCommand()
+        {
+            AppendToConsole("[ACTION] Installing Virtual Audio Driver...\n");
+            UpdateTaskProgress("Installing VAD", 25);
+
+            try
+            {
+                // Check if running as administrator
+                bool isAdmin = IsRunningAsAdministrator();
+                if (!isAdmin)
+                {
+                    AppendToConsole("[ERROR] Administrator privileges required for VAD installation.\n");
+                    AppendToConsole("[INFO] Please run the application as administrator and try again.\n");
+                    UpdateTaskProgress("Installing VAD", 0);
+                    return;
+                }
+
+                // VAD is only available for x86 architecture
+                string architecture = GetSystemArchitecture();
+                if (architecture != "x86")
+                {
+                    AppendToConsole($"[ERROR] Virtual Audio Driver is only available for x86 systems.\n");
+                    AppendToConsole($"[ERROR] Detected architecture: {architecture}\n");
+                    AppendToConsole("[INFO] VAD is not supported on ARM64 systems.\n");
+                    UpdateTaskProgress("Installing VAD", 0);
+                    return;
+                }
+
+                // Get paths to required files
+                string currentDir = AppDomain.CurrentDomain.BaseDirectory;
+                string devconPath = Path.Combine(currentDir, "Dependencies", "devcon.exe");
+                string vadDir = Path.Combine(currentDir, "SignedDrivers", "x86", "VAD");
+                string infPath = Path.Combine(vadDir, "VirtualAudioDriver.inf");
+
+                AppendToConsole($"[INFO] Working directory: {currentDir}\n");
+                AppendToConsole($"[INFO] VAD driver path: SignedDrivers\\x86\\VAD\\\n");
+
+                // Verify files exist with detailed logging
+                AppendToConsole("[INFO] Verifying required VAD files...\n");
+                
+                if (!File.Exists(devconPath))
+                {
+                    AppendToConsole($"[ERROR] devcon.exe not found at: {devconPath}\n");
+                    AppendToConsole("[ERROR] Make sure the Dependencies folder contains devcon.exe\n");
+                    UpdateTaskProgress("Installing VAD", 0);
+                    return;
+                }
+                AppendToConsole($"[✓] Found devcon.exe at: {devconPath}\n");
+
+                if (!Directory.Exists(vadDir))
+                {
+                    AppendToConsole($"[ERROR] VAD directory not found at: {vadDir}\n");
+                    AppendToConsole("[ERROR] Expected structure: SignedDrivers\\x86\\VAD\\\n");
+                    UpdateTaskProgress("Installing VAD", 0);
+                    return;
+                }
+                AppendToConsole($"[✓] Found VAD directory: {vadDir}\n");
+
+                if (!File.Exists(infPath))
+                {
+                    AppendToConsole($"[ERROR] VAD INF file not found at: {infPath}\n");
+                    AppendToConsole("[ERROR] Required VAD files: VirtualAudioDriver.inf, VirtualAudioDriver.sys, virtualaudiodriver.cat\n");
+                    UpdateTaskProgress("Installing VAD", 0);
+                    return;
+                }
+                AppendToConsole($"[✓] Found VAD INF: {infPath}\n");
+
+                // Check for additional required VAD files
+                string sysPath = Path.Combine(vadDir, "VirtualAudioDriver.sys");
+                string catPath = Path.Combine(vadDir, "virtualaudiodriver.cat");
+                
+                if (!File.Exists(sysPath))
+                {
+                    AppendToConsole($"[ERROR] VAD driver SYS file not found at: {sysPath}\n");
+                    UpdateTaskProgress("Installing VAD", 0);
+                    return;
+                }
+                AppendToConsole($"[✓] Found VAD SYS: {sysPath}\n");
+
+                if (!File.Exists(catPath))
+                {
+                    AppendToConsole($"[WARNING] VAD catalog file not found at: {catPath}\n");
+                    AppendToConsole("[WARNING] Installation may fail without proper signatures\n");
+                }
+                else
+                {
+                    AppendToConsole($"[✓] Found VAD catalog: {catPath}\n");
+                }
+
+                UpdateTaskProgress("Installing VAD", 50);
+
+                // Pre-installation summary
+                AppendToConsole("[INFO] ===== VAD INSTALLATION SUMMARY =====\n");
+                AppendToConsole($"[INFO] DevCon tool: {devconPath}\n");
+                AppendToConsole($"[INFO] VAD driver path: {vadDir}\n");
+                AppendToConsole("[INFO] ===================================\n");
+
+                // Run devcon install command for VAD
+                ProcessStartInfo startInfo = new ProcessStartInfo
+                {
+                    FileName = devconPath,
+                    Arguments = $"install \"{infPath}\" ROOT\\VirtualAudioDriver",
+                    UseShellExecute = false,
+                    RedirectStandardOutput = true,
+                    RedirectStandardError = true,
+                    CreateNoWindow = true
+                };
+
+                AppendToConsole("[INFO] Running VAD installation command...\n");
+                
+                using (Process process = new Process())
+                {
+                    process.StartInfo = startInfo;
+                    
+                    try
+                    {
+                        process.Start();
+
+                        string output = await process.StandardOutput.ReadToEndAsync();
+                        string error = await process.StandardError.ReadToEndAsync();
+
+                        process.WaitForExit();
+
+                        UpdateTaskProgress("Installing VAD", 90);
+
+                        if (process.ExitCode == 0)
+                        {
+                            AppendToConsole("[SUCCESS] VAD installation completed successfully!\n");
+                            if (!string.IsNullOrEmpty(output))
+                            {
+                                AppendToConsole($"[OUTPUT] {output}\n");
+                            }
+                            
+                            AppendToConsole("[INFO] Virtual Audio Driver is now installed and ready to use.\n");
+                        }
+                        else
+                        {
+                            AppendToConsole($"[ERROR] VAD installation failed with exit code: {process.ExitCode}\n");
+                            if (!string.IsNullOrEmpty(error))
+                            {
+                                AppendToConsole($"[ERROR] {error}\n");
+                            }
+                            if (!string.IsNullOrEmpty(output))
+                            {
+                                AppendToConsole($"[OUTPUT] {output}\n");
+                            }
+                        }
+                    }
+                    catch (Exception processEx)
+                    {
+                        AppendToConsole($"[ERROR] Failed to start VAD installation process: {processEx.Message}\n");
+                        UpdateTaskProgress("Installing VAD", 0);
+                        return;
+                    }
+                }
+
+                UpdateTaskProgress("Installing VAD", 100);
+                await Task.Delay(1000);
+                UpdateTaskProgress("", 0);
+            }
+            catch (Exception ex)
+            {
+                AppendToConsole($"[ERROR] Failed to install VAD: {ex.Message}\n");
+                UpdateTaskProgress("Installing VAD", 0);
+            }
+        }
+
+        private async void UninstallVADCommand()
+        {
+            AppendToConsole("[ACTION] Uninstalling Virtual Audio Driver...\n");
+            UpdateTaskProgress("Uninstalling VAD", 25);
+
+            try
+            {
+                // Check if running as administrator
+                bool isAdmin = IsRunningAsAdministrator();
+                if (!isAdmin)
+                {
+                    AppendToConsole("[ERROR] Administrator privileges required for VAD uninstallation.\n");
+                    AppendToConsole("[INFO] Please run the application as administrator and try again.\n");
+                    UpdateTaskProgress("Uninstalling VAD", 0);
+                    return;
+                }
+
+                // Get paths to required files
+                string currentDir = AppDomain.CurrentDomain.BaseDirectory;
+                string devconPath = Path.Combine(currentDir, "Dependencies", "devcon.exe");
+
+                AppendToConsole($"[INFO] Working directory: {currentDir}\n");
+
+                // Verify devcon.exe exists
+                if (!File.Exists(devconPath))
+                {
+                    AppendToConsole($"[ERROR] devcon.exe not found at: {devconPath}\n");
+                    UpdateTaskProgress("Uninstalling VAD", 0);
+                    return;
+                }
+
+                AppendToConsole($"[INFO] Using devcon.exe from: {devconPath}\n");
+                
+                UpdateTaskProgress("Uninstalling VAD", 50);
+
+                // Run devcon remove command to uninstall the VAD
+                ProcessStartInfo startInfo = new ProcessStartInfo
+                {
+                    FileName = devconPath,
+                    Arguments = "remove ROOT\\VirtualAudioDriver",
+                    UseShellExecute = false,
+                    RedirectStandardOutput = true,
+                    RedirectStandardError = true,
+                    CreateNoWindow = true
+                };
+
+                AppendToConsole("[INFO] Running VAD uninstallation command...\n");
+                
+                using (Process process = new Process())
+                {
+                    process.StartInfo = startInfo;
+                    
+                    try
+                    {
+                        process.Start();
+
+                        string output = await process.StandardOutput.ReadToEndAsync();
+                        string error = await process.StandardError.ReadToEndAsync();
+
+                        process.WaitForExit();
+
+                        UpdateTaskProgress("Uninstalling VAD", 90);
+
+                        if (process.ExitCode == 0)
+                        {
+                            AppendToConsole("[SUCCESS] VAD uninstallation completed successfully!\n");
+                            if (!string.IsNullOrEmpty(output))
+                            {
+                                AppendToConsole($"[OUTPUT] {output}\n");
+                            }
+                            
+                            AppendToConsole("[INFO] Virtual Audio Driver has been removed from the system.\n");
+                        }
+                        else
+                        {
+                            AppendToConsole($"[ERROR] VAD uninstallation failed with exit code: {process.ExitCode}\n");
+                            if (!string.IsNullOrEmpty(error))
+                            {
+                                AppendToConsole($"[ERROR] {error}\n");
+                            }
+                            if (!string.IsNullOrEmpty(output))
+                            {
+                                AppendToConsole($"[OUTPUT] {output}\n");
+                            }
+                            
+                            // Additional uninstall attempt using alternative hardware ID
+                            AppendToConsole("[INFO] Attempting alternative VAD uninstall method...\n");
+                            ProcessStartInfo altStartInfo = new ProcessStartInfo
+                            {
+                                FileName = devconPath,
+                                Arguments = "remove VirtualAudioDriver",
+                                UseShellExecute = false,
+                                RedirectStandardOutput = true,
+                                RedirectStandardError = true,
+                                CreateNoWindow = true
+                            };
+
+                            using (Process altProcess = new Process())
+                            {
+                                altProcess.StartInfo = altStartInfo;
+                                altProcess.Start();
+                                
+                                string altOutput = await altProcess.StandardOutput.ReadToEndAsync();
+                                string altError = await altProcess.StandardError.ReadToEndAsync();
+                                
+                                altProcess.WaitForExit();
+                                
+                                if (altProcess.ExitCode == 0)
+                                {
+                                    AppendToConsole("[SUCCESS] Alternative VAD uninstall method succeeded!\n");
+                                    if (!string.IsNullOrEmpty(altOutput))
+                                    {
+                                        AppendToConsole($"[OUTPUT] {altOutput}\n");
+                                    }
+                                }
+                                else
+                                {
+                                    AppendToConsole($"[ERROR] Alternative VAD uninstall also failed with exit code: {altProcess.ExitCode}\n");
+                                    if (!string.IsNullOrEmpty(altError))
+                                    {
+                                        AppendToConsole($"[ERROR] {altError}\n");
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    catch (Exception processEx)
+                    {
+                        AppendToConsole($"[ERROR] Failed to start VAD uninstallation process: {processEx.Message}\n");
+                        UpdateTaskProgress("Uninstalling VAD", 0);
+                        return;
+                    }
+                }
+
+                UpdateTaskProgress("Uninstalling VAD", 100);
+                await Task.Delay(1000);
+                UpdateTaskProgress("", 0);
+            }
+            catch (Exception ex)
+            {
+                AppendToConsole($"[ERROR] Failed to uninstall VAD: {ex.Message}\n");
+                UpdateTaskProgress("Uninstalling VAD", 0);
             }
         }
 
@@ -4330,6 +4744,16 @@ namespace VDD_Control
                 case "UNINSTALL_DRIVER":
                     userInput.Text = string.Empty;
                     UninstallDriverCommand();
+                    return;
+
+                case "INSTALL_VAD":
+                    userInput.Text = string.Empty;
+                    InstallVADCommand();
+                    return;
+
+                case "UNINSTALL_VAD":
+                    userInput.Text = string.Empty;
+                    UninstallVADCommand();
                     return;
 
                 case "GETSETTINGS":
@@ -4868,7 +5292,7 @@ namespace VDD_Control
 
         }
 
-        private async void restartAllButton_Click(object sender, EventArgs e)
+        private void restartAllButton_Click(object sender, EventArgs e)
         {
             // Use the pipeline RELOAD_DRIVER command instead of PowerShell restart
             AppendToConsole("[INFO] Restart button clicked. Initiating driver restart...\n");

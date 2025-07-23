@@ -6,7 +6,7 @@ namespace VDD_Control
 {
     public partial class mainWindow
     {
-        private ToolStripMenuItem runOnStartupTrayMenuItem;
+        private ToolStripMenuItem runOnStartupTrayMenuItem = null!;
         
         /// <summary>
         /// Initializes the Options menu in the tray icon context menu
