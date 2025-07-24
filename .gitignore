@@ -406,3 +406,4 @@ ISSUES.md
 VDD Control/BuildPortable.bat
 *.exe
 /VDD Control/Virtual-Display-Driver
+/VDD Control/Documentation
