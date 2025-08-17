@@ -9,7 +9,8 @@
       "Bash(npm run build-portable:*)",
       "Bash(npm run build:*)",
       "Bash(sudo apt:*)",
-      "Bash(sudo apt install:*)"
+      "Bash(sudo apt install:*)",
+      "Bash(cp:*)"
     ],
     "deny": [],
     "ask": []
