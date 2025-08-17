@@ -302,7 +302,7 @@ nav.navigation .nav-item.active,
 nav.navigation .nav-item.active:hover,
 nav.navigation .nav-item.active:focus {
   background: var(--accent-primary) !important;
-  color: var(--text-primary) !important;
+  color: var(--text-on-accent) !important;
 }
 
 /* Dark mode navigation uses white text and should use accent color */

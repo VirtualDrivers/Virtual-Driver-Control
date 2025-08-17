@@ -1,4 +1,4 @@
-const { app, BrowserWindow } = require('electron');
+const { app, BrowserWindow, ipcMain } = require('electron');
 const path = require('path');
 
 let mainWindow;
@@ -34,6 +34,12 @@ function createWindow() {
 }
 
 app.whenReady().then(createWindow);
+
+// Handle IPC messages
+ipcMain.on('quit-app', () => {
+  console.log('Received quit-app message, closing application');
+  app.quit();
+});
 
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {

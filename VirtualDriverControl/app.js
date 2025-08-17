@@ -24,7 +24,7 @@ class VirtualDriverControl {
         }
     }
     constructor() {
-        this.currentTheme = 'light';
+        this.currentTheme = 'dark';
         // Remove any mode-related classes from body
         document.body.classList.remove('user-mode', 'dev-mode');
         this.init().catch(error => {
@@ -112,7 +112,7 @@ class VirtualDriverControl {
     // Helper function to apply colors to active navigation item
     applyColorsToActiveNavItem(navItem) {
         const savedColors = this.getSavedColors();
-        const currentTheme = document.body.getAttribute('data-theme') || 'light';
+        const currentTheme = document.body.getAttribute('data-theme') || 'dark';
         
         // Helper function to generate color variations
         const adjustColor = (color, amount) => {
@@ -215,6 +215,9 @@ class VirtualDriverControl {
             });
         }
 
+        // Check if running with Administrator privileges on startup
+        await this.checkAndPromptForAdminPrivileges();
+        
         // Load VDD settings from C:\VirtualDisplayDriver\vdd_settings.xml
         await this.loadVDDSettings();
         
@@ -859,6 +862,7 @@ class VirtualDriverControl {
         const uninstallDriverBtn = document.getElementById('uninstall-driver-btn');
         if (uninstallDriverBtn) {
             uninstallDriverBtn.addEventListener('click', () => {
+                this.logToFile('UNINSTALL BUTTON CLICKED - Event handler triggered');
                 this.uninstallDriver();
             });
         }
@@ -866,6 +870,7 @@ class VirtualDriverControl {
         const reinstallDriverBtn = document.getElementById('reinstall-driver-btn');
         if (reinstallDriverBtn) {
             reinstallDriverBtn.addEventListener('click', () => {
+                this.logToFile('REINSTALL BUTTON CLICKED - Event handler triggered');
                 this.reinstallDriver();
             });
         }
@@ -1306,22 +1311,168 @@ class VirtualDriverControl {
         }
     }
 
+    // Check and prompt for Administrator privileges on startup
+    async checkAndPromptForAdminPrivileges() {
+        try {
+            this.logToFile('=== CHECKING ADMINISTRATOR PRIVILEGES ON STARTUP ===');
+            const isAdmin = await this.checkAdministratorPrivileges();
+            this.logToFile(`Running as Administrator: ${isAdmin}`);
+            
+            if (!isAdmin && process.platform === 'win32') {
+                this.logToFile('Not running as Administrator - automatically requesting elevation');
+                
+                // Show notification about admin privileges
+                this.showNotification('Requesting Administrator privileges for driver management features...', 'info');
+                
+                // Automatically attempt to restart as Administrator
+                this.logToFile('Automatically restarting as Administrator');
+                await this.restartAsAdministrator();
+            } else if (isAdmin) {
+                this.logToFile('Running as Administrator - all features available');
+                this.showNotification('Running with Administrator privileges - all features available', 'success');
+            } else {
+                this.logToFile('Platform check: Not Windows or unable to determine admin status');
+            }
+        } catch (error) {
+            this.logToFile(`Error checking admin privileges on startup: ${error.message}`);
+        }
+    }
 
+    // Restart the application with Administrator privileges
+    async restartAsAdministrator() {
+        try {
+            this.logToFile('=== ATTEMPTING TO RESTART AS ADMINISTRATOR ===');
+            
+            if (typeof window !== 'undefined' && window.require && process.platform === 'win32') {
+                const { spawn } = window.require('child_process');
+                const path = window.require('path');
+                
+                // Get the current executable path
+                const electronPath = process.execPath;
+                const appPath = process.cwd();
+                
+                this.logToFile(`Current executable: ${electronPath}`);
+                this.logToFile(`App path: ${appPath}`);
+                this.logToFile(`Process argv: ${JSON.stringify(process.argv)}`);
+                
+                // Show notification about restart
+                this.showNotification('Restarting application with Administrator privileges...', 'info');
+                
+                // Use PowerShell to restart with elevated privileges
+                const psCommand = `Start-Process -FilePath "${electronPath}" -ArgumentList "${appPath}" -Verb RunAs`;
+                this.logToFile(`PowerShell command: ${psCommand}`);
+                
+                const { exec } = window.require('child_process');
+                const util = window.require('util');
+                const execPromise = util.promisify(exec);
+                
+                try {
+                    await execPromise(`powershell -Command "${psCommand}"`);
+                    this.logToFile('PowerShell restart command executed successfully');
+                    
+                    // Close current instance after a short delay
+                    setTimeout(() => {
+                        this.logToFile('Closing current instance');
+                        if (typeof window !== 'undefined' && window.require) {
+                            const { ipcRenderer } = window.require('electron');
+                            ipcRenderer.send('quit-app');
+                        } else {
+                            window.close();
+                        }
+                    }, 1000);
+                    
+                } catch (psError) {
+                    this.logToFile(`PowerShell restart failed: ${psError.message}`);
+                    // Check if user cancelled UAC prompt
+                    if (psError.message.includes('cancelled') || psError.message.includes('denied') || psError.code === 1223) {
+                        this.logToFile('User cancelled UAC prompt');
+                        this.showNotification('Administrator privileges declined. Running with limited functionality.', 'warning');
+                    } else {
+                        this.logToFile('Unexpected error during elevation attempt');
+                        this.showNotification('Failed to request Administrator privileges. Running with limited functionality.', 'warning');
+                    }
+                }
+                
+            } else {
+                this.logToFile('Cannot restart as Administrator - no Node.js access or not Windows');
+                this.showNotification('Please manually restart the application as Administrator.', 'warning');
+            }
+        } catch (error) {
+            this.logToFile(`Error restarting as Administrator: ${error.message}`);
+            this.showNotification('Failed to restart as Administrator. Please manually run as Administrator.', 'error');
+        }
+    }
+
+    // Check if the application is running with Administrator privileges
+    async checkAdministratorPrivileges() {
+        try {
+            if (typeof window !== 'undefined' && window.require) {
+                const { exec } = window.require('child_process');
+                const util = window.require('util');
+                const execPromise = util.promisify(exec);
+                
+                if (process.platform === 'win32') {
+                    // Try to run a command that requires admin privileges
+                    try {
+                        await execPromise('net session >nul 2>&1');
+                        return true;
+                    } catch (error) {
+                        return false;
+                    }
+                } else {
+                    // For non-Windows platforms, check if running as root
+                    try {
+                        const result = await execPromise('id -u');
+                        return result.stdout.trim() === '0';
+                    } catch (error) {
+                        return false;
+                    }
+                }
+            } else {
+                this.logToFile('Cannot check admin privileges - no Node.js access');
+                return false;
+            }
+        } catch (error) {
+            this.logToFile(`Error checking admin privileges: ${error.message}`);
+            return false;
+        }
+    }
 
     // Uninstall the virtual display driver
     async uninstallDriver() {
         try {
             this.logToFile('=== UNINSTALL DRIVER FUNCTION CALLED ===');
+            this.logToFile(`Timestamp: ${new Date().toISOString()}`);
+            this.logToFile(`Current working directory: ${process.cwd()}`);
+            this.logToFile(`App version: ${process.env.npm_package_version || 'unknown'}`);
+            this.logToFile(`Process platform: ${process.platform}`);
+            this.logToFile(`Process arch: ${process.arch}`);
+            this.logToFile(`Node version: ${process.version}`);
+            this.logToFile(`Process argv: ${JSON.stringify(process.argv)}`);
+            
+            // Check if running with Administrator privileges
+            const isAdmin = await this.checkAdministratorPrivileges();
+            this.logToFile(`Running as Administrator: ${isAdmin}`);
+            
+            if (!isAdmin) {
+                this.logToFile('WARNING: Not running as Administrator - operations may fail');
+                this.showNotification('Warning: This operation may require Administrator privileges. If it fails, please restart the application as Administrator.', 'warning');
+            }
+            
+            // Show notification that uninstall process started
+            this.showNotification('Starting driver uninstall process...', 'info');
             
             // Show confirmation dialog
             const confirmed = confirm('Are you sure you want to uninstall the Virtual Display Driver? This will remove the driver from your system.');
             
             if (!confirmed) {
                 this.logToFile('User cancelled uninstall');
+                this.showNotification('Driver uninstall cancelled', 'info');
                 return;
             }
             
             this.logToFile('User confirmed uninstall, proceeding...');
+            this.showNotification('Uninstalling driver...', 'info');
             
             if (typeof window !== 'undefined' && window.require) {
                 this.logToFile('Node.js access available');
@@ -1343,19 +1494,102 @@ class VirtualDriverControl {
                         
                         if (!nefconExists) {
                             this.logToFile('ERROR: nefconw.exe not found');
+                            this.showNotification('Error: nefconw.exe not found', 'error');
                             return;
                         }
                         this.logToFile('nefconw.exe found, proceeding with removal...');
                         
-                        this.logToFile('Attempting to remove driver with nefconw...');
+                        this.logToFile('Attempting to uninstall driver with nefconw...');
                         
+                        // Step 1: Remove device node first
                         const removeCmd = `"${nefconPath}" --remove-device-node --hardware-id Root\\MttVDD --class-guid 4d36e968-e325-11ce-bfc1-08002be10318`;
-                        this.logToFile(`Executing command: ${removeCmd}`);
+                        this.logToFile(`Step 1 - Executing command: ${removeCmd}`);
                         
-                        const result = await execPromise(removeCmd);
-                        this.logToFile(`Command stdout: ${result.stdout}`);
-                        this.logToFile(`Command stderr: ${result.stderr}`);
-                        this.logToFile('Driver uninstalled successfully with nefconw');
+                        const removeResult = await Promise.race([
+                            execPromise(removeCmd),
+                            new Promise((_, reject) => setTimeout(() => reject(new Error('Command timeout after 30 seconds')), 30000))
+                        ]);
+                        this.logToFile(`Remove stdout: ${removeResult.stdout}`);
+                        this.logToFile(`Remove stderr: ${removeResult.stderr}`);
+                        this.logToFile('Device node removed successfully');
+                        
+                        // Step 2: Try to completely uninstall the driver package
+                        const driverDir = 'C:\\VirtualDisplayDriver\\Driver Files\\VDD x86 x64';
+                        const infPath = `${driverDir}\\MttVDD.inf`;
+                        
+                        this.logToFile('Step 2: Attempting to uninstall driver package...');
+                        
+                        // Check if INF file exists for uninstall
+                        if (fs.existsSync(infPath)) {
+                            const uninstallCmd = `"${nefconPath}" --uninstall-driver --inf-path "${infPath}"`;
+                            this.logToFile(`Executing uninstall command: ${uninstallCmd}`);
+                            
+                            try {
+                                const uninstallResult = await Promise.race([
+                                    execPromise(uninstallCmd),
+                                    new Promise((_, reject) => setTimeout(() => reject(new Error('Uninstall timeout after 30 seconds')), 30000))
+                                ]);
+                                this.logToFile(`Uninstall stdout: ${uninstallResult.stdout}`);
+                                this.logToFile(`Uninstall stderr: ${uninstallResult.stderr}`);
+                                this.logToFile('Driver package uninstalled successfully');
+                            } catch (uninstallError) {
+                                this.logToFile(`Driver package uninstall failed: ${uninstallError.message}`);
+                                this.logToFile('Continuing with device node removal only...');
+                            }
+                        } else {
+                            this.logToFile('INF file not found, skipping driver package uninstall');
+                        }
+                        
+                        // Step 3: Alternative method - Use PnPUtil to completely remove driver if available
+                        this.logToFile('Step 3: Attempting alternative driver removal with PnPUtil...');
+                        try {
+                            const pnpUtilCmd = 'pnputil /enum-drivers | findstr "MttVDD"';
+                            this.logToFile(`Checking for driver with command: ${pnpUtilCmd}`);
+                            
+                            const pnpResult = await Promise.race([
+                                execPromise(pnpUtilCmd),
+                                new Promise((_, reject) => setTimeout(() => reject(new Error('PnPUtil timeout after 15 seconds')), 15000))
+                            ]);
+                            
+                            if (pnpResult.stdout && pnpResult.stdout.includes('MttVDD')) {
+                                this.logToFile('Found MttVDD driver in system, attempting removal...');
+                                
+                                // Extract the driver package name (oem*.inf)
+                                const lines = pnpResult.stdout.split('\n');
+                                for (const line of lines) {
+                                    if (line.includes('oem') && line.includes('.inf')) {
+                                        const match = line.match(/oem\d+\.inf/);
+                                        if (match) {
+                                            const oemFile = match[0];
+                                            this.logToFile(`Found driver package: ${oemFile}`);
+                                            
+                                            const removeDriverCmd = `pnputil /delete-driver ${oemFile} /uninstall /force`;
+                                            this.logToFile(`Executing: ${removeDriverCmd}`);
+                                            
+                                            const removeDriverResult = await Promise.race([
+                                                execPromise(removeDriverCmd),
+                                                new Promise((_, reject) => setTimeout(() => reject(new Error('Driver removal timeout after 30 seconds')), 30000))
+                                            ]);
+                                            
+                                            this.logToFile(`PnPUtil remove stdout: ${removeDriverResult.stdout}`);
+                                            this.logToFile(`PnPUtil remove stderr: ${removeDriverResult.stderr}`);
+                                            this.logToFile('Driver completely removed from system');
+                                            break;
+                                        }
+                                    }
+                                }
+                            } else {
+                                this.logToFile('No MttVDD driver found in system');
+                            }
+                        } catch (pnpError) {
+                            this.logToFile(`PnPUtil removal failed: ${pnpError.message}`);
+                            this.logToFile('Continuing without PnPUtil removal...');
+                        }
+                        
+                        this.logToFile('Driver uninstall process completed');
+                        
+                        // Show success notification
+                        this.showNotification('Driver uninstalled successfully', 'success');
                         
                         // Refresh status
                         setTimeout(() => this.refreshSystemStatus(), 2000);
@@ -1365,17 +1599,31 @@ class VirtualDriverControl {
                         this.logToFile(`Error stdout: ${commandError.stdout || 'none'}`);
                         this.logToFile(`Error stderr: ${commandError.stderr || 'none'}`);
                         this.logToFile(`Error code: ${commandError.code || 'none'}`);
+                        
+                        // Check if it's an elevation error
+                        const stdout = commandError.stdout || '';
+                        if (stdout.includes('elevated privileges') || stdout.includes('run as Administrator')) {
+                            this.showNotification('Error: This operation requires Administrator privileges. Please run the application as Administrator.', 'error');
+                            this.logToFile('ELEVATION ERROR: User needs to run as Administrator');
+                        } else {
+                            this.showNotification(`Uninstall failed: ${commandError.message}`, 'error');
+                        }
+                        
                         this.logToFile('Listing devices to help debug the issue...');
                         await this.listDevices();
                     }
                 } else {
                     this.logToFile('WARNING: Driver management is only supported on Windows');
+                    this.showNotification('Error: Driver management is only supported on Windows', 'error');
                 }
             } else {
                 this.logToFile('WARNING: Driver management requires elevated permissions');
+                this.showNotification('Error: Driver management requires elevated permissions', 'error');
             }
         } catch (error) {
             this.logToFile(`Uninstall driver error: ${error.message}`);
+            this.logToFile(`Error stack: ${error.stack}`);
+            this.showNotification(`Uninstall error: ${error.message}`, 'error');
         }
     }
 
@@ -1383,6 +1631,25 @@ class VirtualDriverControl {
     async reinstallDriver() {
         try {
             this.logToFile('=== REINSTALL DRIVER FUNCTION CALLED ===');
+            this.logToFile(`Timestamp: ${new Date().toISOString()}`);
+            this.logToFile(`Current working directory: ${process.cwd()}`);
+            this.logToFile(`App version: ${process.env.npm_package_version || 'unknown'}`);
+            this.logToFile(`Process platform: ${process.platform}`);
+            this.logToFile(`Process arch: ${process.arch}`);
+            this.logToFile(`Node version: ${process.version}`);
+            this.logToFile(`Process argv: ${JSON.stringify(process.argv)}`);
+            
+            // Check if running with Administrator privileges
+            const isAdmin = await this.checkAdministratorPrivileges();
+            this.logToFile(`Running as Administrator: ${isAdmin}`);
+            
+            if (!isAdmin) {
+                this.logToFile('WARNING: Not running as Administrator - operations may fail');
+                this.showNotification('Warning: This operation may require Administrator privileges. If it fails, please restart the application as Administrator.', 'warning');
+            }
+            
+            // Show notification that reinstall process started
+            this.showNotification('Starting driver reinstall process...', 'info');
             
             if (typeof window !== 'undefined' && window.require) {
                 const { exec } = window.require('child_process');
@@ -1405,6 +1672,7 @@ class VirtualDriverControl {
                         
                         if (!nefconExists) {
                             this.logToFile('ERROR: nefconw.exe not found');
+                            this.showNotification('Error: nefconw.exe not found', 'error');
                             return;
                         }
                         
@@ -1414,6 +1682,7 @@ class VirtualDriverControl {
                         
                         if (!driverDirExists) {
                             this.logToFile('ERROR: Driver directory not found');
+                            this.showNotification('Error: Driver directory not found', 'error');
                             return;
                         }
                         
@@ -1423,6 +1692,7 @@ class VirtualDriverControl {
                         
                         if (!infExists) {
                             this.logToFile('ERROR: Driver INF file not found');
+                            this.showNotification('Error: Driver INF file not found', 'error');
                             return;
                         }
                         
@@ -1432,7 +1702,10 @@ class VirtualDriverControl {
                         this.logToFile('Step 1: Removing existing device node');
                         const removeCmd = `"${nefconPath}" --remove-device-node --hardware-id Root\\MttVDD --class-guid 4d36e968-e325-11ce-bfc1-08002be10318`;
                         this.logToFile(`Executing command: ${removeCmd}`);
-                        const removeResult = await execPromise(removeCmd);
+                        const removeResult = await Promise.race([
+                            execPromise(removeCmd),
+                            new Promise((_, reject) => setTimeout(() => reject(new Error('Remove command timeout after 30 seconds')), 30000))
+                        ]);
                         this.logToFile(`Remove stdout: ${removeResult.stdout}`);
                         this.logToFile(`Remove stderr: ${removeResult.stderr}`);
                         this.logToFile('Existing device node removed');
@@ -1441,7 +1714,10 @@ class VirtualDriverControl {
                         this.logToFile('Step 2: Creating new device node');
                         const createCmd = `"${nefconPath}" --create-device-node --hardware-id Root\\MttVDD --class-name Display --class-guid 4D36E968-E325-11CE-BFC1-08002BE10318`;
                         this.logToFile(`Executing command: ${createCmd}`);
-                        const createResult = await execPromise(createCmd);
+                        const createResult = await Promise.race([
+                            execPromise(createCmd),
+                            new Promise((_, reject) => setTimeout(() => reject(new Error('Create command timeout after 30 seconds')), 30000))
+                        ]);
                         this.logToFile(`Create stdout: ${createResult.stdout}`);
                         this.logToFile(`Create stderr: ${createResult.stderr}`);
                         this.logToFile('New device node created');
@@ -1450,11 +1726,17 @@ class VirtualDriverControl {
                         this.logToFile('Step 3: Installing driver');
                         const installCmd = `"${nefconPath}" --install-driver --inf-path "${infPath}"`;
                         this.logToFile(`Executing command: ${installCmd}`);
-                        const installResult = await execPromise(installCmd);
+                        const installResult = await Promise.race([
+                            execPromise(installCmd),
+                            new Promise((_, reject) => setTimeout(() => reject(new Error('Install command timeout after 30 seconds')), 30000))
+                        ]);
                         this.logToFile(`Install stdout: ${installResult.stdout}`);
                         this.logToFile(`Install stderr: ${installResult.stderr}`);
                         
                         this.logToFile('Driver reinstalled successfully');
+                        
+                        // Show success notification
+                        this.showNotification('Driver reinstalled successfully', 'success');
                         
                         // Refresh status
                         setTimeout(() => this.refreshSystemStatus(), 2000);
@@ -1464,17 +1746,31 @@ class VirtualDriverControl {
                         this.logToFile(`Error stdout: ${commandError.stdout || 'none'}`);
                         this.logToFile(`Error stderr: ${commandError.stderr || 'none'}`);
                         this.logToFile(`Error code: ${commandError.code || 'none'}`);
+                        
+                        // Check if it's an elevation error
+                        const stdout = commandError.stdout || '';
+                        if (stdout.includes('elevated privileges') || stdout.includes('run as Administrator')) {
+                            this.showNotification('Error: This operation requires Administrator privileges. Please run the application as Administrator.', 'error');
+                            this.logToFile('ELEVATION ERROR: User needs to run as Administrator');
+                        } else {
+                            this.showNotification(`Reinstall failed: ${commandError.message}`, 'error');
+                        }
+                        
                         this.logToFile('Listing devices to help debug the issue...');
                         await this.listDevices();
                     }
                 } else {
                     this.logToFile('WARNING: Driver management is only supported on Windows');
+                    this.showNotification('Error: Driver management is only supported on Windows', 'error');
                 }
             } else {
                 this.logToFile('WARNING: Driver management requires elevated permissions');
+                this.showNotification('Error: Driver management requires elevated permissions', 'error');
             }
         } catch (error) {
             this.logToFile(`Reinstall driver error: ${error.message}`);
+            this.logToFile(`Error stack: ${error.stack}`);
+            this.showNotification(`Reinstall error: ${error.message}`, 'error');
         }
     }
 
@@ -3384,7 +3680,7 @@ class VirtualDriverControl {
     // Update CSS custom properties
     updateCSSVariables(colors) {
         const root = document.documentElement;
-        const currentTheme = document.body.getAttribute('data-theme') || 'light';
+        const currentTheme = document.body.getAttribute('data-theme') || 'dark';
         
         // Helper function to generate color variations
         const adjustColor = (color, amount) => {

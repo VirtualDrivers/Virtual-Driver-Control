@@ -1,82 +1,79 @@
-[2025-08-17T14:14:56.279Z] === STOP DRIVER FUNCTION CALLED ===
-[2025-08-17T14:14:56.280Z] Platform: win32
-[2025-08-17T14:14:56.280Z] Checking nefconw.exe at: C:\VirtualDisplayDriver\nefconw.exe
-[2025-08-17T14:14:56.281Z] nefconw.exe exists: false
-[2025-08-17T14:14:56.281Z] Checking devcon.exe at: C:\VirtualDisplayDriver\EDID\devcon.exe
-[2025-08-17T14:14:56.281Z] devcon.exe exists: false
-[2025-08-17T14:14:56.282Z] ERROR: Neither nefconw.exe nor devcon.exe found
-[2025-08-17T14:14:59.159Z] === START DRIVER FUNCTION CALLED ===
-[2025-08-17T14:14:59.160Z] Platform: win32
-[2025-08-17T14:14:59.160Z] Checking nefconw.exe at: C:\VirtualDisplayDriver\nefconw.exe
-[2025-08-17T14:14:59.160Z] nefconw.exe exists: false
-[2025-08-17T14:14:59.161Z] Checking devcon.exe at: C:\VirtualDisplayDriver\EDID\devcon.exe
-[2025-08-17T14:14:59.161Z] devcon.exe exists: false
-[2025-08-17T14:14:59.162Z] ERROR: Neither nefconw.exe nor devcon.exe found
-[2025-08-17T14:15:00.549Z] === UNINSTALL DRIVER FUNCTION CALLED ===
-[2025-08-17T14:15:01.582Z] User confirmed uninstall, proceeding...
-[2025-08-17T14:15:01.582Z] Node.js access available
-[2025-08-17T14:15:01.583Z] Platform: win32
-[2025-08-17T14:15:01.583Z] Running on Windows, proceeding with nefconw
-[2025-08-17T14:15:01.583Z] Checking nefconw path: C:\VirtualDisplayDriver\nefconw.exe
-[2025-08-17T14:15:01.583Z] nefconw.exe exists: false
-[2025-08-17T14:15:01.584Z] ERROR: nefconw.exe not found
-[2025-08-17T14:15:08.280Z] === REINSTALL DRIVER FUNCTION CALLED ===
-[2025-08-17T14:15:08.280Z] Platform: win32
-[2025-08-17T14:15:08.281Z] Checking nefconw.exe at: C:\VirtualDisplayDriver\nefconw.exe
-[2025-08-17T14:15:08.281Z] nefconw.exe exists: false
-[2025-08-17T14:15:08.282Z] ERROR: nefconw.exe not found
-[2025-08-17T14:17:53.335Z] === UNINSTALL DRIVER FUNCTION CALLED ===
-[2025-08-17T14:17:54.599Z] User confirmed uninstall, proceeding...
-[2025-08-17T14:17:54.600Z] Node.js access available
-[2025-08-17T14:17:54.601Z] Platform: win32
-[2025-08-17T14:17:54.601Z] Running on Windows, proceeding with nefconw
-[2025-08-17T14:17:54.601Z] Checking nefconw path: C:\VirtualDisplayDriver\EDID\nefconw.exe
-[2025-08-17T14:17:54.602Z] nefconw.exe exists: true
-[2025-08-17T14:17:54.602Z] nefconw.exe found, proceeding with removal...
-[2025-08-17T14:17:54.602Z] Attempting to remove driver with nefconw...
-[2025-08-17T14:17:54.603Z] Executing command: "C:\VirtualDisplayDriver\EDID\nefconw.exe" --remove-device-node --hardware-id Root\MttVDD --class-guid 4d36e968-e325-11ce-bfc1-08002be10318
-[2025-08-17T14:17:54.667Z] Command execution failed: Command failed: "C:\VirtualDisplayDriver\EDID\nefconw.exe" --remove-device-node --hardware-id Root\MttVDD --class-guid 4d36e968-e325-11ce-bfc1-08002be10318
+[2025-08-17T15:19:24.121Z] REINSTALL BUTTON CLICKED - Event handler triggered
+[2025-08-17T15:19:24.125Z] === REINSTALL DRIVER FUNCTION CALLED ===
+[2025-08-17T15:19:24.125Z] Timestamp: 2025-08-17T15:19:24.125Z
+[2025-08-17T15:19:24.125Z] Current working directory: E:\GitHub\Virtual-Driver-Control\VirtualDriverControl
+[2025-08-17T15:19:24.126Z] App version: unknown
+[2025-08-17T15:19:24.126Z] Process platform: win32
+[2025-08-17T15:19:24.126Z] Process arch: x64
+[2025-08-17T15:19:24.126Z] Node version: v18.17.1
+[2025-08-17T15:19:24.127Z] Process argv: ["E:\\GitHub\\Virtual-Driver-Control\\VirtualDriverControl\\node_modules\\electron\\dist\\electron.exe","--type=renderer","--user-data-dir=C:\\Users\\alisa\\AppData\\Roaming\\virtual-driver-control","--app-path=E:\\GitHub\\Virtual-Driver-Control\\VirtualDriverControl","--no-sandbox","--no-zygote","--first-renderer-process","--lang=en-GB","--device-scale-factor=1","--num-raster-threads=4","--enable-main-frame-before-activation","--renderer-client-id=4","--time-ticks-at-unix-epoch=-1755174639139612","--launch-time-ticks=269260241784","--mojo-platform-channel-handle=2272","--field-trial-handle=1664,i,17779471995178631874,4766366951113859379,262144","--disable-features=SpareRendererForSitePerProcess,WinDelaySpellcheckServiceInit,WinRetrieveSuggestionsOnlyOnDemand","/prefetch:1"]
+[2025-08-17T15:19:24.185Z] Running as Administrator: true
+[2025-08-17T15:19:24.185Z] Platform: win32
+[2025-08-17T15:19:24.186Z] Checking nefconw.exe at: C:\VirtualDisplayDriver\EDID\nefconw.exe
+[2025-08-17T15:19:24.186Z] nefconw.exe exists: true
+[2025-08-17T15:19:24.186Z] Checking driver directory at: C:\VirtualDisplayDriver\Driver Files\VDD x86 x64
+[2025-08-17T15:19:24.187Z] Driver directory exists: true
+[2025-08-17T15:19:24.187Z] Checking INF file at: C:\VirtualDisplayDriver\Driver Files\VDD x86 x64\MttVDD.inf
+[2025-08-17T15:19:24.187Z] INF file exists: true
+[2025-08-17T15:19:24.187Z] All files found, proceeding with reinstall...
+[2025-08-17T15:19:24.188Z] Step 1: Removing existing device node
+[2025-08-17T15:19:24.188Z] Executing command: "C:\VirtualDisplayDriver\EDID\nefconw.exe" --remove-device-node --hardware-id Root\MttVDD --class-guid 4d36e968-e325-11ce-bfc1-08002be10318
+[2025-08-17T15:19:24.236Z] Command execution failed: Command failed: "C:\VirtualDisplayDriver\EDID\nefconw.exe" --remove-device-node --hardware-id Root\MttVDD --class-guid 4d36e968-e325-11ce-bfc1-08002be10318
 
-[2025-08-17T14:17:54.667Z] Error stdout: 2025-08-17 07:17:54,661 ERROR [default] This command requires elevated privileges. Please run as Administrator and make sure the UAC is enabled.
-This command requires elevated privileges. Please run as Administrator and make sure the UAC is enabled.
+[2025-08-17T15:19:24.237Z] Error stdout: 2025-08-17 08:19:24,231 ERROR [default] Failed to delete device node, error: No more data is available.
 
-[2025-08-17T14:17:54.668Z] Error stderr: none
-[2025-08-17T14:17:54.668Z] Error code: 1
-[2025-08-17T14:17:54.668Z] Listing devices to help debug the issue...
-[2025-08-17T14:18:15.630Z] === REINSTALL DRIVER FUNCTION CALLED ===
-[2025-08-17T14:18:15.631Z] Platform: win32
-[2025-08-17T14:18:15.632Z] Checking nefconw.exe at: C:\VirtualDisplayDriver\EDID\nefconw.exe
-[2025-08-17T14:18:15.632Z] nefconw.exe exists: true
-[2025-08-17T14:18:15.632Z] Checking driver directory at: C:\VirtualDisplayDriver\Driver Files\VDD x86 x64
-[2025-08-17T14:18:15.633Z] Driver directory exists: true
-[2025-08-17T14:18:15.634Z] Checking INF file at: C:\VirtualDisplayDriver\Driver Files\VDD x86 x64\MttVDD.inf
-[2025-08-17T14:18:15.635Z] INF file exists: true
-[2025-08-17T14:18:15.635Z] All files found, proceeding with reinstall...
-[2025-08-17T14:18:15.636Z] Step 1: Removing existing device node
-[2025-08-17T14:18:15.636Z] Executing command: "C:\VirtualDisplayDriver\EDID\nefconw.exe" --remove-device-node --hardware-id Root\MttVDD --class-guid 4d36e968-e325-11ce-bfc1-08002be10318
-[2025-08-17T14:18:15.683Z] Command execution failed: Command failed: "C:\VirtualDisplayDriver\EDID\nefconw.exe" --remove-device-node --hardware-id Root\MttVDD --class-guid 4d36e968-e325-11ce-bfc1-08002be10318
+Failed to delete device node, error: LEER
 
-[2025-08-17T14:18:15.684Z] Error stdout: 2025-08-17 07:18:15,678 ERROR [default] This command requires elevated privileges. Please run as Administrator and make sure the UAC is enabled.
-This command requires elevated privileges. Please run as Administrator and make sure the UAC is enabled.
-
-[2025-08-17T14:18:15.685Z] Error stderr: none
-[2025-08-17T14:18:15.685Z] Error code: 1
-[2025-08-17T14:18:15.685Z] Listing devices to help debug the issue...
-[2025-08-17T15:03:10.980Z] === UNINSTALL DRIVER FUNCTION CALLED ===
-[2025-08-17T15:03:12.049Z] User confirmed uninstall, proceeding...
-[2025-08-17T15:03:12.050Z] Node.js access available
-[2025-08-17T15:03:12.050Z] Platform: win32
-[2025-08-17T15:03:12.050Z] Running on Windows, proceeding with nefconw
-[2025-08-17T15:03:12.051Z] Checking nefconw path: C:\VirtualDisplayDriver\EDID\nefconw.exe
-[2025-08-17T15:03:12.051Z] nefconw.exe exists: true
-[2025-08-17T15:03:12.051Z] nefconw.exe found, proceeding with removal...
-[2025-08-17T15:03:12.052Z] Attempting to remove driver with nefconw...
-[2025-08-17T15:03:12.052Z] Executing command: "C:\VirtualDisplayDriver\EDID\nefconw.exe" --remove-device-node --hardware-id Root\MttVDD --class-guid 4d36e968-e325-11ce-bfc1-08002be10318
-[2025-08-17T15:03:12.105Z] Command execution failed: Command failed: "C:\VirtualDisplayDriver\EDID\nefconw.exe" --remove-device-node --hardware-id Root\MttVDD --class-guid 4d36e968-e325-11ce-bfc1-08002be10318
-
-[2025-08-17T15:03:12.105Z] Error stdout: 2025-08-17 08:03:12,099 ERROR [default] This command requires elevated privileges. Please run as Administrator and make sure the UAC is enabled.
-This command requires elevated privileges. Please run as Administrator and make sure the UAC is enabled.
-
-[2025-08-17T15:03:12.105Z] Error stderr: none
-[2025-08-17T15:03:12.106Z] Error code: 1
-[2025-08-17T15:03:12.106Z] Listing devices to help debug the issue...
+[2025-08-17T15:19:24.237Z] Error stderr: none
+[2025-08-17T15:19:24.237Z] Error code: 6
+[2025-08-17T15:19:24.237Z] Listing devices to help debug the issue...
+[2025-08-17T15:20:55.318Z] === CHECKING ADMINISTRATOR PRIVILEGES ON STARTUP ===
+[2025-08-17T15:20:55.373Z] Running as Administrator: false
+[2025-08-17T15:20:55.374Z] Not running as Administrator - prompting user
+[2025-08-17T15:20:56.708Z] User chose to restart as Administrator
+[2025-08-17T15:20:56.709Z] === ATTEMPTING TO RESTART AS ADMINISTRATOR ===
+[2025-08-17T15:20:56.709Z] Current executable: E:\GitHub\Virtual-Driver-Control\VirtualDriverControl\node_modules\electron\dist\electron.exe
+[2025-08-17T15:20:56.709Z] App path: E:\GitHub\Virtual-Driver-Control\VirtualDriverControl
+[2025-08-17T15:20:56.710Z] Process argv: ["E:\\GitHub\\Virtual-Driver-Control\\VirtualDriverControl\\node_modules\\electron\\dist\\electron.exe","--type=renderer","--user-data-dir=C:\\Users\\alisa\\AppData\\Roaming\\virtual-driver-control","--app-path=E:\\GitHub\\Virtual-Driver-Control\\VirtualDriverControl","--no-sandbox","--no-zygote","--first-renderer-process","--lang=en-GB","--device-scale-factor=1","--num-raster-threads=4","--enable-main-frame-before-activation","--renderer-client-id=4","--time-ticks-at-unix-epoch=-1755174639139205","--launch-time-ticks=269415856269","--mojo-platform-channel-handle=2396","--field-trial-handle=1688,i,13383574880014593378,10224841355071731593,262144","--disable-features=SpareRendererForSitePerProcess,WinDelaySpellcheckServiceInit,WinRetrieveSuggestionsOnlyOnDemand","/prefetch:1"]
+[2025-08-17T15:20:56.710Z] PowerShell command: Start-Process -FilePath "E:\GitHub\Virtual-Driver-Control\VirtualDriverControl\node_modules\electron\dist\electron.exe" -ArgumentList "E:\GitHub\Virtual-Driver-Control\VirtualDriverControl" -Verb RunAs
+[2025-08-17T15:20:59.054Z] PowerShell restart command executed successfully
+[2025-08-17T15:21:00.145Z] Closing current instance
+[2025-08-17T15:21:00.277Z] === CHECKING ADMINISTRATOR PRIVILEGES ON STARTUP ===
+[2025-08-17T15:21:00.340Z] Running as Administrator: true
+[2025-08-17T15:21:00.341Z] Running as Administrator - all features available
+[2025-08-17T15:21:04.410Z] === CHECKING ADMINISTRATOR PRIVILEGES ON STARTUP ===
+[2025-08-17T15:21:04.464Z] Running as Administrator: false
+[2025-08-17T15:21:04.465Z] Not running as Administrator - prompting user
+[2025-08-17T15:23:25.102Z] User chose to restart as Administrator
+[2025-08-17T15:23:25.103Z] === ATTEMPTING TO RESTART AS ADMINISTRATOR ===
+[2025-08-17T15:23:25.103Z] Current executable: E:\GitHub\Virtual-Driver-Control\VirtualDriverControl\node_modules\electron\dist\electron.exe
+[2025-08-17T15:23:25.103Z] App path: E:\GitHub\Virtual-Driver-Control\VirtualDriverControl
+[2025-08-17T15:23:25.104Z] Process argv: ["E:\\GitHub\\Virtual-Driver-Control\\VirtualDriverControl\\node_modules\\electron\\dist\\electron.exe","--type=renderer","--user-data-dir=C:\\Users\\alisa\\AppData\\Roaming\\virtual-driver-control","--app-path=E:\\GitHub\\Virtual-Driver-Control\\VirtualDriverControl","--no-sandbox","--no-zygote","--first-renderer-process","--lang=en-GB","--device-scale-factor=1","--num-raster-threads=4","--enable-main-frame-before-activation","--renderer-client-id=4","--time-ticks-at-unix-epoch=-1755174639139468","--launch-time-ticks=269419238746","--mojo-platform-channel-handle=2228","--field-trial-handle=1672,i,15810517438644176872,15333334737591745017,262144","--disable-features=SpareRendererForSitePerProcess,WinDelaySpellcheckServiceInit,WinRetrieveSuggestionsOnlyOnDemand","/prefetch:1"]
+[2025-08-17T15:23:25.104Z] PowerShell command: Start-Process -FilePath "E:\GitHub\Virtual-Driver-Control\VirtualDriverControl\node_modules\electron\dist\electron.exe" -ArgumentList "E:\GitHub\Virtual-Driver-Control\VirtualDriverControl" -Verb RunAs
+[2025-08-17T15:23:27.678Z] PowerShell restart command executed successfully
+[2025-08-17T15:23:28.232Z] === CHECKING ADMINISTRATOR PRIVILEGES ON STARTUP ===
+[2025-08-17T15:23:28.297Z] Running as Administrator: true
+[2025-08-17T15:23:28.298Z] Running as Administrator - all features available
+[2025-08-17T15:23:29.144Z] Closing current instance
+[2025-08-17T15:28:33.788Z] === CHECKING ADMINISTRATOR PRIVILEGES ON STARTUP ===
+[2025-08-17T15:28:33.846Z] Running as Administrator: false
+[2025-08-17T15:28:33.847Z] Not running as Administrator - prompting user
+[2025-08-17T15:28:35.834Z] User chose to continue without Administrator privileges
+[2025-08-17T15:28:58.072Z] === CHECKING ADMINISTRATOR PRIVILEGES ON STARTUP ===
+[2025-08-17T15:28:58.130Z] Running as Administrator: false
+[2025-08-17T15:28:58.131Z] Not running as Administrator - prompting user
+[2025-08-17T15:29:41.146Z] User chose to continue without Administrator privileges
+[2025-08-17T15:30:47.687Z] === CHECKING ADMINISTRATOR PRIVILEGES ON STARTUP ===
+[2025-08-17T15:30:47.741Z] Running as Administrator: false
+[2025-08-17T15:30:47.741Z] Not running as Administrator - automatically requesting elevation
+[2025-08-17T15:30:47.742Z] Automatically restarting as Administrator
+[2025-08-17T15:30:47.742Z] === ATTEMPTING TO RESTART AS ADMINISTRATOR ===
+[2025-08-17T15:30:47.742Z] Current executable: E:\GitHub\Virtual-Driver-Control\VirtualDriverControl\node_modules\electron\dist\electron.exe
+[2025-08-17T15:30:47.743Z] App path: E:\GitHub\Virtual-Driver-Control\VirtualDriverControl
+[2025-08-17T15:30:47.743Z] Process argv: ["E:\\GitHub\\Virtual-Driver-Control\\VirtualDriverControl\\node_modules\\electron\\dist\\electron.exe","--type=renderer","--user-data-dir=C:\\Users\\alisa\\AppData\\Roaming\\virtual-driver-control","--app-path=E:\\GitHub\\Virtual-Driver-Control\\VirtualDriverControl","--no-sandbox","--no-zygote","--first-renderer-process","--lang=en-GB","--device-scale-factor=1","--num-raster-threads=4","--enable-main-frame-before-activation","--renderer-client-id=4","--time-ticks-at-unix-epoch=-1755174639139550","--launch-time-ticks=270008254839","--mojo-platform-channel-handle=2348","--field-trial-handle=1656,i,1097215531060269183,11033605446352001800,262144","--disable-features=SpareRendererForSitePerProcess,WinDelaySpellcheckServiceInit,WinRetrieveSuggestionsOnlyOnDemand","/prefetch:1"]
+[2025-08-17T15:30:47.743Z] PowerShell command: Start-Process -FilePath "E:\GitHub\Virtual-Driver-Control\VirtualDriverControl\node_modules\electron\dist\electron.exe" -ArgumentList "E:\GitHub\Virtual-Driver-Control\VirtualDriverControl" -Verb RunAs
+[2025-08-17T15:30:50.907Z] PowerShell restart command executed successfully
+[2025-08-17T15:30:52.151Z] Closing current instance
+[2025-08-17T15:30:56.165Z] === CHECKING ADMINISTRATOR PRIVILEGES ON STARTUP ===
+[2025-08-17T15:30:56.222Z] Running as Administrator: true
+[2025-08-17T15:30:56.222Z] Running as Administrator - all features available
