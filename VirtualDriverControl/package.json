@@ -1,0 +1,16 @@
+{
+  "name": "virtual-driver-control",
+  "version": "1.0.0",
+  "description": "WinUI3-style control panel for Virtual Display Driver",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "dev": "electron . --dev"
+  },
+  "keywords": ["electron", "winui3", "virtual-display", "driver-control"],
+  "author": "Virtual Driver Control",
+  "license": "MIT",
+  "devDependencies": {
+    "electron": "^27.0.0"
+  }
+}

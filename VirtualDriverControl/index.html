@@ -1,0 +1,1110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Virtual Driver Control</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body data-theme="light">
+    <div class="app-container">
+        <!-- Title Bar -->
+        <header class="title-bar">
+            <div class="title-info">
+                <i class="fas fa-desktop app-icon"></i>
+                <span class="app-title">Virtual Driver Control</span>
+            </div>
+            <div class="title-actions">
+                <button id="load-btn" class="toolbar-button">
+                    <i class="fas fa-folder-open button-icon"></i>
+                    <span class="button-text">Load XML</span>
+                </button>
+                <button id="save-btn" class="toolbar-button primary">
+                    <i class="fas fa-save button-icon"></i>
+                    <span class="button-text">Save XML</span>
+                </button>
+                <button id="save-reload-driver-btn" class="toolbar-button primary">
+                    <i class="fas fa-sync-alt button-icon"></i>
+                    <span class="button-text">Save & Reload Driver</span>
+                </button>
+            </div>
+        </header>
+
+        <!-- Main Layout -->
+        <div class="main-layout">
+            <!-- Navigation -->
+            <nav class="navigation" id="navigation">
+                
+                <div class="nav-content">
+                    <div class="nav-section">
+                        <div class="nav-item active" data-page="basic">
+                            <i class="fas fa-cog"></i>
+                            <span class="nav-label">Basic Settings</span>
+                        </div>
+                        <div class="nav-item" data-page="display">
+                            <i class="fas fa-tv"></i>
+                            <span class="nav-label">Display & Resolution</span>
+                        </div>
+                        <div class="nav-item" data-page="hdr">
+                            <i class="fas fa-palette"></i>
+                            <span class="nav-label">HDR & Color</span>
+                        </div>
+                        <div class="nav-item" data-page="cursor">
+                            <i class="fas fa-mouse-pointer"></i>
+                            <span class="nav-label">Cursor Settings</span>
+                        </div>
+                        <div class="nav-item" data-page="edid">
+                            <i class="fas fa-microchip"></i>
+                            <span class="nav-label">EDID Configuration</span>
+                        </div>
+                        <div class="nav-item" data-page="advanced">
+                            <i class="fas fa-sliders-h"></i>
+                            <span class="nav-label">Advanced</span>
+                        </div>
+                    </div>
+                    
+                    <div class="nav-divider"></div>
+                    
+                    <div class="nav-section">
+                        <div class="nav-item" data-page="status">
+                            <i class="fas fa-info-circle"></i>
+                            <span class="nav-label">Driver Status</span>
+                        </div>
+                        <div class="nav-item" data-page="logging">
+                            <i class="fas fa-file-alt"></i>
+                            <span class="nav-label">Logging & Debug</span>
+                        </div>
+                    </div>
+                    
+                    <div class="nav-footer">
+                        <div class="nav-item" data-page="settings">
+                            <i class="fas fa-cog"></i>
+                            <span class="nav-label">Settings</span>
+                        </div>
+                    </div>
+                </div>
+            </nav>
+
+            <!-- Content Area -->
+            <main class="content-area">
+                <!-- Basic Settings Page -->
+                <div class="page active" id="basic-page">
+                    <div class="page-header">
+                        <h1><i class="fas fa-cog"></i> Basic Driver Configuration</h1>
+                        <p>Configure basic monitor and GPU settings for the virtual display driver.</p>
+                    </div>
+                    
+                    <div class="cards-grid">
+                        <div class="card">
+                            <div class="card-header">
+                                <h3><i class="fas fa-desktop"></i> Monitor Configuration</h3>
+                            </div>
+                            <div class="card-content">
+                                <div class="form-group">
+                                    <label for="monitor-count">Number of Virtual Monitors</label>
+                                    <input type="number" id="monitor-count" min="1" max="16" value="1" class="form-input">
+                                    <small class="form-hint">Maximum of 16 virtual monitors supported</small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card">
+                            <div class="card-header">
+                                <h3><i class="fas fa-memory"></i> GPU Configuration</h3>
+                            </div>
+                            <div class="card-content">
+                                <div class="form-group">
+                                    <label for="gpu-name">GPU Friendly Name</label>
+                                    <div style="display: flex; gap: 8px;">
+                                        <select id="gpu-name" class="form-input" style="flex: 1;">
+                                            <option value="default" selected>default</option>
+                                        </select>
+                                        <button type="button" id="refresh-gpu-btn" class="btn btn-secondary" style="margin: 0; flex-shrink: 0;">
+                                            <i class="fas fa-sync"></i>
+                                        </button>
+                                    </div>
+                                    <small class="form-hint">Display name for the virtual GPU adapter</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Display Settings Page -->
+                <div class="page" id="display-page">
+                    <div class="page-header">
+                        <h1><i class="fas fa-tv"></i> Display & Resolution Settings</h1>
+                        <p>Configure supported resolutions and refresh rates for virtual displays.</p>
+                    </div>
+                    
+                    <div class="cards-grid">
+                        <div class="card full-width">
+                            <div class="card-header">
+                                <h3><i class="fas fa-list"></i> Global Refresh Rates</h3>
+                            </div>
+                            <div class="card-content">
+                                <div class="form-group">
+                                    <label>Add New Refresh Rate</label>
+                                    <div style="display: flex; gap: 12px; align-items: center;">
+                                        <input type="number" id="new-refresh-rate" class="form-input" placeholder="Enter Hz" min="1" max="1000" style="flex: 1;">
+                                        <button type="button" class="btn btn-primary" id="add-refresh-rate-btn">
+                                            <i class="fas fa-plus"></i>
+                                            Add
+                                        </button>
+                                    </div>
+                                    <small class="form-hint">Enter refresh rate in Hz (e.g., 60, 120, 144)</small>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label>Current Refresh Rates</label>
+                                    <div id="refresh-rates-list" class="refresh-rates-list">
+                                        <!-- Dynamically populated from XML -->
+                                    </div>
+                                    <small class="form-hint">These refresh rates will be applied to all resolutions</small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card full-width">
+                            <div class="card-header">
+                                <h3><i class="fas fa-expand"></i> Supported Resolutions</h3>
+                                <button class="btn btn-primary btn-small" id="add-resolution">
+                                    <i class="fas fa-plus"></i>
+                                    Add Resolution
+                                </button>
+                            </div>
+                            <div class="card-content">
+                                <div class="resolution-list" id="resolution-list">
+                                    <div class="resolution-item">
+                                        <div class="resolution-inputs">
+                                            <input type="number" placeholder="Width" value="1920" class="form-input">
+                                            <span>×</span>
+                                            <input type="number" placeholder="Height" value="1080" class="form-input">
+                                            <span>@</span>
+                                            <input type="number" placeholder="Hz" value="60" class="form-input">
+                                        </div>
+                                        <button class="btn btn-danger btn-small">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>
+                                    <div class="resolution-item">
+                                        <div class="resolution-inputs">
+                                            <input type="number" placeholder="Width" value="2560" class="form-input">
+                                            <span>×</span>
+                                            <input type="number" placeholder="Height" value="1440" class="form-input">
+                                            <span>@</span>
+                                            <input type="number" placeholder="Hz" value="60" class="form-input">
+                                        </div>
+                                        <button class="btn btn-danger btn-small">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Settings Page -->
+                <div class="page" id="settings-page">
+                    <div class="page-header">
+                        <h1><i class="fas fa-cog"></i> Application Settings</h1>
+                        <p>Configure application preferences and appearance settings.</p>
+                    </div>
+                    
+                    <div class="cards-grid">
+                        <div class="card">
+                            <div class="card-header">
+                                <h3><i class="fas fa-paint-brush"></i> Appearance</h3>
+                            </div>
+                            <div class="card-content">
+                                <div class="form-group">
+                                    <label>Theme</label>
+                                    <div class="theme-selector">
+                                        <div class="theme-option active" data-theme="light">
+                                            <div class="theme-preview light-theme">
+                                                <div class="preview-header"></div>
+                                                <div class="preview-content">
+                                                    <div class="preview-nav"></div>
+                                                    <div class="preview-main"></div>
+                                                </div>
+                                            </div>
+                                            <span>Light</span>
+                                        </div>
+                                        <div class="theme-option" data-theme="dark">
+                                            <div class="theme-preview dark-theme">
+                                                <div class="preview-header"></div>
+                                                <div class="preview-content">
+                                                    <div class="preview-nav"></div>
+                                                    <div class="preview-main"></div>
+                                                </div>
+                                            </div>
+                                            <span>Dark</span>
+                                        </div>
+                                        <div class="theme-option" data-theme="system">
+                                            <div class="theme-preview system-theme">
+                                                <div class="preview-header"></div>
+                                                <div class="preview-content">
+                                                    <div class="preview-nav"></div>
+                                                    <div class="preview-main"></div>
+                                                </div>
+                                            </div>
+                                            <span>System</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card">
+                            <div class="card-header">
+                                <h3><i class="fas fa-palette"></i> Color Customization</h3>
+                                <button class="btn btn-secondary btn-small" id="reset-colors-btn">
+                                    <i class="fas fa-undo"></i>
+                                    Reset to Default
+                                </button>
+                            </div>
+                            <div class="card-content">
+                                <div class="color-customization">
+                                    <div class="color-section">
+                                        <h4><i class="fas fa-sun"></i> Light Theme Colors</h4>
+                                        <div class="color-controls">
+                                            <div class="color-control">
+                                                <label for="light-accent-color">Accent Color</label>
+                                                <div class="color-picker-wrapper">
+                                                    <input type="color" id="light-accent-color" value="#107c10" class="color-input">
+                                                    <div class="color-preview" data-color="#107c10"></div>
+                                                    <span class="color-value">#107c10</span>
+                                                </div>
+                                                <small class="form-hint">Primary buttons, links, and highlights</small>
+                                            </div>
+                                            <div class="color-control">
+                                                <label for="light-danger-color">Danger Color</label>
+                                                <div class="color-picker-wrapper">
+                                                    <input type="color" id="light-danger-color" value="#d13438" class="color-input">
+                                                    <div class="color-preview" data-color="#d13438"></div>
+                                                    <span class="color-value">#d13438</span>
+                                                </div>
+                                                <small class="form-hint">Delete buttons and error states</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="color-section">
+                                        <h4><i class="fas fa-moon"></i> Dark Theme Colors</h4>
+                                        <div class="color-controls">
+                                            <div class="color-control">
+                                                <label for="dark-accent-color">Accent Color</label>
+                                                <div class="color-picker-wrapper">
+                                                    <input type="color" id="dark-accent-color" value="#10b010" class="color-input">
+                                                    <div class="color-preview" data-color="#10b010"></div>
+                                                    <span class="color-value">#10b010</span>
+                                                </div>
+                                                <small class="form-hint">Primary buttons, links, and highlights</small>
+                                            </div>
+                                            <div class="color-control">
+                                                <label for="dark-danger-color">Danger Color</label>
+                                                <div class="color-picker-wrapper">
+                                                    <input type="color" id="dark-danger-color" value="#ff6b6b" class="color-input">
+                                                    <div class="color-preview" data-color="#ff6b6b"></div>
+                                                    <span class="color-value">#ff6b6b</span>
+                                                </div>
+                                                <small class="form-hint">Delete buttons and error states</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="color-section">
+                                        <h4><i class="fas fa-swatchbook"></i> Quick Presets</h4>
+                                        <div class="color-presets">
+                                            <button class="preset-btn" data-preset="default" title="Default Green">
+                                                <div class="preset-colors">
+                                                    <div class="preset-color" style="background: #107c10;"></div>
+                                                    <div class="preset-color" style="background: #d13438;"></div>
+                                                </div>
+                                                <span>Default</span>
+                                            </button>
+                                            <button class="preset-btn" data-preset="blue" title="Blue Theme">
+                                                <div class="preset-colors">
+                                                    <div class="preset-color" style="background: #0078d4;"></div>
+                                                    <div class="preset-color" style="background: #d83b01;"></div>
+                                                </div>
+                                                <span>Blue</span>
+                                            </button>
+                                            <button class="preset-btn" data-preset="purple" title="Purple Theme">
+                                                <div class="preset-colors">
+                                                    <div class="preset-color" style="background: #8e44ad;"></div>
+                                                    <div class="preset-color" style="background: #e74c3c;"></div>
+                                                </div>
+                                                <span>Purple</span>
+                                            </button>
+                                            <button class="preset-btn" data-preset="orange" title="Orange Theme">
+                                                <div class="preset-colors">
+                                                    <div class="preset-color" style="background: #ff8c00;"></div>
+                                                    <div class="preset-color" style="background: #dc3545;"></div>
+                                                </div>
+                                                <span>Orange</span>
+                                            </button>
+                                            <button class="preset-btn" data-preset="teal" title="Teal Theme">
+                                                <div class="preset-colors">
+                                                    <div class="preset-color" style="background: #20b2aa;"></div>
+                                                    <div class="preset-color" style="background: #cd5c5c;"></div>
+                                                </div>
+                                                <span>Teal</span>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- HDR & Color Page -->
+                <div class="page" id="hdr-page">
+                    <div class="page-header">
+                        <h1><i class="fas fa-palette"></i> HDR & Color Configuration</h1>
+                        <p>Configure HDR support and color processing settings.</p>
+                    </div>
+                    <div class="cards-grid">
+                        <div class="card">
+                            <div class="card-header">
+                                <h3><i class="fas fa-palette"></i> Color Format Settings</h3>
+                            </div>
+                            <div class="card-content">
+                                <div class="form-group">
+                                    <label class="checkbox-item">
+                                        <input type="checkbox" id="sdr-10bit">
+                                        <span class="checkmark"></span>
+                                        <span>SDR 10-bit Support</span>
+                                    </label>
+                                    <small class="form-hint">Enable 10-bit color depth for SDR content</small>
+                                </div>
+                                <div class="form-group">
+                                    <label class="checkbox-item">
+                                        <input type="checkbox" id="hdr-plus">
+                                        <span class="checkmark"></span>
+                                        <span>HDR Plus Support</span>
+                                    </label>
+                                    <small class="form-hint">Enable enhanced HDR processing</small>
+                                </div>
+                                <div class="form-group">
+                                    <label for="color-format">Color Format</label>
+                                    <select id="color-format" class="form-input">
+                                        <option value="RGB" selected>RGB</option>
+                                        <option value="YCbCr444">YCbCr 4:4:4</option>
+                                        <option value="YCbCr422">YCbCr 4:2:2</option>
+                                        <option value="YCbCr420">YCbCr 4:2:0</option>
+                                    </select>
+                                    <small class="form-hint">Select the color format for video output</small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card dev-only">
+                            <div class="card-header">
+                                <h3><i class="fas fa-sun"></i> HDR10 Static Metadata</h3>
+                            </div>
+                            <div class="card-content">
+                                <div class="form-group">
+                                    <label class="checkbox-item">
+                                        <input type="checkbox" id="hdr10-enabled">
+                                        <span class="checkmark"></span>
+                                        <span>Enable HDR10 Static Metadata</span>
+                                    </label>
+                                    <small class="form-hint">Enable HDR10 support with static metadata</small>
+                                </div>
+                                <div class="form-group">
+                                    <label for="max-mastering-luminance">Max Display Mastering Luminance (nits)</label>
+                                    <input type="number" id="max-mastering-luminance" value="1000.0" step="0.1" class="form-input">
+                                </div>
+                                <div class="form-group">
+                                    <label for="min-mastering-luminance">Min Display Mastering Luminance (nits)</label>
+                                    <input type="number" id="min-mastering-luminance" value="0.05" step="0.01" class="form-input">
+                                </div>
+                                <div class="form-group">
+                                    <label for="max-content-light">Max Content Light Level (nits)</label>
+                                    <input type="number" id="max-content-light" value="1000" class="form-input">
+                                </div>
+                                <div class="form-group">
+                                    <label for="max-frame-avg-light">Max Frame Average Light Level (nits)</label>
+                                    <input type="number" id="max-frame-avg-light" value="400" class="form-input">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card dev-only">
+                            <div class="card-header">
+                                <h3><i class="fas fa-eye-dropper"></i> Color Primaries</h3>
+                            </div>
+                            <div class="card-content">
+                                <div class="form-group">
+                                    <label class="checkbox-item">
+                                        <input type="checkbox" id="custom-primaries">
+                                        <span class="checkmark"></span>
+                                        <span>Enable Custom Color Primaries</span>
+                                    </label>
+                                    <small class="form-hint">Override default sRGB color space</small>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label for="red-x">Red X</label>
+                                        <input type="number" id="red-x" value="0.640" step="0.001" class="form-input">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="red-y">Red Y</label>
+                                        <input type="number" id="red-y" value="0.330" step="0.001" class="form-input">
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label for="green-x">Green X</label>
+                                        <input type="number" id="green-x" value="0.300" step="0.001" class="form-input">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="green-y">Green Y</label>
+                                        <input type="number" id="green-y" value="0.600" step="0.001" class="form-input">
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label for="blue-x">Blue X</label>
+                                        <input type="number" id="blue-x" value="0.150" step="0.001" class="form-input">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="blue-y">Blue Y</label>
+                                        <input type="number" id="blue-y" value="0.060" step="0.001" class="form-input">
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label for="white-x">White Point X (D65)</label>
+                                        <input type="number" id="white-x" value="0.3127" step="0.0001" class="form-input">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="white-y">White Point Y (D65)</label>
+                                        <input type="number" id="white-y" value="0.3290" step="0.0001" class="form-input">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card">
+                            <div class="card-header">
+                                <h3><i class="fas fa-adjust"></i> Color Space Settings</h3>
+                            </div>
+                            <div class="card-content">
+                                <div class="form-group">
+                                    <label class="checkbox-item">
+                                        <input type="checkbox" id="advanced-gamma">
+                                        <span class="checkmark"></span>
+                                        <span>Enable Advanced Gamma Correction</span>
+                                    </label>
+                                </div>
+                                <div class="form-group">
+                                    <label for="gamma-correction">Gamma Correction</label>
+                                    <input type="number" id="gamma-correction" value="2.2" step="0.1" class="form-input">
+                                    <small class="form-hint">Standard sRGB gamma value is 2.2</small>
+                                </div>
+                                <div class="form-group">
+                                    <label for="primary-color-space">Primary Color Space</label>
+                                    <select id="primary-color-space" class="form-input">
+                                        <option value="sRGB" selected>sRGB</option>
+                                        <option value="Adobe RGB">Adobe RGB</option>
+                                        <option value="DCI-P3">DCI-P3</option>
+                                        <option value="Rec.2020">Rec.2020</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label class="checkbox-item">
+                                        <input type="checkbox" id="matrix-transform">
+                                        <span class="checkmark"></span>
+                                        <span>Enable Matrix Transform</span>
+                                    </label>
+                                    <small class="form-hint">Enable color matrix transformations</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="page" id="cursor-page">
+                    <div class="page-header">
+                        <h1><i class="fas fa-mouse-pointer"></i> Cursor Configuration</h1>
+                        <p>Configure cursor support and rendering options.</p>
+                    </div>
+                    <div class="cards-grid">
+                        <div class="card dev-only">
+                            <div class="card-header">
+                                <h3><i class="fas fa-mouse-pointer"></i> Hardware Cursor Support</h3>
+                            </div>
+                            <div class="card-content">
+                                <div class="form-group">
+                                    <label class="checkbox-item">
+                                        <input type="checkbox" id="hardware-cursor" checked>
+                                        <span class="checkmark"></span>
+                                        <span>Enable Hardware Cursor</span>
+                                    </label>
+                                    <small class="form-hint">Use hardware-accelerated cursor rendering</small>
+                                </div>
+                                <div class="form-group">
+                                    <label class="checkbox-item">
+                                        <input type="checkbox" id="alpha-cursor" checked>
+                                        <span class="checkmark"></span>
+                                        <span>Alpha Cursor Support</span>
+                                    </label>
+                                    <small class="form-hint">Enable transparency support for cursors</small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card">
+                            <div class="card-header">
+                                <h3><i class="fas fa-expand-arrows-alt"></i> Cursor Dimensions</h3>
+                            </div>
+                            <div class="card-content">
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label for="cursor-max-x">Maximum Cursor Width</label>
+                                        <input type="number" id="cursor-max-x" value="128" min="16" max="256" class="form-input">
+                                        <small class="form-hint">Maximum width in pixels</small>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="cursor-max-y">Maximum Cursor Height</label>
+                                        <input type="number" id="cursor-max-y" value="128" min="16" max="256" class="form-input">
+                                        <small class="form-hint">Maximum height in pixels</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card">
+                            <div class="card-header">
+                                <h3><i class="fas fa-cogs"></i> Advanced Cursor Settings</h3>
+                            </div>
+                            <div class="card-content">
+                                <div class="form-group">
+                                    <label for="xor-cursor-support">XOR Cursor Support Level</label>
+                                    <select id="xor-cursor-support" class="form-input">
+                                        <option value="0">Disabled</option>
+                                        <option value="1">Basic Support</option>
+                                        <option value="2" selected>Full Support</option>
+                                        <option value="3">Enhanced Support</option>
+                                    </select>
+                                    <small class="form-hint">Level of XOR cursor operation support</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="page" id="edid-page">
+                    <div class="page-header">
+                        <h1><i class="fas fa-microchip"></i> EDID Configuration</h1>
+                        <p>Configure Extended Display Identification Data settings.</p>
+                    </div>
+                    <div class="cards-grid">
+                        <div class="card full-width dev-only">
+                            <div class="card-header">
+                                <h3><i class="fas fa-upload"></i> EDID Upload & Analysis</h3>
+                            </div>
+                            <div class="card-content">
+                                <div class="form-group">
+                                    <label>Upload EDID Binary File</label>
+                                    <div style="display: flex; gap: 12px; align-items: center;">
+                                        <input type="file" id="edid-file-input" accept=".bin,.edid" class="form-input" style="flex: 1;">
+                                        <button type="button" class="btn btn-primary" id="upload-edid-btn">
+                                            <i class="fas fa-upload"></i>
+                                            Upload & Parse
+                                        </button>
+                                    </div>
+                                    <small class="form-hint">Upload an EDID binary file (.bin, .edid) to analyze display capabilities</small>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label>EDID Analysis Results</label>
+                                    <div id="edid-analysis-results" class="edid-analysis-container">
+                                        <div class="edid-placeholder">
+                                            <i class="fas fa-info-circle"></i>
+                                            <span>Upload an EDID file to see detailed analysis and supported modes</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <button type="button" class="btn btn-secondary" id="apply-edid-settings-btn" disabled>
+                                        <i class="fas fa-magic"></i>
+                                        Apply EDID Settings to Driver
+                                    </button>
+                                    <small class="form-hint">Apply the analyzed EDID data to the virtual display driver configuration</small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card">
+                            <div class="card-header">
+                                <h3><i class="fas fa-file-code"></i> Custom EDID Settings</h3>
+                            </div>
+                            <div class="card-content">
+                                <div class="form-group">
+                                    <label class="checkbox-item">
+                                        <input type="checkbox" id="custom-edid">
+                                        <span class="checkmark"></span>
+                                        <span>Use Custom EDID File</span>
+                                    </label>
+                                    <small class="form-hint">Load EDID from user_edid.bin file</small>
+                                </div>
+                                <div class="form-group">
+                                    <label class="checkbox-item">
+                                        <input type="checkbox" id="prevent-spoof">
+                                        <span class="checkmark"></span>
+                                        <span>Prevent Manufacturer ID Spoofing</span>
+                                    </label>
+                                    <small class="form-hint">Block applications from detecting EDID spoofing</small>
+                                </div>
+                                <div class="form-group">
+                                    <label class="checkbox-item">
+                                        <input type="checkbox" id="edid-cea-override">
+                                        <span class="checkmark"></span>
+                                        <span>Override CEA Extension Block</span>
+                                    </label>
+                                    <small class="form-hint">Override Consumer Electronics Association extension</small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card">
+                            <div class="card-header">
+                                <h3><i class="fas fa-cogs"></i> EDID Integration System</h3>
+                            </div>
+                            <div class="card-content">
+                                <div class="form-group">
+                                    <label class="checkbox-item">
+                                        <input type="checkbox" id="edid-integration">
+                                        <span class="checkmark"></span>
+                                        <span>Enable EDID Integration</span>
+                                    </label>
+                                    <small class="form-hint">Enable when you have monitor_profile.xml</small>
+                                </div>
+                                <div class="form-group">
+                                    <label class="checkbox-item">
+                                        <input type="checkbox" id="auto-configure-edid">
+                                        <span class="checkmark"></span>
+                                        <span>Auto-Configure from EDID</span>
+                                    </label>
+                                    <small class="form-hint">Automatically apply settings from monitor_profile.xml</small>
+                                </div>
+                                <div class="form-group">
+                                    <label for="edid-profile-path">EDID Profile Path</label>
+                                    <input type="text" id="edid-profile-path" value="EDID/monitor_profile.xml" class="form-input">
+                                    <small class="form-hint">Path to the monitor profile XML file</small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card">
+                            <div class="card-header">
+                                <h3><i class="fas fa-sliders-h"></i> Integration Behavior</h3>
+                            </div>
+                            <div class="card-content">
+                                <div class="form-group">
+                                    <label class="checkbox-item">
+                                        <input type="checkbox" id="override-manual">
+                                        <span class="checkmark"></span>
+                                        <span>Override Manual Settings</span>
+                                    </label>
+                                    <small class="form-hint">EDID settings take priority over manual configuration</small>
+                                </div>
+                                <div class="form-group">
+                                    <label class="checkbox-item">
+                                        <input type="checkbox" id="fallback-on-error" checked>
+                                        <span class="checkmark"></span>
+                                        <span>Fallback on EDID Error</span>
+                                    </label>
+                                    <small class="form-hint">Use manual settings if EDID parsing fails</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="page" id="advanced-page">
+                    <div class="page-header">
+                        <h1><i class="fas fa-sliders-h"></i> Advanced Configuration</h1>
+                        <p>Advanced driver settings and experimental features.</p>
+                    </div>
+                    <div class="cards-grid">
+                        <div class="card dev-only">
+                            <div class="card-header">
+                                <h3><i class="fas fa-magic"></i> Auto Resolution System</h3>
+                            </div>
+                            <div class="card-content">
+                                <div class="form-group">
+                                    <label class="checkbox-item">
+                                        <input type="checkbox" id="auto-resolutions">
+                                        <span class="checkmark"></span>
+                                        <span>Enable Auto Resolution Generation</span>
+                                    </label>
+                                    <small class="form-hint">Automatically generate resolutions from EDID</small>
+                                </div>
+                                <div class="form-group">
+                                    <label for="source-priority">Source Priority</label>
+                                    <select id="source-priority" class="form-input">
+                                        <option value="manual" selected>Manual Only</option>
+                                        <option value="edid">EDID Only</option>
+                                        <option value="hybrid">EDID + Manual</option>
+                                    </select>
+                                    <small class="form-hint">Resolution source priority</small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card">
+                            <div class="card-header">
+                                <h3><i class="fas fa-filter"></i> EDID Mode Filtering</h3>
+                            </div>
+                            <div class="card-content">
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label for="min-refresh">Min Refresh Rate (Hz)</label>
+                                        <input type="number" id="min-refresh" value="24" min="1" max="1000" class="form-input">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="max-refresh">Max Refresh Rate (Hz)</label>
+                                        <input type="number" id="max-refresh" value="240" min="1" max="1000" class="form-input">
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label for="min-width">Min Resolution Width</label>
+                                        <input type="number" id="min-width" value="640" min="1" class="form-input">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="min-height">Min Resolution Height</label>
+                                        <input type="number" id="min-height" value="480" min="1" class="form-input">
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label for="max-width">Max Resolution Width</label>
+                                        <input type="number" id="max-width" value="7680" min="1" class="form-input">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="max-height">Max Resolution Height</label>
+                                        <input type="number" id="max-height" value="4320" min="1" class="form-input">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="checkbox-item">
+                                        <input type="checkbox" id="exclude-fractional">
+                                        <span class="checkmark"></span>
+                                        <span>Exclude Fractional Refresh Rates</span>
+                                    </label>
+                                    <small class="form-hint">Filter out non-integer refresh rates (e.g., 59.94Hz)</small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card">
+                            <div class="card-header">
+                                <h3><i class="fas fa-star"></i> Preferred Mode Settings</h3>
+                            </div>
+                            <div class="card-content">
+                                <div class="form-group">
+                                    <label class="checkbox-item">
+                                        <input type="checkbox" id="use-edid-preferred">
+                                        <span class="checkmark"></span>
+                                        <span>Use EDID Preferred Mode</span>
+                                    </label>
+                                    <small class="form-hint">Use the preferred mode from EDID data</small>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label for="fallback-width">Fallback Width</label>
+                                        <input type="number" id="fallback-width" value="1920" class="form-input">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="fallback-height">Fallback Height</label>
+                                        <input type="number" id="fallback-height" value="1080" class="form-input">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="fallback-refresh">Fallback Refresh Rate</label>
+                                    <input type="number" id="fallback-refresh" value="60" class="form-input">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card">
+                            <div class="card-header">
+                                <h3><i class="fas fa-palette"></i> Advanced Color Processing</h3>
+                            </div>
+                            <div class="card-content">
+                                <div class="form-group">
+                                    <label class="checkbox-item">
+                                        <input type="checkbox" id="auto-bit-depth">
+                                        <span class="checkmark"></span>
+                                        <span>Auto-Select Bit Depth from Color Space</span>
+                                    </label>
+                                    <small class="form-hint">Automatically determine optimal bit depth</small>
+                                </div>
+                                <div class="form-group">
+                                    <label for="force-bit-depth">Force Bit Depth</label>
+                                    <select id="force-bit-depth" class="form-input">
+                                        <option value="8" selected>8-bit</option>
+                                        <option value="10">10-bit</option>
+                                        <option value="12">12-bit</option>
+                                        <option value="16">16-bit</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label class="checkbox-item">
+                                        <input type="checkbox" id="fp16-surface" checked>
+                                        <span class="checkmark"></span>
+                                        <span>FP16 Surface Support</span>
+                                    </label>
+                                    <small class="form-hint">Enable 16-bit floating point surface support</small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card">
+                            <div class="card-header">
+                                <h3><i class="fas fa-paint-brush"></i> Extended Color Format</h3>
+                            </div>
+                            <div class="card-content">
+                                <div class="form-group">
+                                    <label for="sdr-white-level">SDR White Level (nits)</label>
+                                    <input type="number" id="sdr-white-level" value="80.0" step="0.1" class="form-input">
+                                    <small class="form-hint">Standard dynamic range white level</small>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <div class="page" id="status-page">
+                    <div class="page-header">
+                        <h1><i class="fas fa-info-circle"></i> Driver Status & Management</h1>
+                        <p>Monitor driver installation status and manage operations.</p>
+                    </div>
+                    <div class="cards-grid">
+                        <div class="card">
+                            <div class="card-header">
+                                <h3><i class="fas fa-check-circle"></i> Driver Status</h3>
+                            </div>
+                            <div class="card-content">
+                                <div class="status-item">
+                                    <div class="status-indicator success"></div>
+                                    <div class="status-info">
+                                        <strong>Driver Status:</strong> Installed and Running
+                                    </div>
+                                </div>
+                                <div class="status-item">
+                                    <div class="status-indicator success"></div>
+                                    <div class="status-info">
+                                        <strong>Service:</strong> WUDF (Windows User Mode Driver Framework)
+                                    </div>
+                                </div>
+                                <div class="status-item">
+                                    <div class="status-indicator success"></div>
+                                    <div class="status-info">
+                                        <strong>Hardware ID:</strong> Root\MttVDD
+                                    </div>
+                                </div>
+                                <div class="status-item">
+                                    <div class="status-indicator warning"></div>
+                                    <div class="status-info">
+                                        <strong>Virtual Monitors:</strong> <span id="virtual-monitor-count">Detecting...</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card driver-management-card">
+                            <div class="card-header">
+                                <h3><i class="fas fa-tools"></i> Driver Management</h3>
+                            </div>
+                            <div class="card-content">
+                                <div class="form-group">
+                                    <button class="btn btn-secondary" id="reload-driver-btn">
+                                        <i class="fas fa-redo"></i>
+                                        Reload Driver
+                                    </button>
+                                    <button class="btn btn-primary">
+                                        <i class="fas fa-sync"></i>
+                                        Refresh Status
+                                    </button>
+                                    <button class="btn btn-secondary">
+                                        <i class="fas fa-stop"></i>
+                                        Stop Driver
+                                    </button>
+                                    <button class="btn btn-primary">
+                                        <i class="fas fa-play"></i>
+                                        Start Driver
+                                    </button>
+                                </div>
+                                <div class="form-group">
+                                    <button class="btn btn-danger">
+                                        <i class="fas fa-trash"></i>
+                                        Uninstall Driver
+                                    </button>
+                                    <button class="btn btn-primary">
+                                        <i class="fas fa-download"></i>
+                                        Reinstall Driver
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card">
+                            <div class="card-header">
+                                <h3><i class="fas fa-info"></i> System Information</h3>
+                            </div>
+                            <div class="card-content">
+                                <div class="info-grid">
+                                    <div class="info-item">
+                                        <label>Driver Version:</label>
+                                        <span id="driver-version">Detecting...</span>
+                                    </div>
+                                    <div class="info-item">
+                                        <label>UMDF Version:</label>
+                                        <span>2.25.0</span>
+                                    </div>
+                                    <div class="info-item">
+                                        <label>IddCx Version:</label>
+                                        <span id="iddcx-version">Detecting...</span>
+                                    </div>
+                                    <div class="info-item">
+                                        <label>Platform:</label>
+                                        <span>x64</span>
+                                    </div>
+                                    <div class="info-item">
+                                        <label>Windows Version:</label>
+                                        <span>Windows 11 22H2</span>
+                                    </div>
+                                    <div class="info-item">
+                                        <label>Driver Path:</label>
+                                        <span>C:\Windows\System32\drivers\UMDF\MttVDD.dll</span>
+                                    </div>
+                                    <div class="info-item">
+                                        <label>Config Path:</label>
+                                        <span>C:\VirtualDisplayDriver\vdd_settings.xml</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card">
+                            <div class="card-header">
+                                <h3><i class="fas fa-cloud-download-alt"></i> Available Driver Versions</h3>
+                                <button class="btn btn-secondary btn-small" id="refresh-versions-btn">
+                                    <i class="fas fa-sync"></i>
+                                    Refresh
+                                </button>
+                            </div>
+                            <div class="card-content">
+                                <div id="available-versions" class="available-versions">
+                                    <div class="version-loading">
+                                        <i class="fas fa-spinner fa-spin"></i>
+                                        <span>Checking for available versions...</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="page" id="logging-page">
+                    <div class="page-header">
+                        <h1><i class="fas fa-file-alt"></i> Logging & Debug</h1>
+                        <p>Configure logging output and debug information.</p>
+                    </div>
+                    <div class="cards-grid">
+                        <div class="card">
+                            <div class="card-header">
+                                <h3><i class="fas fa-pipe"></i> Pipe Logging</h3>
+                            </div>
+                            <div class="card-content">
+                                <div class="form-group">
+                                    <label class="checkbox-item">
+                                        <input type="checkbox" id="send-logs-pipe" checked>
+                                        <span class="checkmark"></span>
+                                        <span>Send Logs Through Named Pipe</span>
+                                    </label>
+                                    <small class="form-hint">Enable real-time log streaming via named pipe</small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card">
+                            <div class="card-header">
+                                <h3><i class="fas fa-file"></i> File Logging</h3>
+                            </div>
+                            <div class="card-content">
+                                <div class="form-group">
+                                    <label class="checkbox-item">
+                                        <input type="checkbox" id="file-logging">
+                                        <span class="checkmark"></span>
+                                        <span>Enable File Logging</span>
+                                    </label>
+                                    <small class="form-hint">Write logs to file system</small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card">
+                            <div class="card-header">
+                                <h3><i class="fas fa-bug"></i> Debug Logging</h3>
+                            </div>
+                            <div class="card-content">
+                                <div class="form-group">
+                                    <label class="checkbox-item">
+                                        <input type="checkbox" id="debug-logging">
+                                        <span class="checkmark"></span>
+                                        <span>Enable Debug Logging</span>
+                                    </label>
+                                    <small class="form-hint">⚠️ WARNING: Debug logging creates large files</small>
+                                </div>
+                                <div class="form-group">
+                                    <div class="warning-box">
+                                        <i class="fas fa-exclamation-triangle"></i>
+                                        <strong>Important:</strong> Debug logging generates extensive output and should only be enabled for troubleshooting. Disable after debugging to prevent disk space issues.
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card">
+                            <div class="card-header">
+                                <h3><i class="fas fa-terminal"></i> Log Viewer</h3>
+                            </div>
+                            <div class="card-content">
+                                <div class="form-group">
+                                    <button class="btn btn-primary">
+                                        <i class="fas fa-play"></i>
+                                        Start Log Monitoring
+                                    </button>
+                                    <button class="btn btn-secondary">
+                                        <i class="fas fa-folder-open"></i>
+                                        Open Log Directory
+                                    </button>
+                                </div>
+                                <div class="form-group">
+                                    <label for="log-output">Live Log Output</label>
+                                    <textarea id="log-output" class="form-input log-viewer" rows="8" readonly placeholder="Log output will appear here when monitoring is active..."></textarea>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
