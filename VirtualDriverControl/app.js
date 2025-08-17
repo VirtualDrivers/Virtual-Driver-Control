@@ -26,6 +26,8 @@ class VirtualDriverControl {
     constructor() {
         this.currentTheme = 'dark';
         this.isReinstalling = false; // Reset flag from any previous session
+        this.driverInstalled = false; // Track driver installation status
+        this.driverStatus = 'Unknown'; // Track current driver status
         // Remove any mode-related classes from body
         document.body.classList.remove('user-mode', 'dev-mode');
         this.init().catch(error => {
@@ -39,6 +41,7 @@ class VirtualDriverControl {
         this.setupFileOperations();
         this.setupGPUEnumeration();
         this.setupRefreshRates();
+        this.setupExternalLinks();
         this.setupResolutions();
         this.setupEDIDUpload();
         this.setupColorCustomization();
@@ -70,6 +73,17 @@ class VirtualDriverControl {
         });
     }
 
+    setupExternalLinks() {
+        // Handle external links to open in default browser
+        document.addEventListener('click', (event) => {
+            const link = event.target.closest('a[href^="http"]');
+            if (link && window.require) {
+                event.preventDefault();
+                const { shell } = window.require('electron');
+                shell.openExternal(link.href);
+            }
+        });
+    }
 
     showPage(pageId) {
         // Hide all pages
@@ -91,6 +105,11 @@ class VirtualDriverControl {
                 this.detectIddCxVersion();
                 this.detectDriverVersion();
                 this.checkAvailableVersions();
+            }
+            
+            // Refresh scripts list when showing scripts page
+            if (pageId === 'scripts') {
+                refreshLocalScripts();
             }
         }
     }
@@ -1565,6 +1584,8 @@ class VirtualDriverControl {
         
         // Track driver installation status
         const driverInstalled = (status === 'Installed and Running' || status === 'Driver Package Installed');
+        this.driverInstalled = driverInstalled;
+        this.driverStatus = status;
         
         // Update driver status
         const driverStatusText = document.getElementById('driver-status-text');
@@ -2035,10 +2056,17 @@ class VirtualDriverControl {
 
     // Detect Driver version using driver date
     async detectDriverVersion() {
+        console.log('Starting driver version detection...');
+        
+        // Check if driver is installed first
+        if (this.driverInstalled === false || this.driverStatus === 'Not Installed') {
+            console.log('Driver not installed, setting version to "Not Installed"');
+            this.updateDriverVersion('Not Installed');
+            return 'Not Installed';
+        }
+        
         // Immediate fallback - use known date if PowerShell methods fail
         const knownDriverDate = '25.8.14'; // From our WMI testing: 20250814000000.******+***
-        
-        console.log('Starting driver version detection...');
         
         // Quick test - if Node.js isn't available, use fallback immediately
         if (typeof window === 'undefined' || !window.require) {
@@ -4078,6 +4106,472 @@ class VirtualDriverControl {
         div.textContent = text;
         return div.innerHTML;
     }
+}
+
+// Global functions for Community Scripts management
+async function updateCommunityScripts() {
+    const statusElement = document.getElementById('scripts-download-status');
+    const progressElement = document.getElementById('scripts-progress');
+    const buttonElement = document.getElementById('update-scripts-btn');
+    
+    // Show progress UI
+    statusElement.style.display = 'block';
+    buttonElement.disabled = true;
+    buttonElement.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Downloading...';
+    
+    try {
+        // Ensure Node.js access is available
+        if (!window.require) {
+            throw new Error('Node.js access not available');
+        }
+        
+        const fs = window.require('fs');
+        const path = window.require('path');
+        const https = window.require('https');
+        
+        const scriptsDir = 'C:\\VirtualDisplayDriver\\Scripts';
+        
+        // Create scripts directory if it doesn't exist
+        if (!fs.existsSync(scriptsDir)) {
+            fs.mkdirSync(scriptsDir, { recursive: true });
+            console.log('Created scripts directory:', scriptsDir);
+        }
+        
+        // GitHub API URL for the Community Scripts directory
+        const apiUrl = 'https://api.github.com/repos/VirtualDrivers/Virtual-Display-Driver/contents/Community%20Scripts';
+        
+        // Fetch file list from GitHub
+        const fileList = await fetchGitHubContents(apiUrl);
+        
+        let downloaded = 0;
+        const total = fileList.filter(file => file.name.endsWith('.ps1') || file.name.endsWith('.bat')).length;
+        
+        // Download each script file
+        for (const file of fileList) {
+            if (file.name.endsWith('.ps1') || file.name.endsWith('.bat')) {
+                await downloadScriptFile(file, scriptsDir);
+                downloaded++;
+                
+                // Update progress
+                const progress = (downloaded / total) * 100;
+                progressElement.style.width = `${progress}%`;
+                
+                // Small delay to show progress
+                await new Promise(resolve => setTimeout(resolve, 100));
+            }
+        }
+        
+        showScriptNotification(`Successfully downloaded ${downloaded} scripts!`, 'success');
+        
+        // Refresh the local scripts list
+        await refreshLocalScripts();
+        
+    } catch (error) {
+        console.error('Error downloading scripts:', error);
+        showScriptNotification('Failed to download scripts: ' + error.message, 'error');
+    } finally {
+        // Hide progress UI
+        statusElement.style.display = 'none';
+        buttonElement.disabled = false;
+        buttonElement.innerHTML = '<i class="fas fa-sync"></i> Download/Update Scripts';
+        progressElement.style.width = '0%';
+    }
+}
+
+async function fetchGitHubContents(url) {
+    const response = await fetch(url);
+    if (!response.ok) {
+        throw new Error(`GitHub API error: ${response.status}`);
+    }
+    return await response.json();
+}
+
+async function downloadScriptFile(file, targetDir) {
+    const fs = window.require('fs');
+    const path = window.require('path');
+    
+    // Fetch file content
+    const response = await fetch(file.download_url);
+    if (!response.ok) {
+        throw new Error(`Failed to download ${file.name}: ${response.status}`);
+    }
+    
+    const content = await response.text();
+    const filePath = path.join(targetDir, file.name);
+    
+    // Write file to disk
+    fs.writeFileSync(filePath, content, 'utf8');
+    console.log('Downloaded:', file.name);
+}
+
+async function removeAllScripts() {
+    try {
+        if (!window.require) {
+            throw new Error('Node.js access not available');
+        }
+        
+        const fs = window.require('fs');
+        const path = window.require('path');
+        
+        const scriptsDir = 'C:\\VirtualDisplayDriver\\Scripts';
+        
+        if (!fs.existsSync(scriptsDir)) {
+            showScriptNotification('Scripts directory does not exist', 'info');
+            return;
+        }
+        
+        // Read all files in the scripts directory
+        const files = fs.readdirSync(scriptsDir).filter(file => 
+            file.endsWith('.ps1') || file.endsWith('.bat')
+        );
+        
+        if (files.length === 0) {
+            showScriptNotification('No scripts to remove', 'info');
+            return;
+        }
+        
+        // Confirm deletion
+        const confirmDelete = confirm(`Are you sure you want to remove all ${files.length} script(s)? This action cannot be undone.`);
+        if (!confirmDelete) {
+            return;
+        }
+        
+        // Delete each script file
+        let removedCount = 0;
+        for (const fileName of files) {
+            const filePath = path.join(scriptsDir, fileName);
+            try {
+                fs.unlinkSync(filePath);
+                removedCount++;
+                console.log('Removed:', fileName);
+            } catch (error) {
+                console.error('Failed to remove:', fileName, error);
+            }
+        }
+        
+        showScriptNotification(`Successfully removed ${removedCount} script(s)!`, 'success');
+        
+        // Refresh the local scripts list
+        await refreshLocalScripts();
+        
+    } catch (error) {
+        console.error('Error removing scripts:', error);
+        showScriptNotification('Failed to remove scripts: ' + error.message, 'error');
+    }
+}
+
+async function refreshLocalScripts() {
+    const scriptsListElement = document.getElementById('local-scripts-list');
+    
+    try {
+        if (!window.require) {
+            throw new Error('Node.js access not available');
+        }
+        
+        const fs = window.require('fs');
+        const path = window.require('path');
+        
+        const scriptsDir = 'C:\\VirtualDisplayDriver\\Scripts';
+        
+        if (!fs.existsSync(scriptsDir)) {
+            scriptsListElement.innerHTML = `
+                <div class="scripts-empty">
+                    <i class="fas fa-folder-open"></i>
+                    <p>Scripts directory does not exist. Click "Download/Update Scripts" to create it.</p>
+                </div>
+            `;
+            return;
+        }
+        
+        // Read all files in the scripts directory
+        const files = fs.readdirSync(scriptsDir).filter(file => 
+            file.endsWith('.ps1') || file.endsWith('.bat')
+        );
+        
+        if (files.length === 0) {
+            scriptsListElement.innerHTML = `
+                <div class="scripts-empty">
+                    <i class="fas fa-folder-open"></i>
+                    <p>No scripts found. Click "Download/Update Scripts" to get started.</p>
+                </div>
+            `;
+            return;
+        }
+        
+        // Generate HTML for each script
+        const scriptsHtml = files.map(fileName => {
+            const filePath = path.join(scriptsDir, fileName);
+            const stats = fs.statSync(filePath);
+            const fileSize = formatFileSize(stats.size);
+            const fileType = path.extname(fileName).substring(1).toUpperCase();
+            const baseName = path.basename(fileName, path.extname(fileName));
+            
+            // Generate a description based on filename
+            const description = generateScriptDescription(baseName);
+            
+            return `
+                <div class="script-item-local">
+                    <div class="script-info">
+                        <h4 class="script-name">
+                            <i class="fas fa-file-code"></i>
+                            ${baseName}
+                            <span class="script-type">${fileType}</span>
+                        </h4>
+                        <p class="script-description">${description}</p>
+                        <span class="script-size">${fileSize}</span>
+                    </div>
+                    <div class="script-actions-local">
+                        <button class="btn btn-run btn-small" onclick="runScript('${fileName}')">
+                            <i class="fas fa-play"></i> Run
+                        </button>
+                        <button class="btn btn-view btn-small" onclick="viewScript('${fileName}')">
+                            <i class="fas fa-eye"></i> View
+                        </button>
+                    </div>
+                </div>
+            `;
+        }).join('');
+        
+        scriptsListElement.innerHTML = scriptsHtml;
+        
+    } catch (error) {
+        console.error('Error refreshing scripts:', error);
+        scriptsListElement.innerHTML = `
+            <div class="scripts-empty">
+                <i class="fas fa-exclamation-triangle"></i>
+                <p>Error loading scripts: ${error.message}</p>
+            </div>
+        `;
+    }
+}
+
+function formatFileSize(bytes) {
+    if (bytes === 0) return '0 B';
+    const k = 1024;
+    const sizes = ['B', 'KB', 'MB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
+}
+
+function generateScriptDescription(baseName) {
+    const descriptions = {
+        'install': 'Installs the Virtual Display Driver',
+        'uninstall': 'Removes the Virtual Display Driver',
+        'cleanup': 'Cleans up driver files and registry entries',
+        'status': 'Checks driver installation status',
+        'monitor': 'Configures virtual monitor settings',
+        'edid': 'Manages EDID configuration',
+        'test': 'Tests driver functionality',
+        'backup': 'Backs up driver configuration',
+        'restore': 'Restores driver configuration'
+    };
+    
+    const lowerName = baseName.toLowerCase();
+    for (const [key, desc] of Object.entries(descriptions)) {
+        if (lowerName.includes(key)) {
+            return desc;
+        }
+    }
+    
+    return 'Community script for Virtual Display Driver';
+}
+
+async function runScript(fileName) {
+    try {
+        if (!window.require) {
+            throw new Error('Node.js access not available');
+        }
+        
+        const { spawn } = window.require('child_process');
+        const path = window.require('path');
+        
+        const scriptsDir = 'C:\\VirtualDisplayDriver\\Scripts';
+        const filePath = path.join(scriptsDir, fileName);
+        const fileExt = path.extname(fileName).toLowerCase();
+        
+        let command, args;
+        
+        if (fileExt === '.ps1') {
+            // PowerShell script
+            command = 'powershell.exe';
+            args = ['-ExecutionPolicy', 'Bypass', '-File', filePath];
+        } else if (fileExt === '.bat') {
+            // Batch script
+            command = 'cmd.exe';
+            args = ['/c', filePath];
+        } else {
+            throw new Error('Unsupported script type');
+        }
+        
+        showScriptNotification(`Running ${fileName}...`, 'info');
+        
+        const process = spawn(command, args, {
+            cwd: scriptsDir,
+            stdio: ['ignore', 'pipe', 'pipe']
+        });
+        
+        let output = '';
+        let errorOutput = '';
+        
+        process.stdout.on('data', (data) => {
+            output += data.toString();
+        });
+        
+        process.stderr.on('data', (data) => {
+            errorOutput += data.toString();
+        });
+        
+        process.on('close', (code) => {
+            if (code === 0) {
+                showScriptNotification(`${fileName} completed successfully`, 'success');
+                if (output.trim()) {
+                    console.log('Script output:', output);
+                }
+            } else {
+                showScriptNotification(`${fileName} failed with exit code ${code}`, 'error');
+                if (errorOutput.trim()) {
+                    console.error('Script error:', errorOutput);
+                }
+            }
+        });
+        
+    } catch (error) {
+        console.error('Error running script:', error);
+        showScriptNotification('Failed to run script: ' + error.message, 'error');
+    }
+}
+
+async function viewScript(fileName) {
+    try {
+        if (!window.require) {
+            throw new Error('Node.js access not available');
+        }
+        
+        const fs = window.require('fs');
+        const path = window.require('path');
+        
+        const scriptsDir = 'C:\\VirtualDisplayDriver\\Scripts';
+        const filePath = path.join(scriptsDir, fileName);
+        
+        const content = fs.readFileSync(filePath, 'utf8');
+        
+        // Create a modal to display the script content
+        showScriptModal(fileName, content);
+        
+    } catch (error) {
+        console.error('Error viewing script:', error);
+        showScriptNotification('Failed to view script: ' + error.message, 'error');
+    }
+}
+
+function showScriptModal(fileName, content) {
+    // Create modal overlay
+    const modal = document.createElement('div');
+    modal.className = 'script-modal-overlay';
+    modal.innerHTML = `
+        <div class="script-modal">
+            <div class="script-modal-header">
+                <h3><i class="fas fa-file-code"></i> ${fileName}</h3>
+                <button class="script-modal-close" onclick="closeScriptModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="script-modal-content">
+                <pre><code>${escapeHtml(content)}</code></pre>
+            </div>
+            <div class="script-modal-footer">
+                <button class="btn btn-secondary" onclick="closeScriptModal()">Close</button>
+                <button class="btn btn-primary" onclick="copyScriptContent('${fileName}')">
+                    <i class="fas fa-copy"></i> Copy
+                </button>
+            </div>
+        </div>
+    `;
+    
+    // Add modal styles
+    modal.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.7);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 10000;
+    `;
+    
+    document.body.appendChild(modal);
+    window.currentScriptModal = modal;
+    window.currentScriptContent = content;
+}
+
+function closeScriptModal() {
+    if (window.currentScriptModal) {
+        document.body.removeChild(window.currentScriptModal);
+        window.currentScriptModal = null;
+        window.currentScriptContent = null;
+    }
+}
+
+function copyScriptContent(fileName) {
+    if (window.currentScriptContent) {
+        if (navigator.clipboard) {
+            navigator.clipboard.writeText(window.currentScriptContent).then(() => {
+                showScriptNotification('Script content copied to clipboard!', 'success');
+            });
+        } else {
+            // Fallback for older browsers
+            const textArea = document.createElement('textarea');
+            textArea.value = window.currentScriptContent;
+            document.body.appendChild(textArea);
+            textArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textArea);
+            showScriptNotification('Script content copied to clipboard!', 'success');
+        }
+    }
+}
+
+function showScriptNotification(message, type = 'success') {
+    const notification = document.createElement('div');
+    notification.className = `script-notification ${type}`;
+    notification.textContent = message;
+    
+    const bgColor = type === 'success' ? '#4caf50' : type === 'error' ? '#f44336' : '#2196f3';
+    
+    notification.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: ${bgColor};
+        color: white;
+        padding: 12px 16px;
+        border-radius: 6px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        z-index: 10000;
+        font-size: 14px;
+        font-weight: 500;
+        animation: slideInNotification 0.3s ease-out;
+    `;
+    
+    document.body.appendChild(notification);
+    
+    setTimeout(() => {
+        notification.style.animation = 'slideOutNotification 0.3s ease-out';
+        setTimeout(() => {
+            if (notification.parentNode) {
+                document.body.removeChild(notification);
+            }
+        }, 300);
+    }, 3000);
+}
+
+function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
 }
 
 // Initialize the app when DOM is loaded

@@ -75,6 +75,14 @@
                             <i class="fas fa-file-alt"></i>
                             <span class="nav-label">Logging & Debug</span>
                         </div>
+                        <div class="nav-item" data-page="scripts">
+                            <i class="fas fa-code"></i>
+                            <span class="nav-label">Community Scripts</span>
+                        </div>
+                        <div class="nav-item" data-page="links">
+                            <i class="fas fa-external-link-alt"></i>
+                            <span class="nav-label">Links & Resources</span>
+                        </div>
                     </div>
                     
                     <div class="nav-footer">
@@ -1085,6 +1093,229 @@
                                             <li><strong>Location:</strong> C:\VirtualDisplayDriver\Logs\</li>
                                         </ul>
                                     </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="page" id="scripts-page">
+                    <div class="page-header">
+                        <h1><i class="fas fa-code"></i> Community Scripts</h1>
+                        <p>Download and manage community scripts for Virtual Display Driver automation.</p>
+                    </div>
+                    
+                    <div class="card">
+                        <div class="card-header">
+                            <h3><i class="fas fa-list"></i> Available Scripts</h3>
+                            <div class="card-header-actions">
+                                <button class="btn btn-danger btn-small" id="remove-scripts-btn" onclick="removeAllScripts()">
+                                    <i class="fas fa-trash"></i>
+                                    Remove All Scripts
+                                </button>
+                                <button class="btn btn-primary btn-small" id="update-scripts-btn" onclick="updateCommunityScripts()">
+                                    <i class="fas fa-sync"></i>
+                                    Download/Update Scripts
+                                </button>
+                                <button class="btn btn-secondary btn-small" id="refresh-scripts-btn" onclick="refreshLocalScripts()">
+                                    <i class="fas fa-refresh"></i>
+                                    Refresh
+                                </button>
+                            </div>
+                        </div>
+                        <div class="card-content">
+                            <div id="scripts-download-status" class="download-status" style="display: none;">
+                                <div class="status-content">
+                                    <i class="fas fa-spinner fa-spin"></i>
+                                    <span>Downloading community scripts...</span>
+                                </div>
+                                <div class="progress-bar">
+                                    <div class="progress-fill" id="scripts-progress"></div>
+                                </div>
+                            </div>
+                            
+                            <div id="local-scripts-list" class="local-scripts">
+                                <div class="scripts-empty">
+                                    <i class="fas fa-folder-open"></i>
+                                    <p>No scripts found. Click "Download/Update Scripts" to get started.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="card">
+                        <div class="card-header">
+                            <h3><i class="fas fa-share"></i> Contribute</h3>
+                        </div>
+                        <div class="card-content">
+                            <p>Have a useful script to share with the community? Submit it to our GitHub repository!</p>
+                            <div class="submit-actions">
+                                <a href="https://github.com/VirtualDrivers/Virtual-Display-Driver/tree/master/Community%20Scripts" class="btn btn-primary">
+                                    <i class="fab fa-github"></i>
+                                    View Repository
+                                </a>
+                                <a href="https://github.com/VirtualDrivers/Virtual-Display-Driver/issues/new?template=script-submission.md" class="btn btn-secondary">
+                                    <i class="fas fa-plus"></i>
+                                    Submit Script
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="page" id="links-page">
+                    <div class="page-header">
+                        <h1><i class="fas fa-external-link-alt"></i> Links & Resources</h1>
+                        <p>Quick access to useful websites and resources for Virtual Display Driver.</p>
+                    </div>
+                    
+                    <div class="cards-grid">
+                        <div class="card">
+                            <div class="card-header">
+                                <h3><i class="fas fa-globe"></i> Resources</h3>
+                            </div>
+                            <div class="card-content">
+                                <div class="links-grid">
+                                    <a href="https://pyrosoft.pro/" class="link-box">
+                                        <div class="link-icon">
+                                            <i class="fas fa-globe"></i>
+                                        </div>
+                                        <div class="link-content">
+                                            <h4>PyroSoft Productions / MikeTheTech</h4>
+                                            <p>Official website and portfolio</p>
+                                        </div>
+                                        <i class="fas fa-external-link-alt link-arrow"></i>
+                                    </a>
+                                    
+                                    <a href="https://github.com/VirtualDrivers" class="link-box">
+                                        <div class="link-icon">
+                                            <i class="fab fa-github"></i>
+                                        </div>
+                                        <div class="link-content">
+                                            <h4>VirtualDrivers Organization</h4>
+                                            <p>Organization containing all Virtual Driver projects</p>
+                                        </div>
+                                        <i class="fas fa-external-link-alt link-arrow"></i>
+                                    </a>
+                                    
+                                    <a href="https://github.com/VirtualDrivers/Virtual-Display-Driver" class="link-box">
+                                        <div class="link-icon">
+                                            <i class="fas fa-desktop"></i>
+                                        </div>
+                                        <div class="link-content">
+                                            <h4>Virtual Display Driver</h4>
+                                            <p>Main virtual display driver repository</p>
+                                        </div>
+                                        <i class="fas fa-external-link-alt link-arrow"></i>
+                                    </a>
+                                    
+                                    <a href="https://github.com/VirtualDrivers/Virtual-Audio-Driver" class="link-box">
+                                        <div class="link-icon">
+                                            <i class="fas fa-volume-up"></i>
+                                        </div>
+                                        <div class="link-content">
+                                            <h4>Virtual Audio Driver</h4>
+                                            <p>Virtual audio device driver</p>
+                                        </div>
+                                        <i class="fas fa-external-link-alt link-arrow"></i>
+                                    </a>
+                                    
+                                    <a href="https://github.com/VirtualDrivers/Virtual-Driver-Control" class="link-box">
+                                        <div class="link-icon">
+                                            <i class="fas fa-cog"></i>
+                                        </div>
+                                        <div class="link-content">
+                                            <h4>Virtual Driver Control</h4>
+                                            <p>This control panel application</p>
+                                        </div>
+                                        <i class="fas fa-external-link-alt link-arrow"></i>
+                                    </a>
+                                    
+                                    <a href="https://github.com/VirtualDrivers/Virtual-Driver-Installer" class="link-box">
+                                        <div class="link-icon">
+                                            <i class="fas fa-download"></i>
+                                        </div>
+                                        <div class="link-content">
+                                            <h4>Virtual Driver Installer</h4>
+                                            <p>Installation utility for virtual drivers</p>
+                                        </div>
+                                        <i class="fas fa-external-link-alt link-arrow"></i>
+                                    </a>
+                                    
+                                    <div class="link-box coming-soon">
+                                        <div class="link-icon">
+                                            <i class="fab fa-bluetooth"></i>
+                                        </div>
+                                        <div class="link-content">
+                                            <h4>Virtual Bluetooth Device Driver</h4>
+                                            <p>Coming Soon</p>
+                                        </div>
+                                        <i class="fas fa-clock link-arrow"></i>
+                                    </div>
+                                    
+                                    <a href="https://discord.mikethetech.com/" class="link-box">
+                                        <div class="link-icon">
+                                            <i class="fab fa-discord"></i>
+                                        </div>
+                                        <div class="link-content">
+                                            <h4>Discord / Support</h4>
+                                            <p>Join our community Discord server</p>
+                                        </div>
+                                        <i class="fas fa-external-link-alt link-arrow"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="card">
+                            <div class="card-header">
+                                <h3><i class="fas fa-heart"></i> Support Us</h3>
+                            </div>
+                            <div class="card-content">
+                                <div class="links-grid">
+                                    <a href="https://www.patreon.com/c/mikethetech" class="link-box">
+                                        <div class="link-icon">
+                                            <i class="fab fa-patreon"></i>
+                                        </div>
+                                        <div class="link-content">
+                                            <h4>Patreon</h4>
+                                            <p>Monthly support with exclusive updates</p>
+                                        </div>
+                                        <i class="fas fa-external-link-alt link-arrow"></i>
+                                    </a>
+                                    
+                                    <a href="https://github.com/sponsors/itsmikethetech" class="link-box">
+                                        <div class="link-icon">
+                                            <i class="fab fa-github"></i>
+                                        </div>
+                                        <div class="link-content">
+                                            <h4>Mike Rodriguez (MikeTheTech)</h4>
+                                            <p>Support development through GitHub Sponsors</p>
+                                        </div>
+                                        <i class="fas fa-external-link-alt link-arrow"></i>
+                                    </a>
+                                    
+                                    <a href="https://buymeacoffee.com/mikethetech" class="link-box">
+                                        <div class="link-icon">
+                                            <i class="fas fa-coffee"></i>
+                                        </div>
+                                        <div class="link-content">
+                                            <h4>Buy Me a Coffee - MikeTheTech</h4>
+                                            <p>One-time donations to support the project</p>
+                                        </div>
+                                        <i class="fas fa-external-link-alt link-arrow"></i>
+                                    </a>
+                                    
+                                    <a href="https://github.com/sponsors/zjoasan" class="link-box">
+                                        <div class="link-icon">
+                                            <i class="fab fa-github"></i>
+                                        </div>
+                                        <div class="link-content">
+                                            <h4>Joakim Sandström (zjoasan)</h4>
+                                            <p>Support development through GitHub Sponsors</p>
+                                        </div>
+                                        <i class="fas fa-external-link-alt link-arrow"></i>
+                                    </a>
                                 </div>
                             </div>
                         </div>
