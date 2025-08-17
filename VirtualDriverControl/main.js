@@ -1,10 +1,48 @@
-const { app, BrowserWindow, ipcMain } = require('electron');
+const { app, BrowserWindow, ipcMain, nativeImage } = require('electron');
 const path = require('path');
 const { exec } = require('child_process');
 const { promisify } = require('util');
 
 const execPromise = promisify(exec);
 let mainWindow;
+
+// Icon paths for different driver states
+const icons = {
+  default: path.join(__dirname, 'Virtual Display Driver.ico'),
+  installed: path.join(__dirname, 'Virtual Display Driver.ico'), // Green/default
+  warning: path.join(__dirname, 'VDD_Yellow.ico'), // Yellow for warnings
+  error: path.join(__dirname, 'VDD_Red.ico') // Red for errors/not installed
+};
+
+// Function to update app icon based on driver status
+function updateAppIcon(statusClass) {
+  if (!mainWindow) return;
+  
+  let iconPath;
+  switch (statusClass) {
+    case 'success':
+      iconPath = icons.installed;
+      break;
+    case 'warning':
+      iconPath = icons.warning;
+      break;
+    case 'danger':
+    case 'error':
+      iconPath = icons.error;
+      break;
+    default:
+      iconPath = icons.default;
+      break;
+  }
+  
+  try {
+    const icon = nativeImage.createFromPath(iconPath);
+    mainWindow.setIcon(icon);
+    console.log(`App icon updated to: ${iconPath} (status: ${statusClass})`);
+  } catch (error) {
+    console.error('Failed to update app icon:', error);
+  }
+}
 
 // Check if running as Administrator
 async function checkAdministratorPrivileges() {
@@ -71,6 +109,8 @@ function createWindow() {
 
   mainWindow.once('ready-to-show', () => {
     mainWindow.show();
+    // Set initial icon (will be updated when driver status is detected)
+    updateAppIcon('default');
   });
 
   mainWindow.on('closed', () => {
@@ -105,6 +145,12 @@ app.whenReady().then(initializeApp);
 ipcMain.on('quit-app', () => {
   console.log('Received quit-app message, closing application');
   app.quit();
+});
+
+// Handle driver status updates from renderer process
+ipcMain.on('driver-status-changed', (event, statusClass) => {
+  console.log(`Received driver status update: ${statusClass}`);
+  updateAppIcon(statusClass);
 });
 
 app.on('window-all-closed', () => {

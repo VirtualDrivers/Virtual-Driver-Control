@@ -1506,13 +1506,13 @@ class VirtualDriverControl {
                         this.logToFile(`Device query stdout: ${result.stdout}`);
                         this.logToFile(`Device query stderr: ${result.stderr}`);
                         
-                        if (result.stdout && result.stdout.includes('MttVDD')) {
+                        if (result.stdout && result.stdout.toLowerCase().includes('mttvdd')) {
                             // Check if the device has a proper name (not just hardware ID)
                             const lines = result.stdout.split('\n');
                             let hasValidDriver = false;
                             
                             for (const line of lines) {
-                                if (line.includes('MttVDD') && line.trim()) {
+                                if (line.toLowerCase().includes('mttvdd') && line.trim()) {
                                     // Parse the line to check if Name field has content
                                     const parts = line.split(/\s+/);
                                     if (parts.length >= 3 && parts[0] && parts[0] !== '' && !parts[0].startsWith('----')) {
@@ -1523,14 +1523,14 @@ class VirtualDriverControl {
                             }
                             
                             if (hasValidDriver) {
-                                this.logToFile('MttVDD driver found and properly installed in Device Manager');
+                                this.logToFile('Virtual Display Driver found and properly installed in Device Manager');
                                 this.updateDriverStatus('Installed and Running', 'success', 'WUDF (Windows User Mode Driver Framework)', 'Root\\MttVDD');
                             } else {
-                                this.logToFile('MttVDD device found but driver not properly installed (missing name)');
+                                this.logToFile('Virtual Display Driver device found but driver not properly installed (missing name)');
                                 this.updateDriverStatus('Not Installed', 'danger', 'N/A', 'N/A');
                             }
                         } else {
-                            this.logToFile('MttVDD driver not found in Device Manager');
+                            this.logToFile('Virtual Display Driver not found in Device Manager');
                             this.updateDriverStatus('Not Installed', 'danger', 'N/A', 'N/A');
                         }
                         
@@ -1613,6 +1613,16 @@ class VirtualDriverControl {
         
         // Update virtual monitor display based on driver status
         this.updateVirtualMonitorDisplayForDriverStatus(driverInstalled);
+        
+        // Send driver status to main process for icon update
+        if (typeof require !== 'undefined') {
+            try {
+                const { ipcRenderer } = require('electron');
+                ipcRenderer.send('driver-status-changed', statusClass);
+            } catch (error) {
+                console.log('Could not send driver status to main process:', error);
+            }
+        }
     }
 
     // Update virtual monitor display based on driver installation status
