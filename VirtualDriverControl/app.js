@@ -25,6 +25,7 @@ class VirtualDriverControl {
     }
     constructor() {
         this.currentTheme = 'dark';
+        this.isReinstalling = false; // Reset flag from any previous session
         // Remove any mode-related classes from body
         document.body.classList.remove('user-mode', 'dev-mode');
         this.init().catch(error => {
@@ -85,6 +86,7 @@ class VirtualDriverControl {
             
             // Refresh status information when showing status page
             if (pageId === 'status') {
+                this.detectDriverStatus();
                 this.detectVirtualDisplays();
                 this.detectIddCxVersion();
                 this.detectDriverVersion();
@@ -215,11 +217,13 @@ class VirtualDriverControl {
             });
         }
 
-        // Check if running with Administrator privileges on startup
-        await this.checkAndPromptForAdminPrivileges();
+        // Administrator privileges are now checked in main.js before UI creation
         
         // Load VDD settings from C:\VirtualDisplayDriver\vdd_settings.xml
         await this.loadVDDSettings();
+        
+        // Detect driver status
+        await this.detectDriverStatus();
         
         // Detect virtual displays
         await this.detectVirtualDisplays();
@@ -869,10 +873,14 @@ class VirtualDriverControl {
 
         const reinstallDriverBtn = document.getElementById('reinstall-driver-btn');
         if (reinstallDriverBtn) {
+            this.logToFile('Reinstall button found - attaching event handler');
             reinstallDriverBtn.addEventListener('click', () => {
                 this.logToFile('REINSTALL BUTTON CLICKED - Event handler triggered');
+                console.log('Reinstall button clicked - calling reinstallDriver()');
                 this.reinstallDriver();
             });
+        } else {
+            this.logToFile('ERROR: Reinstall button not found in DOM');
         }
 
         // Log folder button
@@ -1299,6 +1307,7 @@ class VirtualDriverControl {
             await this.listDevices();
             
             // Re-run all detection methods
+            await this.detectDriverStatus();
             await this.detectVirtualDisplays();
             await this.detectIddCxVersion();
             await this.detectDriverVersion();
@@ -1311,32 +1320,8 @@ class VirtualDriverControl {
         }
     }
 
-    // Check and prompt for Administrator privileges on startup
-    async checkAndPromptForAdminPrivileges() {
-        try {
-            this.logToFile('=== CHECKING ADMINISTRATOR PRIVILEGES ON STARTUP ===');
-            const isAdmin = await this.checkAdministratorPrivileges();
-            this.logToFile(`Running as Administrator: ${isAdmin}`);
-            
-            if (!isAdmin && process.platform === 'win32') {
-                this.logToFile('Not running as Administrator - automatically requesting elevation');
-                
-                // Show notification about admin privileges
-                this.showNotification('Requesting Administrator privileges for driver management features...', 'info');
-                
-                // Automatically attempt to restart as Administrator
-                this.logToFile('Automatically restarting as Administrator');
-                await this.restartAsAdministrator();
-            } else if (isAdmin) {
-                this.logToFile('Running as Administrator - all features available');
-                this.showNotification('Running with Administrator privileges - all features available', 'success');
-            } else {
-                this.logToFile('Platform check: Not Windows or unable to determine admin status');
-            }
-        } catch (error) {
-            this.logToFile(`Error checking admin privileges on startup: ${error.message}`);
-        }
-    }
+    // Note: Administrator privilege checking is now handled in main.js before UI creation
+    // This function is no longer used for startup
 
     // Restart the application with Administrator privileges
     async restartAsAdministrator() {
@@ -1499,25 +1484,13 @@ class VirtualDriverControl {
                         }
                         this.logToFile('nefconw.exe found, proceeding with removal...');
                         
-                        this.logToFile('Attempting to uninstall driver with nefconw...');
+                        this.logToFile('Attempting to uninstall driver with comprehensive approach...');
                         
-                        // Step 1: Remove device node first
-                        const removeCmd = `"${nefconPath}" --remove-device-node --hardware-id Root\\MttVDD --class-guid 4d36e968-e325-11ce-bfc1-08002be10318`;
-                        this.logToFile(`Step 1 - Executing command: ${removeCmd}`);
-                        
-                        const removeResult = await Promise.race([
-                            execPromise(removeCmd),
-                            new Promise((_, reject) => setTimeout(() => reject(new Error('Command timeout after 30 seconds')), 30000))
-                        ]);
-                        this.logToFile(`Remove stdout: ${removeResult.stdout}`);
-                        this.logToFile(`Remove stderr: ${removeResult.stderr}`);
-                        this.logToFile('Device node removed successfully');
-                        
-                        // Step 2: Try to completely uninstall the driver package
+                        // Step 1: First try to uninstall the driver package (this is more important than device removal)
                         const driverDir = 'C:\\VirtualDisplayDriver\\Driver Files\\VDD x86 x64';
                         const infPath = `${driverDir}\\MttVDD.inf`;
                         
-                        this.logToFile('Step 2: Attempting to uninstall driver package...');
+                        this.logToFile('Step 1: Attempting to uninstall driver package...');
                         
                         // Check if INF file exists for uninstall
                         if (fs.existsSync(infPath)) {
@@ -1534,10 +1507,33 @@ class VirtualDriverControl {
                                 this.logToFile('Driver package uninstalled successfully');
                             } catch (uninstallError) {
                                 this.logToFile(`Driver package uninstall failed: ${uninstallError.message}`);
-                                this.logToFile('Continuing with device node removal only...');
+                                this.logToFile('Continuing with alternative methods...');
                             }
                         } else {
                             this.logToFile('INF file not found, skipping driver package uninstall');
+                        }
+                        
+                        // Step 2: Remove device node (after driver package uninstall)
+                        this.logToFile('Step 2: Attempting to remove device node...');
+                        const removeCmd = `"${nefconPath}" --remove-device-node --hardware-id Root\\MttVDD --class-guid 4d36e968-e325-11ce-bfc1-08002be10318`;
+                        this.logToFile(`Executing command: ${removeCmd}`);
+                        
+                        try {
+                            const removeResult = await Promise.race([
+                                execPromise(removeCmd),
+                                new Promise((_, reject) => setTimeout(() => reject(new Error('Device node removal timeout after 15 seconds')), 15000))
+                            ]);
+                            this.logToFile(`Remove stdout: ${removeResult.stdout}`);
+                            this.logToFile(`Remove stderr: ${removeResult.stderr}`);
+                            this.logToFile('Device node removed successfully');
+                        } catch (removeError) {
+                            this.logToFile(`Device node removal failed: ${removeError.message}`);
+                            const stdout = removeError.stdout || '';
+                            if (stdout.includes('No more data is available') || stdout.includes('LEER')) {
+                                this.logToFile('Device node already removed - this is expected');
+                            } else {
+                                this.logToFile('Continuing without device node removal...');
+                            }
                         }
                         
                         // Step 3: Alternative method - Use PnPUtil to completely remove driver if available
@@ -1591,8 +1587,20 @@ class VirtualDriverControl {
                         // Show success notification
                         this.showNotification('Driver uninstalled successfully', 'success');
                         
-                        // Refresh status
-                        setTimeout(() => this.refreshSystemStatus(), 2000);
+                        // Refresh status multiple times to ensure driver removal is detected
+                        this.logToFile('Refreshing driver status after uninstall...');
+                        setTimeout(() => {
+                            this.logToFile('First status refresh after uninstall');
+                            this.refreshSystemStatus();
+                        }, 2000);
+                        setTimeout(() => {
+                            this.logToFile('Second status refresh after uninstall');
+                            this.refreshSystemStatus();
+                        }, 5000);
+                        setTimeout(() => {
+                            this.logToFile('Final status refresh after uninstall');
+                            this.refreshSystemStatus();
+                        }, 8000);
                         
                     } catch (commandError) {
                         this.logToFile(`Command execution failed: ${commandError.message}`);
@@ -1627,151 +1635,180 @@ class VirtualDriverControl {
         }
     }
 
-    // Reinstall the virtual display driver
-    async reinstallDriver() {
+    // Uninstall driver without user confirmation (for internal use during reinstall)
+    async performUninstallWithoutConfirmation() {
+        this.logToFile('=== PERFORMING SILENT UNINSTALL ===');
+        
+        if (typeof window !== 'undefined' && window.require) {
+            const { exec } = window.require('child_process');
+            const fs = window.require('fs');
+            const util = window.require('util');
+            const execPromise = util.promisify(exec);
+            
+            if (process.platform === 'win32') {
+                try {
+                    const nefconPath = 'C:\\VirtualDisplayDriver\\EDID\\nefconw.exe';
+                    
+                    if (!fs.existsSync(nefconPath)) {
+                        this.logToFile('ERROR: nefconw.exe not found for silent uninstall');
+                        return false;
+                    }
+                    
+                    // Step 1: Uninstall driver package
+                    const driverDir = 'C:\\VirtualDisplayDriver\\Driver Files\\VDD x86 x64';
+                    const infPath = `${driverDir}\\MttVDD.inf`;
+                    
+                    if (fs.existsSync(infPath)) {
+                        const uninstallCmd = `"${nefconPath}" --uninstall-driver --inf-path "${infPath}"`;
+                        this.logToFile(`Silent uninstall executing: ${uninstallCmd}`);
+                        
+                        try {
+                            await Promise.race([
+                                execPromise(uninstallCmd),
+                                new Promise((_, reject) => setTimeout(() => reject(new Error('Silent uninstall timeout')), 20000))
+                            ]);
+                            this.logToFile('Silent driver package uninstall completed');
+                        } catch (error) {
+                            this.logToFile(`Silent driver uninstall failed: ${error.message}`);
+                        }
+                    }
+                    
+                    // Step 2: Remove device node
+                    const removeCmd = `"${nefconPath}" --remove-device-node --hardware-id Root\\MttVDD --class-guid 4d36e968-e325-11ce-bfc1-08002be10318`;
+                    this.logToFile(`Silent device removal executing: ${removeCmd}`);
+                    
+                    try {
+                        await Promise.race([
+                            execPromise(removeCmd),
+                            new Promise((_, reject) => setTimeout(() => reject(new Error('Silent device removal timeout')), 10000))
+                        ]);
+                        this.logToFile('Silent device node removal completed');
+                    } catch (error) {
+                        this.logToFile(`Silent device removal failed: ${error.message} - continuing anyway`);
+                    }
+                    
+                    return true;
+                    
+                } catch (error) {
+                    this.logToFile(`Silent uninstall error: ${error.message}`);
+                    return false;
+                }
+            }
+        }
+        
+        return false;
+    }
+
+    // EMERGENCY: Clean up multiple driver instances
+    async emergencyCleanupMultipleDrivers() {
         try {
-            this.logToFile('=== REINSTALL DRIVER FUNCTION CALLED ===');
-            this.logToFile(`Timestamp: ${new Date().toISOString()}`);
-            this.logToFile(`Current working directory: ${process.cwd()}`);
-            this.logToFile(`App version: ${process.env.npm_package_version || 'unknown'}`);
-            this.logToFile(`Process platform: ${process.platform}`);
-            this.logToFile(`Process arch: ${process.arch}`);
-            this.logToFile(`Node version: ${process.version}`);
-            this.logToFile(`Process argv: ${JSON.stringify(process.argv)}`);
+            this.logToFile('=== EMERGENCY CLEANUP: Removing ALL MttVDD drivers ===');
+            this.showNotification('Emergency cleanup: Removing all driver instances...', 'warning');
             
-            // Check if running with Administrator privileges
-            const isAdmin = await this.checkAdministratorPrivileges();
-            this.logToFile(`Running as Administrator: ${isAdmin}`);
+            const devices = await this.enumerateAllMttVDDDevices();
+            this.logToFile(`Found ${devices.length} driver instances to remove`);
             
-            if (!isAdmin) {
-                this.logToFile('WARNING: Not running as Administrator - operations may fail');
-                this.showNotification('Warning: This operation may require Administrator privileges. If it fails, please restart the application as Administrator.', 'warning');
+            if (devices.length === 0) {
+                this.showNotification('No driver instances found', 'info');
+                return;
             }
             
-            // Show notification that reinstall process started
-            this.showNotification('Starting driver reinstall process...', 'info');
+            // Remove ALL instances
+            for (let i = 0; i < devices.length; i++) {
+                this.logToFile(`Emergency removal ${i + 1}/${devices.length}: ${devices[i]}`);
+                await this.removeSpecificDevice(devices[i]);
+                await new Promise(resolve => setTimeout(resolve, 1000)); // Wait between removals
+            }
             
+            // Wait for all removals to complete
+            await new Promise(resolve => setTimeout(resolve, 5000));
+            
+            // Verify cleanup
+            const remainingDevices = await this.enumerateAllMttVDDDevices();
+            if (remainingDevices.length === 0) {
+                this.logToFile('Emergency cleanup successful - all driver instances removed');
+                this.showNotification('Emergency cleanup successful - system should be stable now', 'success');
+            } else {
+                this.logToFile(`Emergency cleanup incomplete - ${remainingDevices.length} instances remain`);
+                this.showNotification(`Warning: ${remainingDevices.length} driver instances still remain`, 'warning');
+            }
+            
+            // Refresh status
+            setTimeout(() => this.refreshSystemStatus(), 2000);
+            
+        } catch (error) {
+            this.logToFile(`Emergency cleanup error: ${error.message}`);
+            this.showNotification(`Emergency cleanup failed: ${error.message}`, 'error');
+        }
+    }
+
+    // Enumerate all MttVDD devices in the system
+    async enumerateAllMttVDDDevices() {
+        try {
             if (typeof window !== 'undefined' && window.require) {
                 const { exec } = window.require('child_process');
-                const fs = window.require('fs');
                 const util = window.require('util');
                 const execPromise = util.promisify(exec);
                 
-                this.logToFile(`Platform: ${process.platform}`);
+                const deviceQuery = 'powershell "Get-WmiObject -Class Win32_PnPEntity | Where-Object { $_.HardwareID -like \'*MttVDD*\' } | Select-Object DeviceID | ForEach-Object { $_.DeviceID }"';
                 
-                if (process.platform === 'win32') {
-                    try {
-                        const nefconPath = 'C:\\VirtualDisplayDriver\\EDID\\nefconw.exe';
-                        const driverDir = 'C:\\VirtualDisplayDriver\\Driver Files\\VDD x86 x64';
-                        const infPath = `${driverDir}\\MttVDD.inf`;
-                        
-                        // Check if files exist
-                        this.logToFile(`Checking nefconw.exe at: ${nefconPath}`);
-                        const nefconExists = fs.existsSync(nefconPath);
-                        this.logToFile(`nefconw.exe exists: ${nefconExists}`);
-                        
-                        if (!nefconExists) {
-                            this.logToFile('ERROR: nefconw.exe not found');
-                            this.showNotification('Error: nefconw.exe not found', 'error');
-                            return;
-                        }
-                        
-                        this.logToFile(`Checking driver directory at: ${driverDir}`);
-                        const driverDirExists = fs.existsSync(driverDir);
-                        this.logToFile(`Driver directory exists: ${driverDirExists}`);
-                        
-                        if (!driverDirExists) {
-                            this.logToFile('ERROR: Driver directory not found');
-                            this.showNotification('Error: Driver directory not found', 'error');
-                            return;
-                        }
-                        
-                        this.logToFile(`Checking INF file at: ${infPath}`);
-                        const infExists = fs.existsSync(infPath);
-                        this.logToFile(`INF file exists: ${infExists}`);
-                        
-                        if (!infExists) {
-                            this.logToFile('ERROR: Driver INF file not found');
-                            this.showNotification('Error: Driver INF file not found', 'error');
-                            return;
-                        }
-                        
-                        this.logToFile('All files found, proceeding with reinstall...');
-                        
-                        // Step 1: Remove existing device node
-                        this.logToFile('Step 1: Removing existing device node');
-                        const removeCmd = `"${nefconPath}" --remove-device-node --hardware-id Root\\MttVDD --class-guid 4d36e968-e325-11ce-bfc1-08002be10318`;
-                        this.logToFile(`Executing command: ${removeCmd}`);
-                        const removeResult = await Promise.race([
-                            execPromise(removeCmd),
-                            new Promise((_, reject) => setTimeout(() => reject(new Error('Remove command timeout after 30 seconds')), 30000))
-                        ]);
-                        this.logToFile(`Remove stdout: ${removeResult.stdout}`);
-                        this.logToFile(`Remove stderr: ${removeResult.stderr}`);
-                        this.logToFile('Existing device node removed');
-                        
-                        // Step 2: Create new device node
-                        this.logToFile('Step 2: Creating new device node');
-                        const createCmd = `"${nefconPath}" --create-device-node --hardware-id Root\\MttVDD --class-name Display --class-guid 4D36E968-E325-11CE-BFC1-08002BE10318`;
-                        this.logToFile(`Executing command: ${createCmd}`);
-                        const createResult = await Promise.race([
-                            execPromise(createCmd),
-                            new Promise((_, reject) => setTimeout(() => reject(new Error('Create command timeout after 30 seconds')), 30000))
-                        ]);
-                        this.logToFile(`Create stdout: ${createResult.stdout}`);
-                        this.logToFile(`Create stderr: ${createResult.stderr}`);
-                        this.logToFile('New device node created');
-                        
-                        // Step 3: Install driver
-                        this.logToFile('Step 3: Installing driver');
-                        const installCmd = `"${nefconPath}" --install-driver --inf-path "${infPath}"`;
-                        this.logToFile(`Executing command: ${installCmd}`);
-                        const installResult = await Promise.race([
-                            execPromise(installCmd),
-                            new Promise((_, reject) => setTimeout(() => reject(new Error('Install command timeout after 30 seconds')), 30000))
-                        ]);
-                        this.logToFile(`Install stdout: ${installResult.stdout}`);
-                        this.logToFile(`Install stderr: ${installResult.stderr}`);
-                        
-                        this.logToFile('Driver reinstalled successfully');
-                        
-                        // Show success notification
-                        this.showNotification('Driver reinstalled successfully', 'success');
-                        
-                        // Refresh status
-                        setTimeout(() => this.refreshSystemStatus(), 2000);
-                        
-                    } catch (commandError) {
-                        this.logToFile(`Command execution failed: ${commandError.message}`);
-                        this.logToFile(`Error stdout: ${commandError.stdout || 'none'}`);
-                        this.logToFile(`Error stderr: ${commandError.stderr || 'none'}`);
-                        this.logToFile(`Error code: ${commandError.code || 'none'}`);
-                        
-                        // Check if it's an elevation error
-                        const stdout = commandError.stdout || '';
-                        if (stdout.includes('elevated privileges') || stdout.includes('run as Administrator')) {
-                            this.showNotification('Error: This operation requires Administrator privileges. Please run the application as Administrator.', 'error');
-                            this.logToFile('ELEVATION ERROR: User needs to run as Administrator');
-                        } else {
-                            this.showNotification(`Reinstall failed: ${commandError.message}`, 'error');
-                        }
-                        
-                        this.logToFile('Listing devices to help debug the issue...');
-                        await this.listDevices();
-                    }
-                } else {
-                    this.logToFile('WARNING: Driver management is only supported on Windows');
-                    this.showNotification('Error: Driver management is only supported on Windows', 'error');
+                try {
+                    const result = await execPromise(deviceQuery);
+                    const devices = result.stdout.split('\n')
+                        .map(line => line.trim())
+                        .filter(line => line && line.includes('DISPLAY'));
+                    
+                    this.logToFile(`Found ${devices.length} MttVDD devices: ${JSON.stringify(devices)}`);
+                    return devices;
+                } catch (error) {
+                    this.logToFile(`Device enumeration failed: ${error.message}`);
+                    return [];
                 }
-            } else {
-                this.logToFile('WARNING: Driver management requires elevated permissions');
-                this.showNotification('Error: Driver management requires elevated permissions', 'error');
             }
+            return [];
         } catch (error) {
-            this.logToFile(`Reinstall driver error: ${error.message}`);
-            this.logToFile(`Error stack: ${error.stack}`);
-            this.showNotification(`Reinstall error: ${error.message}`, 'error');
+            this.logToFile(`Error enumerating devices: ${error.message}`);
+            return [];
         }
+    }
+
+    // Remove a specific device by DeviceID
+    async removeSpecificDevice(deviceId) {
+        try {
+            if (typeof window !== 'undefined' && window.require) {
+                const { exec } = window.require('child_process');
+                const util = window.require('util');
+                const execPromise = util.promisify(exec);
+                
+                const nefconPath = 'C:\\VirtualDisplayDriver\\EDID\\nefconw.exe';
+                
+                // Extract hardware ID for removal command
+                const removeCmd = `"${nefconPath}" --remove-device-node --hardware-id Root\\MttVDD --class-guid 4d36e968-e325-11ce-bfc1-08002be10318`;
+                this.logToFile(`Removing device with command: ${removeCmd}`);
+                
+                try {
+                    await Promise.race([
+                        execPromise(removeCmd),
+                        new Promise((_, reject) => setTimeout(() => reject(new Error('Device removal timeout')), 10000))
+                    ]);
+                    this.logToFile(`Device ${deviceId} removal command completed`);
+                    return true;
+                } catch (error) {
+                    this.logToFile(`Failed to remove device ${deviceId}: ${error.message}`);
+                    return false;
+                }
+            }
+            return false;
+        } catch (error) {
+            this.logToFile(`Error removing device ${deviceId}: ${error.message}`);
+            return false;
+        }
+    }
+
+    // Reinstall function disabled for system safety
+    async reinstallDriver() {
+        this.logToFile('REINSTALL FUNCTION DISABLED - Driver installation functionality has been removed for system safety');
+        this.showNotification('Driver installation has been disabled for system safety. Please use external tools to manage drivers.', 'warning');
     }
 
     // Open the log folder and find the latest log file
@@ -1830,13 +1867,159 @@ class VirtualDriverControl {
         }
     }
 
-    // Detect virtual display count
+    // Detect actual driver status from Windows Device Manager
+    async detectDriverStatus() {
+        try {
+            this.logToFile('=== DETECTING ACTUAL DRIVER STATUS ===');
+            
+            if (typeof window !== 'undefined' && window.require) {
+                const { exec } = window.require('child_process');
+                const util = window.require('util');
+                const execPromise = util.promisify(exec);
+                
+                if (process.platform === 'win32') {
+                    // Check for virtual display driver using PowerShell
+                    const deviceQuery = 'powershell "Get-WmiObject -Class Win32_PnPEntity | Where-Object { $_.DeviceID -like \'*MttVDD*\' -or $_.Name -like \'*Virtual Display*\' -or $_.HardwareID -like \'*MttVDD*\' } | Select-Object Name, DeviceID, Status, HardwareID | Format-Table -AutoSize"';
+                    this.logToFile(`Executing device query: ${deviceQuery}`);
+                    
+                    try {
+                        const result = await Promise.race([
+                            execPromise(deviceQuery),
+                            new Promise((_, reject) => setTimeout(() => reject(new Error('Device query timeout after 15 seconds')), 15000))
+                        ]);
+                        
+                        this.logToFile(`Device query stdout: ${result.stdout}`);
+                        this.logToFile(`Device query stderr: ${result.stderr}`);
+                        
+                        if (result.stdout && result.stdout.includes('MttVDD')) {
+                            // Check if the device has a proper name (not just hardware ID)
+                            const lines = result.stdout.split('\n');
+                            let hasValidDriver = false;
+                            
+                            for (const line of lines) {
+                                if (line.includes('MttVDD') && line.trim()) {
+                                    // Parse the line to check if Name field has content
+                                    const parts = line.split(/\s+/);
+                                    if (parts.length >= 3 && parts[0] && parts[0] !== '' && !parts[0].startsWith('----')) {
+                                        hasValidDriver = true;
+                                        break;
+                                    }
+                                }
+                            }
+                            
+                            if (hasValidDriver) {
+                                this.logToFile('MttVDD driver found and properly installed in Device Manager');
+                                this.updateDriverStatus('Installed and Running', 'success', 'WUDF (Windows User Mode Driver Framework)', 'Root\\MttVDD');
+                            } else {
+                                this.logToFile('MttVDD device found but driver not properly installed (missing name)');
+                                this.updateDriverStatus('Not Installed', 'danger', 'N/A', 'N/A');
+                            }
+                        } else {
+                            this.logToFile('MttVDD driver not found in Device Manager');
+                            this.updateDriverStatus('Not Installed', 'danger', 'N/A', 'N/A');
+                        }
+                        
+                    } catch (deviceError) {
+                        this.logToFile(`Device query failed: ${deviceError.message}`);
+                        
+                        // Fallback: Check using PnPUtil
+                        this.logToFile('Trying fallback method with PnPUtil...');
+                        try {
+                            const pnpQuery = 'pnputil /enum-drivers | findstr /i "mtt"';
+                            this.logToFile(`Executing PnPUtil query: ${pnpQuery}`);
+                            
+                            const pnpResult = await Promise.race([
+                                execPromise(pnpQuery),
+                                new Promise((_, reject) => setTimeout(() => reject(new Error('PnPUtil timeout after 10 seconds')), 10000))
+                            ]);
+                            
+                            this.logToFile(`PnPUtil stdout: ${pnpResult.stdout}`);
+                            
+                            if (pnpResult.stdout && pnpResult.stdout.toLowerCase().includes('mtt')) {
+                                this.logToFile('Driver package found via PnPUtil');
+                                this.updateDriverStatus('Driver Package Installed', 'warning', 'Package Only', 'MttVDD');
+                            } else {
+                                this.logToFile('No driver found via PnPUtil');
+                                this.updateDriverStatus('Not Installed', 'danger', 'N/A', 'N/A');
+                            }
+                            
+                        } catch (pnpError) {
+                            this.logToFile(`PnPUtil query failed: ${pnpError.message}`);
+                            this.updateDriverStatus('Status Unknown', 'warning', 'Detection Failed', 'N/A');
+                        }
+                    }
+                    
+                } else {
+                    this.logToFile('Not Windows - driver detection not supported');
+                    this.updateDriverStatus('Not Supported', 'warning', 'Non-Windows Platform', 'N/A');
+                }
+            } else {
+                this.logToFile('Node.js access not available for driver detection');
+                this.updateDriverStatus('Detection Failed', 'warning', 'Limited Access', 'N/A');
+            }
+        } catch (error) {
+            this.logToFile(`Driver status detection error: ${error.message}`);
+            this.updateDriverStatus('Detection Error', 'danger', 'Error', 'N/A');
+        }
+    }
+
+    // Update driver status display
+    updateDriverStatus(status, statusClass, service, hardwareId) {
+        this.logToFile(`Updating driver status: ${status} (${statusClass})`);
+        
+        // Track driver installation status
+        const driverInstalled = (status === 'Installed and Running' || status === 'Driver Package Installed');
+        
+        // Update driver status
+        const driverStatusText = document.getElementById('driver-status-text');
+        const driverStatusIndicator = document.getElementById('driver-status-indicator');
+        if (driverStatusText) driverStatusText.textContent = status;
+        if (driverStatusIndicator) {
+            driverStatusIndicator.className = `status-indicator ${statusClass}`;
+        }
+        
+        // Update service status
+        const serviceStatusText = document.getElementById('service-status-text');
+        const serviceStatusIndicator = document.getElementById('service-status-indicator');
+        if (serviceStatusText) serviceStatusText.textContent = service;
+        if (serviceStatusIndicator) {
+            serviceStatusIndicator.className = `status-indicator ${statusClass}`;
+        }
+        
+        // Update hardware ID
+        const hardwareIdText = document.getElementById('hardware-id-text');
+        const hardwareIdIndicator = document.getElementById('hardware-id-indicator');
+        if (hardwareIdText) hardwareIdText.textContent = hardwareId;
+        if (hardwareIdIndicator) {
+            hardwareIdIndicator.className = `status-indicator ${statusClass}`;
+        }
+        
+        // Update virtual monitor display based on driver status
+        this.updateVirtualMonitorDisplayForDriverStatus(driverInstalled);
+    }
+
+    // Update virtual monitor display based on driver installation status
+    async updateVirtualMonitorDisplayForDriverStatus(driverInstalled) {
+        try {
+            // Get the configured monitor count from XML
+            const configuredCount = await this.getConfiguredMonitorCount();
+            const count = configuredCount > 0 ? configuredCount : 1; // Default to 1 if no XML config
+            
+            // Update the virtual monitor display with driver status
+            this.updateVirtualDisplayCount(count, false, driverInstalled);
+        } catch (error) {
+            console.log('Error updating virtual monitor display:', error);
+            // Fallback: use default count of 1
+            this.updateVirtualDisplayCount(1, true, driverInstalled);
+        }
+    }
+
+    // Detect virtual display count (for internal use - display is now controlled by driver status)
     async detectVirtualDisplays() {
         try {
             // First, try to read monitor count from XML configuration
             const configuredCount = await this.getConfiguredMonitorCount();
             if (configuredCount > 0) {
-                this.updateVirtualDisplayCount(configuredCount, false);
                 return configuredCount;
             }
 
@@ -1875,25 +2058,21 @@ class VirtualDriverControl {
                         }
                     }
 
-                    this.updateVirtualDisplayCount(virtualCount);
-                    return virtualCount;
+                    return virtualCount || 1; // Return at least 1 as fallback
 
                 } catch (queryError) {
                     console.warn('Display query failed:', queryError);
                     // Fallback: try to count from current configuration
                     const monitorCountInput = document.getElementById('monitor-count');
                     const fallbackCount = monitorCountInput ? parseInt(monitorCountInput.value) || 1 : 1;
-                    this.updateVirtualDisplayCount(fallbackCount, true);
                     return fallbackCount;
                 }
             } else {
                 console.warn('Node.js access not available for display detection');
-                this.updateVirtualDisplayCount(1, true);
                 return 1;
             }
         } catch (error) {
             console.error('Error detecting virtual displays:', error);
-            this.updateVirtualDisplayCount(1, true);
             return 1;
         }
     }
@@ -1946,21 +2125,32 @@ class VirtualDriverControl {
     }
 
     // Update virtual display count in UI
-    updateVirtualDisplayCount(count, isEstimate = false) {
+    updateVirtualDisplayCount(count, isEstimate = false, driverInstalled = true) {
         const countElement = document.getElementById('virtual-monitor-count');
         const statusIndicator = countElement?.parentElement?.parentElement?.querySelector('.status-indicator');
         
         if (countElement) {
-            const displayText = isEstimate ? `${count} Configured` : `${count} Configured`;
+            let displayText;
+            if (driverInstalled) {
+                // Driver is installed - show normal format
+                displayText = `${count} Configured`;
+            } else {
+                // Driver is not installed - show "None (X Configured)" format
+                displayText = `None (${count} Configured)`;
+            }
             countElement.textContent = displayText;
         }
 
-        // Update status indicator color - always use accent color
+        // Update status indicator color based on driver status
         if (statusIndicator) {
-            statusIndicator.className = 'status-indicator success';
+            if (driverInstalled) {
+                statusIndicator.className = 'status-indicator success';
+            } else {
+                statusIndicator.className = 'status-indicator danger';
+            }
         }
 
-        console.log(`Virtual displays detected: ${count} ${isEstimate ? '(estimated)' : '(active)'}`);
+        console.log(`Virtual displays: ${count} configured, driver ${driverInstalled ? 'installed' : 'not installed'}`);
     }
 
     // Detect IddCx version

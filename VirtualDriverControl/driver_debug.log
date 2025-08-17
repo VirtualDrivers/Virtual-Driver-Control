@@ -1,79 +1,557 @@
-[2025-08-17T15:19:24.121Z] REINSTALL BUTTON CLICKED - Event handler triggered
-[2025-08-17T15:19:24.125Z] === REINSTALL DRIVER FUNCTION CALLED ===
-[2025-08-17T15:19:24.125Z] Timestamp: 2025-08-17T15:19:24.125Z
-[2025-08-17T15:19:24.125Z] Current working directory: E:\GitHub\Virtual-Driver-Control\VirtualDriverControl
-[2025-08-17T15:19:24.126Z] App version: unknown
-[2025-08-17T15:19:24.126Z] Process platform: win32
-[2025-08-17T15:19:24.126Z] Process arch: x64
-[2025-08-17T15:19:24.126Z] Node version: v18.17.1
-[2025-08-17T15:19:24.127Z] Process argv: ["E:\\GitHub\\Virtual-Driver-Control\\VirtualDriverControl\\node_modules\\electron\\dist\\electron.exe","--type=renderer","--user-data-dir=C:\\Users\\alisa\\AppData\\Roaming\\virtual-driver-control","--app-path=E:\\GitHub\\Virtual-Driver-Control\\VirtualDriverControl","--no-sandbox","--no-zygote","--first-renderer-process","--lang=en-GB","--device-scale-factor=1","--num-raster-threads=4","--enable-main-frame-before-activation","--renderer-client-id=4","--time-ticks-at-unix-epoch=-1755174639139612","--launch-time-ticks=269260241784","--mojo-platform-channel-handle=2272","--field-trial-handle=1664,i,17779471995178631874,4766366951113859379,262144","--disable-features=SpareRendererForSitePerProcess,WinDelaySpellcheckServiceInit,WinRetrieveSuggestionsOnlyOnDemand","/prefetch:1"]
-[2025-08-17T15:19:24.185Z] Running as Administrator: true
-[2025-08-17T15:19:24.185Z] Platform: win32
-[2025-08-17T15:19:24.186Z] Checking nefconw.exe at: C:\VirtualDisplayDriver\EDID\nefconw.exe
-[2025-08-17T15:19:24.186Z] nefconw.exe exists: true
-[2025-08-17T15:19:24.186Z] Checking driver directory at: C:\VirtualDisplayDriver\Driver Files\VDD x86 x64
-[2025-08-17T15:19:24.187Z] Driver directory exists: true
-[2025-08-17T15:19:24.187Z] Checking INF file at: C:\VirtualDisplayDriver\Driver Files\VDD x86 x64\MttVDD.inf
-[2025-08-17T15:19:24.187Z] INF file exists: true
-[2025-08-17T15:19:24.187Z] All files found, proceeding with reinstall...
-[2025-08-17T15:19:24.188Z] Step 1: Removing existing device node
-[2025-08-17T15:19:24.188Z] Executing command: "C:\VirtualDisplayDriver\EDID\nefconw.exe" --remove-device-node --hardware-id Root\MttVDD --class-guid 4d36e968-e325-11ce-bfc1-08002be10318
-[2025-08-17T15:19:24.236Z] Command execution failed: Command failed: "C:\VirtualDisplayDriver\EDID\nefconw.exe" --remove-device-node --hardware-id Root\MttVDD --class-guid 4d36e968-e325-11ce-bfc1-08002be10318
+[2025-08-17T16:02:07.637Z] Found 4 MttVDD devices: ["ROOT\\DISPLAY\\0001","ROOT\\DISPLAY\\0003","ROOT\\DISPLAY\\0004","ROOT\\DISPLAY\\0005"]
+[2025-08-17T16:02:07.637Z] After alternative removal: 4 devices remain
+[2025-08-17T16:02:07.638Z] Platform: win32
+[2025-08-17T16:02:07.638Z] Checking nefconw.exe at: C:\VirtualDisplayDriver\EDID\nefconw.exe
+[2025-08-17T16:02:07.639Z] nefconw.exe exists: true
+[2025-08-17T16:02:07.639Z] Checking driver directory at: C:\VirtualDisplayDriver\Driver Files\VDD x86 x64
+[2025-08-17T16:02:07.639Z] Driver directory exists: true
+[2025-08-17T16:02:07.640Z] Checking INF file at: C:\VirtualDisplayDriver\Driver Files\VDD x86 x64\MttVDD.inf
+[2025-08-17T16:02:07.640Z] INF file exists: true
+[2025-08-17T16:02:07.643Z] All files found, proceeding with reinstall...
+[2025-08-17T16:02:07.644Z] Step 1: Attempting to remove existing device node
+[2025-08-17T16:02:07.644Z] Executing command: "C:\VirtualDisplayDriver\EDID\nefconw.exe" --remove-device-node --hardware-id Root\MttVDD --class-guid 4d36e968-e325-11ce-bfc1-08002be10318
+[2025-08-17T16:02:07.703Z] Remove command failed: Command failed: "C:\VirtualDisplayDriver\EDID\nefconw.exe" --remove-device-node --hardware-id Root\MttVDD --class-guid 4d36e968-e325-11ce-bfc1-08002be10318
 
-[2025-08-17T15:19:24.237Z] Error stdout: 2025-08-17 08:19:24,231 ERROR [default] Failed to delete device node, error: No more data is available.
+[2025-08-17T16:02:07.703Z] No existing device node found - this is expected for a fresh install
+[2025-08-17T16:02:07.704Z] Step 2: Creating new device node
+[2025-08-17T16:02:07.704Z] Executing command: "C:\VirtualDisplayDriver\EDID\nefconw.exe" --create-device-node --hardware-id Root\MttVDD --class-name Display --class-guid 4D36E968-E325-11CE-BFC1-08002BE10318
+[2025-08-17T16:02:07.770Z] Create stdout: 2025-08-17 09:02:07,755 INFO [default] Device node created successfully
+Device node created successfully
 
-Failed to delete device node, error: LEER
+[2025-08-17T16:02:07.771Z] Create stderr: 
+[2025-08-17T16:02:07.771Z] New device node created
+[2025-08-17T16:02:07.771Z] Step 3: Installing driver
+[2025-08-17T16:02:07.771Z] Executing command: "C:\VirtualDisplayDriver\EDID\nefconw.exe" --install-driver --inf-path "C:\VirtualDisplayDriver\Driver Files\VDD x86 x64\MttVDD.inf"
+[2025-08-17T16:02:08.642Z] REINSTALL BUTTON CLICKED - Event handler triggered
+[2025-08-17T16:02:08.643Z] Reinstall already in progress - skipping duplicate request
+[2025-08-17T16:02:08.643Z] Reinstall operation completed - cleared reinstalling flag
+[2025-08-17T16:02:37.788Z] Critical reinstall error: Install command timeout after 30 seconds
+[2025-08-17T16:02:37.788Z] Error stdout: none
+[2025-08-17T16:02:37.789Z] Error stderr: none
+[2025-08-17T16:02:37.789Z] Error code: none
+[2025-08-17T16:02:37.789Z] Listing devices to help debug the issue...
+[2025-08-17T16:02:37.790Z] Reinstall operation completed - cleared reinstalling flag
+[2025-08-17T16:03:24.923Z] UNINSTALL BUTTON CLICKED - Event handler triggered
+[2025-08-17T16:03:24.923Z] === UNINSTALL DRIVER FUNCTION CALLED ===
+[2025-08-17T16:03:24.924Z] Timestamp: 2025-08-17T16:03:24.924Z
+[2025-08-17T16:03:24.924Z] Current working directory: E:\GitHub\Virtual-Driver-Control\VirtualDriverControl
+[2025-08-17T16:03:24.924Z] App version: unknown
+[2025-08-17T16:03:24.924Z] Process platform: win32
+[2025-08-17T16:03:24.925Z] Process arch: x64
+[2025-08-17T16:03:24.925Z] Node version: v18.17.1
+[2025-08-17T16:03:24.925Z] Process argv: ["E:\\GitHub\\Virtual-Driver-Control\\VirtualDriverControl\\node_modules\\electron\\dist\\electron.exe","--type=renderer","--user-data-dir=C:\\Users\\alisa\\AppData\\Roaming\\virtual-driver-control","--app-path=E:\\GitHub\\Virtual-Driver-Control\\VirtualDriverControl","--no-sandbox","--no-zygote","--first-renderer-process","--lang=en-GB","--device-scale-factor=1","--num-raster-threads=4","--enable-main-frame-before-activation","--renderer-client-id=4","--time-ticks-at-unix-epoch=-1755174639139483","--launch-time-ticks=271875508232","--mojo-platform-channel-handle=2716","--field-trial-handle=1608,i,4273172066207163345,3169946169724037001,262144","--disable-features=SpareRendererForSitePerProcess,WinDelaySpellcheckServiceInit,WinRetrieveSuggestionsOnlyOnDemand","/prefetch:1"]
+[2025-08-17T16:03:24.988Z] Running as Administrator: true
+[2025-08-17T16:03:26.109Z] User confirmed uninstall, proceeding...
+[2025-08-17T16:03:26.109Z] Node.js access available
+[2025-08-17T16:03:26.110Z] Platform: win32
+[2025-08-17T16:03:26.110Z] Running on Windows, proceeding with nefconw
+[2025-08-17T16:03:26.110Z] Checking nefconw path: C:\VirtualDisplayDriver\EDID\nefconw.exe
+[2025-08-17T16:03:26.110Z] nefconw.exe exists: true
+[2025-08-17T16:03:26.111Z] nefconw.exe found, proceeding with removal...
+[2025-08-17T16:03:26.111Z] Attempting to uninstall driver with comprehensive approach...
+[2025-08-17T16:03:26.111Z] Step 1: Attempting to uninstall driver package...
+[2025-08-17T16:03:26.111Z] Executing uninstall command: "C:\VirtualDisplayDriver\EDID\nefconw.exe" --uninstall-driver --inf-path "C:\VirtualDisplayDriver\Driver Files\VDD x86 x64\MttVDD.inf"
+[2025-08-17T16:08:52.165Z] Reinstall button found - attaching event handler
+[2025-08-17T16:08:52.210Z] === DETECTING ACTUAL DRIVER STATUS ===
+[2025-08-17T16:08:52.211Z] Executing device query: powershell "Get-WmiObject -Class Win32_PnPEntity | Where-Object { $_.DeviceID -like '*MttVDD*' -or $_.Name -like '*Virtual Display*' -or $_.HardwareID -like '*MttVDD*' } | Select-Object Name, DeviceID, Status, HardwareID | Format-Table -AutoSize"
+[2025-08-17T16:08:53.204Z] Device query stdout: 
+Name                           DeviceID          Status HardwareID       
+----                           --------          ------ ----------       
+                               ROOT\DISPLAY\0001 OK     {Root\MttVDD}    
+Parsec Virtual Display Adapter ROOT\DISPLAY\0002 OK     {Root\Parsec\VDA}
+                               ROOT\DISPLAY\0003 OK     {Root\MttVDD}    
+                               ROOT\DISPLAY\0004 OK     {Root\MttVDD}    
+                               ROOT\DISPLAY\0005 OK     {Root\MttVDD}    
+                               ROOT\DISPLAY\0006 OK     {Root\MttVDD}    
 
-[2025-08-17T15:19:24.237Z] Error stderr: none
-[2025-08-17T15:19:24.237Z] Error code: 6
-[2025-08-17T15:19:24.237Z] Listing devices to help debug the issue...
-[2025-08-17T15:20:55.318Z] === CHECKING ADMINISTRATOR PRIVILEGES ON STARTUP ===
-[2025-08-17T15:20:55.373Z] Running as Administrator: false
-[2025-08-17T15:20:55.374Z] Not running as Administrator - prompting user
-[2025-08-17T15:20:56.708Z] User chose to restart as Administrator
-[2025-08-17T15:20:56.709Z] === ATTEMPTING TO RESTART AS ADMINISTRATOR ===
-[2025-08-17T15:20:56.709Z] Current executable: E:\GitHub\Virtual-Driver-Control\VirtualDriverControl\node_modules\electron\dist\electron.exe
-[2025-08-17T15:20:56.709Z] App path: E:\GitHub\Virtual-Driver-Control\VirtualDriverControl
-[2025-08-17T15:20:56.710Z] Process argv: ["E:\\GitHub\\Virtual-Driver-Control\\VirtualDriverControl\\node_modules\\electron\\dist\\electron.exe","--type=renderer","--user-data-dir=C:\\Users\\alisa\\AppData\\Roaming\\virtual-driver-control","--app-path=E:\\GitHub\\Virtual-Driver-Control\\VirtualDriverControl","--no-sandbox","--no-zygote","--first-renderer-process","--lang=en-GB","--device-scale-factor=1","--num-raster-threads=4","--enable-main-frame-before-activation","--renderer-client-id=4","--time-ticks-at-unix-epoch=-1755174639139205","--launch-time-ticks=269415856269","--mojo-platform-channel-handle=2396","--field-trial-handle=1688,i,13383574880014593378,10224841355071731593,262144","--disable-features=SpareRendererForSitePerProcess,WinDelaySpellcheckServiceInit,WinRetrieveSuggestionsOnlyOnDemand","/prefetch:1"]
-[2025-08-17T15:20:56.710Z] PowerShell command: Start-Process -FilePath "E:\GitHub\Virtual-Driver-Control\VirtualDriverControl\node_modules\electron\dist\electron.exe" -ArgumentList "E:\GitHub\Virtual-Driver-Control\VirtualDriverControl" -Verb RunAs
-[2025-08-17T15:20:59.054Z] PowerShell restart command executed successfully
-[2025-08-17T15:21:00.145Z] Closing current instance
-[2025-08-17T15:21:00.277Z] === CHECKING ADMINISTRATOR PRIVILEGES ON STARTUP ===
-[2025-08-17T15:21:00.340Z] Running as Administrator: true
-[2025-08-17T15:21:00.341Z] Running as Administrator - all features available
-[2025-08-17T15:21:04.410Z] === CHECKING ADMINISTRATOR PRIVILEGES ON STARTUP ===
-[2025-08-17T15:21:04.464Z] Running as Administrator: false
-[2025-08-17T15:21:04.465Z] Not running as Administrator - prompting user
-[2025-08-17T15:23:25.102Z] User chose to restart as Administrator
-[2025-08-17T15:23:25.103Z] === ATTEMPTING TO RESTART AS ADMINISTRATOR ===
-[2025-08-17T15:23:25.103Z] Current executable: E:\GitHub\Virtual-Driver-Control\VirtualDriverControl\node_modules\electron\dist\electron.exe
-[2025-08-17T15:23:25.103Z] App path: E:\GitHub\Virtual-Driver-Control\VirtualDriverControl
-[2025-08-17T15:23:25.104Z] Process argv: ["E:\\GitHub\\Virtual-Driver-Control\\VirtualDriverControl\\node_modules\\electron\\dist\\electron.exe","--type=renderer","--user-data-dir=C:\\Users\\alisa\\AppData\\Roaming\\virtual-driver-control","--app-path=E:\\GitHub\\Virtual-Driver-Control\\VirtualDriverControl","--no-sandbox","--no-zygote","--first-renderer-process","--lang=en-GB","--device-scale-factor=1","--num-raster-threads=4","--enable-main-frame-before-activation","--renderer-client-id=4","--time-ticks-at-unix-epoch=-1755174639139468","--launch-time-ticks=269419238746","--mojo-platform-channel-handle=2228","--field-trial-handle=1672,i,15810517438644176872,15333334737591745017,262144","--disable-features=SpareRendererForSitePerProcess,WinDelaySpellcheckServiceInit,WinRetrieveSuggestionsOnlyOnDemand","/prefetch:1"]
-[2025-08-17T15:23:25.104Z] PowerShell command: Start-Process -FilePath "E:\GitHub\Virtual-Driver-Control\VirtualDriverControl\node_modules\electron\dist\electron.exe" -ArgumentList "E:\GitHub\Virtual-Driver-Control\VirtualDriverControl" -Verb RunAs
-[2025-08-17T15:23:27.678Z] PowerShell restart command executed successfully
-[2025-08-17T15:23:28.232Z] === CHECKING ADMINISTRATOR PRIVILEGES ON STARTUP ===
-[2025-08-17T15:23:28.297Z] Running as Administrator: true
-[2025-08-17T15:23:28.298Z] Running as Administrator - all features available
-[2025-08-17T15:23:29.144Z] Closing current instance
-[2025-08-17T15:28:33.788Z] === CHECKING ADMINISTRATOR PRIVILEGES ON STARTUP ===
-[2025-08-17T15:28:33.846Z] Running as Administrator: false
-[2025-08-17T15:28:33.847Z] Not running as Administrator - prompting user
-[2025-08-17T15:28:35.834Z] User chose to continue without Administrator privileges
-[2025-08-17T15:28:58.072Z] === CHECKING ADMINISTRATOR PRIVILEGES ON STARTUP ===
-[2025-08-17T15:28:58.130Z] Running as Administrator: false
-[2025-08-17T15:28:58.131Z] Not running as Administrator - prompting user
-[2025-08-17T15:29:41.146Z] User chose to continue without Administrator privileges
-[2025-08-17T15:30:47.687Z] === CHECKING ADMINISTRATOR PRIVILEGES ON STARTUP ===
-[2025-08-17T15:30:47.741Z] Running as Administrator: false
-[2025-08-17T15:30:47.741Z] Not running as Administrator - automatically requesting elevation
-[2025-08-17T15:30:47.742Z] Automatically restarting as Administrator
-[2025-08-17T15:30:47.742Z] === ATTEMPTING TO RESTART AS ADMINISTRATOR ===
-[2025-08-17T15:30:47.742Z] Current executable: E:\GitHub\Virtual-Driver-Control\VirtualDriverControl\node_modules\electron\dist\electron.exe
-[2025-08-17T15:30:47.743Z] App path: E:\GitHub\Virtual-Driver-Control\VirtualDriverControl
-[2025-08-17T15:30:47.743Z] Process argv: ["E:\\GitHub\\Virtual-Driver-Control\\VirtualDriverControl\\node_modules\\electron\\dist\\electron.exe","--type=renderer","--user-data-dir=C:\\Users\\alisa\\AppData\\Roaming\\virtual-driver-control","--app-path=E:\\GitHub\\Virtual-Driver-Control\\VirtualDriverControl","--no-sandbox","--no-zygote","--first-renderer-process","--lang=en-GB","--device-scale-factor=1","--num-raster-threads=4","--enable-main-frame-before-activation","--renderer-client-id=4","--time-ticks-at-unix-epoch=-1755174639139550","--launch-time-ticks=270008254839","--mojo-platform-channel-handle=2348","--field-trial-handle=1656,i,1097215531060269183,11033605446352001800,262144","--disable-features=SpareRendererForSitePerProcess,WinDelaySpellcheckServiceInit,WinRetrieveSuggestionsOnlyOnDemand","/prefetch:1"]
-[2025-08-17T15:30:47.743Z] PowerShell command: Start-Process -FilePath "E:\GitHub\Virtual-Driver-Control\VirtualDriverControl\node_modules\electron\dist\electron.exe" -ArgumentList "E:\GitHub\Virtual-Driver-Control\VirtualDriverControl" -Verb RunAs
-[2025-08-17T15:30:50.907Z] PowerShell restart command executed successfully
-[2025-08-17T15:30:52.151Z] Closing current instance
-[2025-08-17T15:30:56.165Z] === CHECKING ADMINISTRATOR PRIVILEGES ON STARTUP ===
-[2025-08-17T15:30:56.222Z] Running as Administrator: true
-[2025-08-17T15:30:56.222Z] Running as Administrator - all features available
+
+
+[2025-08-17T16:08:53.205Z] Device query stderr: 
+[2025-08-17T16:08:53.205Z] MttVDD device found but driver not properly installed (missing name)
+[2025-08-17T16:08:53.206Z] Updating driver status: Not Installed (danger)
+[2025-08-17T16:08:54.420Z] === DETECTING ACTUAL DRIVER STATUS ===
+[2025-08-17T16:08:54.420Z] Executing device query: powershell "Get-WmiObject -Class Win32_PnPEntity | Where-Object { $_.DeviceID -like '*MttVDD*' -or $_.Name -like '*Virtual Display*' -or $_.HardwareID -like '*MttVDD*' } | Select-Object Name, DeviceID, Status, HardwareID | Format-Table -AutoSize"
+[2025-08-17T16:08:55.381Z] Device query stdout: 
+Name                           DeviceID          Status HardwareID       
+----                           --------          ------ ----------       
+                               ROOT\DISPLAY\0001 OK     {Root\MttVDD}    
+Parsec Virtual Display Adapter ROOT\DISPLAY\0002 OK     {Root\Parsec\VDA}
+                               ROOT\DISPLAY\0003 OK     {Root\MttVDD}    
+                               ROOT\DISPLAY\0004 OK     {Root\MttVDD}    
+                               ROOT\DISPLAY\0005 OK     {Root\MttVDD}    
+                               ROOT\DISPLAY\0006 OK     {Root\MttVDD}    
+
+
+
+[2025-08-17T16:08:55.382Z] Device query stderr: 
+[2025-08-17T16:08:55.382Z] MttVDD device found but driver not properly installed (missing name)
+[2025-08-17T16:08:55.382Z] Updating driver status: Not Installed (danger)
+[2025-08-17T16:08:55.717Z] REINSTALL BUTTON CLICKED - Event handler triggered
+[2025-08-17T16:08:55.718Z] Setting reinstalling flag to true
+[2025-08-17T16:08:55.718Z] === REINSTALL DRIVER FUNCTION CALLED ===
+[2025-08-17T16:08:55.718Z] Timestamp: 2025-08-17T16:08:55.718Z
+[2025-08-17T16:08:55.781Z] Running as Administrator: true
+[2025-08-17T16:08:55.782Z] === CHECKING FOR EXISTING DRIVERS ===
+[2025-08-17T16:08:56.741Z] Found 5 MttVDD devices: ["ROOT\\DISPLAY\\0001","ROOT\\DISPLAY\\0003","ROOT\\DISPLAY\\0004","ROOT\\DISPLAY\\0005","ROOT\\DISPLAY\\0006"]
+[2025-08-17T16:08:56.741Z] Found 5 existing drivers - attempting emergency cleanup first
+[2025-08-17T16:08:56.741Z] === EMERGENCY CLEANUP: Removing ALL MttVDD devices ===
+[2025-08-17T16:08:56.742Z] Cleanup attempt 1: "C:\VirtualDisplayDriver\EDID\nefconw.exe" --remove-device-node --hardware-id Root\MttVDD --class-guid 4d36e968-e325-11ce-bfc1-08002be10318
+[2025-08-17T16:08:56.800Z] Cleanup 1 failed: Command failed: "C:\VirtualDisplayDriver\EDID\nefconw.exe" --remove-device-node --hardware-id Root\MttVDD --class-guid 4d36e968-e325-11ce-bfc1-08002be10318
+
+[2025-08-17T16:08:57.802Z] Cleanup attempt 2: "C:\VirtualDisplayDriver\EDID\nefconw.exe" --remove-device-node --hardware-id Root\MttVDD --class-guid 4d36e968-e325-11ce-bfc1-08002be10318
+[2025-08-17T16:08:57.849Z] Cleanup 2 failed: Command failed: "C:\VirtualDisplayDriver\EDID\nefconw.exe" --remove-device-node --hardware-id Root\MttVDD --class-guid 4d36e968-e325-11ce-bfc1-08002be10318
+
+[2025-08-17T16:08:58.863Z] Cleanup attempt 3: "C:\VirtualDisplayDriver\EDID\nefconw.exe" --remove-device-node --hardware-id Root\MttVDD --class-guid 4d36e968-e325-11ce-bfc1-08002be10318
+[2025-08-17T16:08:58.910Z] Cleanup 3 failed: Command failed: "C:\VirtualDisplayDriver\EDID\nefconw.exe" --remove-device-node --hardware-id Root\MttVDD --class-guid 4d36e968-e325-11ce-bfc1-08002be10318
+
+[2025-08-17T16:08:59.923Z] Cleanup attempt 4: "C:\VirtualDisplayDriver\EDID\nefconw.exe" --remove-device-node --hardware-id Root\MttVDD --class-guid 4d36e968-e325-11ce-bfc1-08002be10318
+[2025-08-17T16:08:59.970Z] Cleanup 4 failed: Command failed: "C:\VirtualDisplayDriver\EDID\nefconw.exe" --remove-device-node --hardware-id Root\MttVDD --class-guid 4d36e968-e325-11ce-bfc1-08002be10318
+
+[2025-08-17T16:09:00.971Z] Cleanup attempt 5: "C:\VirtualDisplayDriver\EDID\nefconw.exe" --remove-device-node --hardware-id Root\MttVDD --class-guid 4d36e968-e325-11ce-bfc1-08002be10318
+[2025-08-17T16:09:01.025Z] Cleanup 5 failed: Command failed: "C:\VirtualDisplayDriver\EDID\nefconw.exe" --remove-device-node --hardware-id Root\MttVDD --class-guid 4d36e968-e325-11ce-bfc1-08002be10318
+
+[2025-08-17T16:09:02.033Z] Cleanup attempt 6: "C:\VirtualDisplayDriver\EDID\nefconw.exe" --remove-device-node --hardware-id Root\MttVDD --class-guid 4d36e968-e325-11ce-bfc1-08002be10318
+[2025-08-17T16:09:02.086Z] Cleanup 6 failed: Command failed: "C:\VirtualDisplayDriver\EDID\nefconw.exe" --remove-device-node --hardware-id Root\MttVDD --class-guid 4d36e968-e325-11ce-bfc1-08002be10318
+
+[2025-08-17T16:09:03.093Z] Cleanup attempt 7: "C:\VirtualDisplayDriver\EDID\nefconw.exe" --remove-device-node --hardware-id Root\MttVDD --class-guid 4d36e968-e325-11ce-bfc1-08002be10318
+[2025-08-17T16:09:03.143Z] Cleanup 7 failed: Command failed: "C:\VirtualDisplayDriver\EDID\nefconw.exe" --remove-device-node --hardware-id Root\MttVDD --class-guid 4d36e968-e325-11ce-bfc1-08002be10318
+
+[2025-08-17T16:09:04.145Z] Cleanup attempt 8: "C:\VirtualDisplayDriver\EDID\nefconw.exe" --remove-device-node --hardware-id Root\MttVDD --class-guid 4d36e968-e325-11ce-bfc1-08002be10318
+[2025-08-17T16:09:04.197Z] Cleanup 8 failed: Command failed: "C:\VirtualDisplayDriver\EDID\nefconw.exe" --remove-device-node --hardware-id Root\MttVDD --class-guid 4d36e968-e325-11ce-bfc1-08002be10318
+
+[2025-08-17T16:09:05.199Z] Cleanup attempt 9: "C:\VirtualDisplayDriver\EDID\nefconw.exe" --remove-device-node --hardware-id Root\MttVDD --class-guid 4d36e968-e325-11ce-bfc1-08002be10318
+[2025-08-17T16:09:05.252Z] Cleanup 9 failed: Command failed: "C:\VirtualDisplayDriver\EDID\nefconw.exe" --remove-device-node --hardware-id Root\MttVDD --class-guid 4d36e968-e325-11ce-bfc1-08002be10318
+
+[2025-08-17T16:09:07.153Z] Cleanup attempt 10: "C:\VirtualDisplayDriver\EDID\nefconw.exe" --remove-device-node --hardware-id Root\MttVDD --class-guid 4d36e968-e325-11ce-bfc1-08002be10318
+[2025-08-17T16:09:07.207Z] Cleanup 10 failed: Command failed: "C:\VirtualDisplayDriver\EDID\nefconw.exe" --remove-device-node --hardware-id Root\MttVDD --class-guid 4d36e968-e325-11ce-bfc1-08002be10318
+
+[2025-08-17T16:09:09.144Z] Using PnPUtil for additional cleanup...
+[2025-08-17T16:09:13.882Z] Found 5 MttVDD devices: ["ROOT\\DISPLAY\\0001","ROOT\\DISPLAY\\0003","ROOT\\DISPLAY\\0004","ROOT\\DISPLAY\\0005","ROOT\\DISPLAY\\0006"]
+[2025-08-17T16:09:13.882Z] Emergency cleanup complete. Remaining devices: 5
+[2025-08-17T16:09:13.883Z] Reinstall operation completed - cleared reinstalling flag
+[2025-08-17T16:09:14.945Z] REINSTALL BUTTON CLICKED - Event handler triggered
+[2025-08-17T16:09:14.946Z] Setting reinstalling flag to true
+[2025-08-17T16:09:14.946Z] === REINSTALL DRIVER FUNCTION CALLED ===
+[2025-08-17T16:09:14.946Z] Timestamp: 2025-08-17T16:09:14.946Z
+[2025-08-17T16:09:15.016Z] Running as Administrator: true
+[2025-08-17T16:09:15.016Z] === CHECKING FOR EXISTING DRIVERS ===
+[2025-08-17T16:09:15.973Z] Found 5 MttVDD devices: ["ROOT\\DISPLAY\\0001","ROOT\\DISPLAY\\0003","ROOT\\DISPLAY\\0004","ROOT\\DISPLAY\\0005","ROOT\\DISPLAY\\0006"]
+[2025-08-17T16:09:15.973Z] Found 5 existing drivers - attempting emergency cleanup first
+[2025-08-17T16:09:15.973Z] === EMERGENCY CLEANUP: Removing ALL MttVDD devices ===
+[2025-08-17T16:09:15.974Z] Cleanup attempt 1: "C:\VirtualDisplayDriver\EDID\nefconw.exe" --remove-device-node --hardware-id Root\MttVDD --class-guid 4d36e968-e325-11ce-bfc1-08002be10318
+[2025-08-17T16:09:16.024Z] Cleanup 1 failed: Command failed: "C:\VirtualDisplayDriver\EDID\nefconw.exe" --remove-device-node --hardware-id Root\MttVDD --class-guid 4d36e968-e325-11ce-bfc1-08002be10318
+
+[2025-08-17T16:09:17.028Z] Cleanup attempt 2: "C:\VirtualDisplayDriver\EDID\nefconw.exe" --remove-device-node --hardware-id Root\MttVDD --class-guid 4d36e968-e325-11ce-bfc1-08002be10318
+[2025-08-17T16:09:17.079Z] Cleanup 2 failed: Command failed: "C:\VirtualDisplayDriver\EDID\nefconw.exe" --remove-device-node --hardware-id Root\MttVDD --class-guid 4d36e968-e325-11ce-bfc1-08002be10318
+
+[2025-08-17T16:09:18.087Z] Cleanup attempt 3: "C:\VirtualDisplayDriver\EDID\nefconw.exe" --remove-device-node --hardware-id Root\MttVDD --class-guid 4d36e968-e325-11ce-bfc1-08002be10318
+[2025-08-17T16:09:18.134Z] Cleanup 3 failed: Command failed: "C:\VirtualDisplayDriver\EDID\nefconw.exe" --remove-device-node --hardware-id Root\MttVDD --class-guid 4d36e968-e325-11ce-bfc1-08002be10318
+
+[2025-08-17T16:09:19.143Z] Cleanup attempt 4: "C:\VirtualDisplayDriver\EDID\nefconw.exe" --remove-device-node --hardware-id Root\MttVDD --class-guid 4d36e968-e325-11ce-bfc1-08002be10318
+[2025-08-17T16:09:19.194Z] Cleanup 4 failed: Command failed: "C:\VirtualDisplayDriver\EDID\nefconw.exe" --remove-device-node --hardware-id Root\MttVDD --class-guid 4d36e968-e325-11ce-bfc1-08002be10318
+
+[2025-08-17T16:09:19.427Z] UNINSTALL BUTTON CLICKED - Event handler triggered
+[2025-08-17T16:09:19.428Z] === UNINSTALL DRIVER FUNCTION CALLED ===
+[2025-08-17T16:09:19.429Z] Timestamp: 2025-08-17T16:09:19.429Z
+[2025-08-17T16:09:19.429Z] Current working directory: E:\GitHub\Virtual-Driver-Control\VirtualDriverControl
+[2025-08-17T16:09:19.429Z] App version: unknown
+[2025-08-17T16:09:19.430Z] Process platform: win32
+[2025-08-17T16:09:19.430Z] Process arch: x64
+[2025-08-17T16:09:19.430Z] Node version: v18.17.1
+[2025-08-17T16:09:19.430Z] Process argv: ["E:\\GitHub\\Virtual-Driver-Control\\VirtualDriverControl\\node_modules\\electron\\dist\\electron.exe","--type=renderer","--user-data-dir=C:\\Users\\alisa\\AppData\\Roaming\\virtual-driver-control","--app-path=E:\\GitHub\\Virtual-Driver-Control\\VirtualDriverControl","--no-sandbox","--no-zygote","--first-renderer-process","--lang=en-GB","--device-scale-factor=1","--num-raster-threads=4","--enable-main-frame-before-activation","--renderer-client-id=4","--time-ticks-at-unix-epoch=-1755174639140090","--launch-time-ticks=272292819765","--mojo-platform-channel-handle=2712","--field-trial-handle=1620,i,11025674024244170585,12746969064794008105,262144","--disable-features=SpareRendererForSitePerProcess,WinDelaySpellcheckServiceInit,WinRetrieveSuggestionsOnlyOnDemand","/prefetch:1"]
+[2025-08-17T16:09:19.494Z] Running as Administrator: true
+[2025-08-17T16:09:20.662Z] User confirmed uninstall, proceeding...
+[2025-08-17T16:09:20.662Z] Node.js access available
+[2025-08-17T16:09:20.662Z] Platform: win32
+[2025-08-17T16:09:20.662Z] Running on Windows, proceeding with nefconw
+[2025-08-17T16:09:20.663Z] Checking nefconw path: C:\VirtualDisplayDriver\EDID\nefconw.exe
+[2025-08-17T16:09:20.663Z] nefconw.exe exists: true
+[2025-08-17T16:09:20.663Z] nefconw.exe found, proceeding with removal...
+[2025-08-17T16:09:20.664Z] Attempting to uninstall driver with comprehensive approach...
+[2025-08-17T16:09:20.664Z] Step 1: Attempting to uninstall driver package...
+[2025-08-17T16:09:20.664Z] Executing uninstall command: "C:\VirtualDisplayDriver\EDID\nefconw.exe" --uninstall-driver --inf-path "C:\VirtualDisplayDriver\Driver Files\VDD x86 x64\MttVDD.inf"
+[2025-08-17T16:09:20.673Z] Cleanup attempt 5: "C:\VirtualDisplayDriver\EDID\nefconw.exe" --remove-device-node --hardware-id Root\MttVDD --class-guid 4d36e968-e325-11ce-bfc1-08002be10318
+[2025-08-17T16:09:20.722Z] Cleanup 5 failed: Command failed: "C:\VirtualDisplayDriver\EDID\nefconw.exe" --remove-device-node --hardware-id Root\MttVDD --class-guid 4d36e968-e325-11ce-bfc1-08002be10318
+
+[2025-08-17T16:09:20.826Z] Driver package uninstall failed: Command failed: "C:\VirtualDisplayDriver\EDID\nefconw.exe" --uninstall-driver --inf-path "C:\VirtualDisplayDriver\Driver Files\VDD x86 x64\MttVDD.inf"
+
+[2025-08-17T16:09:20.827Z] Continuing with alternative methods...
+[2025-08-17T16:09:20.827Z] Step 2: Attempting to remove device node...
+[2025-08-17T16:09:20.827Z] Executing command: "C:\VirtualDisplayDriver\EDID\nefconw.exe" --remove-device-node --hardware-id Root\MttVDD --class-guid 4d36e968-e325-11ce-bfc1-08002be10318
+[2025-08-17T16:09:20.874Z] Device node removal failed: Command failed: "C:\VirtualDisplayDriver\EDID\nefconw.exe" --remove-device-node --hardware-id Root\MttVDD --class-guid 4d36e968-e325-11ce-bfc1-08002be10318
+
+[2025-08-17T16:09:20.874Z] Device node already removed - this is expected
+[2025-08-17T16:09:20.874Z] Step 3: Attempting alternative driver removal with PnPUtil...
+[2025-08-17T16:09:20.874Z] Checking for driver with command: pnputil /enum-drivers | findstr "MttVDD"
+[2025-08-17T16:09:20.987Z] PnPUtil removal failed: Command failed: pnputil /enum-drivers | findstr "MttVDD"
+
+[2025-08-17T16:09:20.988Z] Continuing without PnPUtil removal...
+[2025-08-17T16:09:20.988Z] Driver uninstall process completed
+[2025-08-17T16:09:20.989Z] Refreshing driver status after uninstall...
+[2025-08-17T16:09:21.733Z] Cleanup attempt 6: "C:\VirtualDisplayDriver\EDID\nefconw.exe" --remove-device-node --hardware-id Root\MttVDD --class-guid 4d36e968-e325-11ce-bfc1-08002be10318
+[2025-08-17T16:09:21.781Z] Cleanup 6 failed: Command failed: "C:\VirtualDisplayDriver\EDID\nefconw.exe" --remove-device-node --hardware-id Root\MttVDD --class-guid 4d36e968-e325-11ce-bfc1-08002be10318
+
+[2025-08-17T16:09:22.793Z] Cleanup attempt 7: "C:\VirtualDisplayDriver\EDID\nefconw.exe" --remove-device-node --hardware-id Root\MttVDD --class-guid 4d36e968-e325-11ce-bfc1-08002be10318
+[2025-08-17T16:09:22.844Z] Cleanup 7 failed: Command failed: "C:\VirtualDisplayDriver\EDID\nefconw.exe" --remove-device-node --hardware-id Root\MttVDD --class-guid 4d36e968-e325-11ce-bfc1-08002be10318
+
+[2025-08-17T16:09:22.995Z] First status refresh after uninstall
+[2025-08-17T16:09:22.996Z] === DETECTING ACTUAL DRIVER STATUS ===
+[2025-08-17T16:09:22.996Z] Executing device query: powershell "Get-WmiObject -Class Win32_PnPEntity | Where-Object { $_.DeviceID -like '*MttVDD*' -or $_.Name -like '*Virtual Display*' -or $_.HardwareID -like '*MttVDD*' } | Select-Object Name, DeviceID, Status, HardwareID | Format-Table -AutoSize"
+[2025-08-17T16:09:23.854Z] Cleanup attempt 8: "C:\VirtualDisplayDriver\EDID\nefconw.exe" --remove-device-node --hardware-id Root\MttVDD --class-guid 4d36e968-e325-11ce-bfc1-08002be10318
+[2025-08-17T16:09:23.906Z] Cleanup 8 failed: Command failed: "C:\VirtualDisplayDriver\EDID\nefconw.exe" --remove-device-node --hardware-id Root\MttVDD --class-guid 4d36e968-e325-11ce-bfc1-08002be10318
+
+[2025-08-17T16:09:23.917Z] Device query stdout: 
+Name                           DeviceID          Status HardwareID       
+----                           --------          ------ ----------       
+                               ROOT\DISPLAY\0001 OK     {Root\MttVDD}    
+Parsec Virtual Display Adapter ROOT\DISPLAY\0002 OK     {Root\Parsec\VDA}
+                               ROOT\DISPLAY\0003 OK     {Root\MttVDD}    
+                               ROOT\DISPLAY\0004 OK     {Root\MttVDD}    
+                               ROOT\DISPLAY\0005 OK     {Root\MttVDD}    
+                               ROOT\DISPLAY\0006 OK     {Root\MttVDD}    
+
+
+
+[2025-08-17T16:09:23.921Z] Device query stderr: 
+[2025-08-17T16:09:23.921Z] MttVDD device found but driver not properly installed (missing name)
+[2025-08-17T16:09:23.922Z] Updating driver status: Not Installed (danger)
+[2025-08-17T16:09:24.921Z] Cleanup attempt 9: "C:\VirtualDisplayDriver\EDID\nefconw.exe" --remove-device-node --hardware-id Root\MttVDD --class-guid 4d36e968-e325-11ce-bfc1-08002be10318
+[2025-08-17T16:09:24.967Z] Cleanup 9 failed: Command failed: "C:\VirtualDisplayDriver\EDID\nefconw.exe" --remove-device-node --hardware-id Root\MttVDD --class-guid 4d36e968-e325-11ce-bfc1-08002be10318
+
+[2025-08-17T16:09:25.975Z] Cleanup attempt 10: "C:\VirtualDisplayDriver\EDID\nefconw.exe" --remove-device-node --hardware-id Root\MttVDD --class-guid 4d36e968-e325-11ce-bfc1-08002be10318
+[2025-08-17T16:09:25.991Z] Second status refresh after uninstall
+[2025-08-17T16:09:25.992Z] === DETECTING ACTUAL DRIVER STATUS ===
+[2025-08-17T16:09:25.992Z] Executing device query: powershell "Get-WmiObject -Class Win32_PnPEntity | Where-Object { $_.DeviceID -like '*MttVDD*' -or $_.Name -like '*Virtual Display*' -or $_.HardwareID -like '*MttVDD*' } | Select-Object Name, DeviceID, Status, HardwareID | Format-Table -AutoSize"
+[2025-08-17T16:09:26.029Z] Cleanup 10 failed: Command failed: "C:\VirtualDisplayDriver\EDID\nefconw.exe" --remove-device-node --hardware-id Root\MttVDD --class-guid 4d36e968-e325-11ce-bfc1-08002be10318
+
+[2025-08-17T16:09:26.911Z] Device query stdout: 
+Name                           DeviceID          Status HardwareID       
+----                           --------          ------ ----------       
+                               ROOT\DISPLAY\0001 OK     {Root\MttVDD}    
+Parsec Virtual Display Adapter ROOT\DISPLAY\0002 OK     {Root\Parsec\VDA}
+                               ROOT\DISPLAY\0003 OK     {Root\MttVDD}    
+                               ROOT\DISPLAY\0004 OK     {Root\MttVDD}    
+                               ROOT\DISPLAY\0005 OK     {Root\MttVDD}    
+                               ROOT\DISPLAY\0006 OK     {Root\MttVDD}    
+
+
+
+[2025-08-17T16:09:26.911Z] Device query stderr: 
+[2025-08-17T16:09:26.912Z] MttVDD device found but driver not properly installed (missing name)
+[2025-08-17T16:09:26.912Z] Updating driver status: Not Installed (danger)
+[2025-08-17T16:09:27.041Z] Using PnPUtil for additional cleanup...
+[2025-08-17T16:09:29.000Z] Final status refresh after uninstall
+[2025-08-17T16:09:29.001Z] === DETECTING ACTUAL DRIVER STATUS ===
+[2025-08-17T16:09:29.001Z] Executing device query: powershell "Get-WmiObject -Class Win32_PnPEntity | Where-Object { $_.DeviceID -like '*MttVDD*' -or $_.Name -like '*Virtual Display*' -or $_.HardwareID -like '*MttVDD*' } | Select-Object Name, DeviceID, Status, HardwareID | Format-Table -AutoSize"
+[2025-08-17T16:09:29.892Z] Device query stdout: 
+Name                           DeviceID          Status HardwareID       
+----                           --------          ------ ----------       
+                               ROOT\DISPLAY\0001 OK     {Root\MttVDD}    
+Parsec Virtual Display Adapter ROOT\DISPLAY\0002 OK     {Root\Parsec\VDA}
+                               ROOT\DISPLAY\0003 OK     {Root\MttVDD}    
+                               ROOT\DISPLAY\0004 OK     {Root\MttVDD}    
+                               ROOT\DISPLAY\0005 OK     {Root\MttVDD}    
+                               ROOT\DISPLAY\0006 OK     {Root\MttVDD}    
+
+
+
+[2025-08-17T16:09:29.892Z] Device query stderr: 
+[2025-08-17T16:09:29.893Z] MttVDD device found but driver not properly installed (missing name)
+[2025-08-17T16:09:29.893Z] Updating driver status: Not Installed (danger)
+[2025-08-17T16:09:30.969Z] Found 5 MttVDD devices: ["ROOT\\DISPLAY\\0001","ROOT\\DISPLAY\\0003","ROOT\\DISPLAY\\0004","ROOT\\DISPLAY\\0005","ROOT\\DISPLAY\\0006"]
+[2025-08-17T16:09:30.969Z] Emergency cleanup complete. Remaining devices: 5
+[2025-08-17T16:09:30.969Z] Reinstall operation completed - cleared reinstalling flag
+[2025-08-17T16:11:12.272Z] Reinstall button found - attaching event handler
+[2025-08-17T16:11:12.315Z] === DETECTING ACTUAL DRIVER STATUS ===
+[2025-08-17T16:11:12.315Z] Executing device query: powershell "Get-WmiObject -Class Win32_PnPEntity | Where-Object { $_.DeviceID -like '*MttVDD*' -or $_.Name -like '*Virtual Display*' -or $_.HardwareID -like '*MttVDD*' } | Select-Object Name, DeviceID, Status, HardwareID | Format-Table -AutoSize"
+[2025-08-17T16:11:13.289Z] Device query stdout: 
+Name                           DeviceID          Status HardwareID       
+----                           --------          ------ ----------       
+                               ROOT\DISPLAY\0001 OK     {Root\MttVDD}    
+Parsec Virtual Display Adapter ROOT\DISPLAY\0002 OK     {Root\Parsec\VDA}
+                               ROOT\DISPLAY\0003 OK     {Root\MttVDD}    
+                               ROOT\DISPLAY\0004 OK     {Root\MttVDD}    
+                               ROOT\DISPLAY\0005 OK     {Root\MttVDD}    
+                               ROOT\DISPLAY\0006 OK     {Root\MttVDD}    
+
+
+
+[2025-08-17T16:11:13.289Z] Device query stderr: 
+[2025-08-17T16:11:13.290Z] MttVDD device found but driver not properly installed (missing name)
+[2025-08-17T16:11:13.290Z] Updating driver status: Not Installed (danger)
+[2025-08-17T16:11:14.388Z] === DETECTING ACTUAL DRIVER STATUS ===
+[2025-08-17T16:11:14.389Z] Executing device query: powershell "Get-WmiObject -Class Win32_PnPEntity | Where-Object { $_.DeviceID -like '*MttVDD*' -or $_.Name -like '*Virtual Display*' -or $_.HardwareID -like '*MttVDD*' } | Select-Object Name, DeviceID, Status, HardwareID | Format-Table -AutoSize"
+[2025-08-17T16:11:15.397Z] Device query stdout: 
+Name                           DeviceID          Status HardwareID       
+----                           --------          ------ ----------       
+                               ROOT\DISPLAY\0001 OK     {Root\MttVDD}    
+Parsec Virtual Display Adapter ROOT\DISPLAY\0002 OK     {Root\Parsec\VDA}
+                               ROOT\DISPLAY\0003 OK     {Root\MttVDD}    
+                               ROOT\DISPLAY\0004 OK     {Root\MttVDD}    
+                               ROOT\DISPLAY\0005 OK     {Root\MttVDD}    
+                               ROOT\DISPLAY\0006 OK     {Root\MttVDD}    
+
+
+
+[2025-08-17T16:11:15.398Z] Device query stderr: 
+[2025-08-17T16:11:15.398Z] MttVDD device found but driver not properly installed (missing name)
+[2025-08-17T16:11:15.398Z] Updating driver status: Not Installed (danger)
+[2025-08-17T16:11:17.449Z] REINSTALL BUTTON CLICKED - Event handler triggered
+[2025-08-17T16:11:17.450Z] Setting reinstalling flag to true
+[2025-08-17T16:11:17.450Z] === REINSTALL DRIVER FUNCTION CALLED ===
+[2025-08-17T16:11:17.451Z] Timestamp: 2025-08-17T16:11:17.451Z
+[2025-08-17T16:11:17.513Z] Running as Administrator: true
+[2025-08-17T16:11:17.513Z] === CHECKING FOR EXISTING DRIVERS ===
+[2025-08-17T16:11:18.446Z] Found 5 MttVDD devices: ["ROOT\\DISPLAY\\0001","ROOT\\DISPLAY\\0003","ROOT\\DISPLAY\\0004","ROOT\\DISPLAY\\0005","ROOT\\DISPLAY\\0006"]
+[2025-08-17T16:11:18.446Z] Found 5 existing drivers - attempting emergency cleanup first
+[2025-08-17T16:11:18.447Z] === EMERGENCY CLEANUP: Removing ALL MttVDD devices ===
+[2025-08-17T16:11:18.447Z] Cleanup attempt 1: "C:\VirtualDisplayDriver\EDID\nefconw.exe" --remove-device-node --hardware-id Root\MttVDD --class-guid 4d36e968-e325-11ce-bfc1-08002be10318
+[2025-08-17T16:11:18.503Z] Cleanup 1 failed: Command failed: "C:\VirtualDisplayDriver\EDID\nefconw.exe" --remove-device-node --hardware-id Root\MttVDD --class-guid 4d36e968-e325-11ce-bfc1-08002be10318
+
+[2025-08-17T16:11:19.505Z] Cleanup attempt 2: "C:\VirtualDisplayDriver\EDID\nefconw.exe" --remove-device-node --hardware-id Root\MttVDD --class-guid 4d36e968-e325-11ce-bfc1-08002be10318
+[2025-08-17T16:11:19.551Z] Cleanup 2 failed: Command failed: "C:\VirtualDisplayDriver\EDID\nefconw.exe" --remove-device-node --hardware-id Root\MttVDD --class-guid 4d36e968-e325-11ce-bfc1-08002be10318
+
+[2025-08-17T16:11:20.559Z] Cleanup attempt 3: "C:\VirtualDisplayDriver\EDID\nefconw.exe" --remove-device-node --hardware-id Root\MttVDD --class-guid 4d36e968-e325-11ce-bfc1-08002be10318
+[2025-08-17T16:11:20.605Z] Cleanup 3 failed: Command failed: "C:\VirtualDisplayDriver\EDID\nefconw.exe" --remove-device-node --hardware-id Root\MttVDD --class-guid 4d36e968-e325-11ce-bfc1-08002be10318
+
+[2025-08-17T16:11:21.608Z] Cleanup attempt 4: "C:\VirtualDisplayDriver\EDID\nefconw.exe" --remove-device-node --hardware-id Root\MttVDD --class-guid 4d36e968-e325-11ce-bfc1-08002be10318
+[2025-08-17T16:11:21.678Z] Cleanup 4 failed: Command failed: "C:\VirtualDisplayDriver\EDID\nefconw.exe" --remove-device-node --hardware-id Root\MttVDD --class-guid 4d36e968-e325-11ce-bfc1-08002be10318
+
+[2025-08-17T16:11:22.680Z] Cleanup attempt 5: "C:\VirtualDisplayDriver\EDID\nefconw.exe" --remove-device-node --hardware-id Root\MttVDD --class-guid 4d36e968-e325-11ce-bfc1-08002be10318
+[2025-08-17T16:11:22.734Z] Cleanup 5 failed: Command failed: "C:\VirtualDisplayDriver\EDID\nefconw.exe" --remove-device-node --hardware-id Root\MttVDD --class-guid 4d36e968-e325-11ce-bfc1-08002be10318
+
+[2025-08-17T16:11:23.736Z] Cleanup attempt 6: "C:\VirtualDisplayDriver\EDID\nefconw.exe" --remove-device-node --hardware-id Root\MttVDD --class-guid 4d36e968-e325-11ce-bfc1-08002be10318
+[2025-08-17T16:11:23.793Z] Cleanup 6 failed: Command failed: "C:\VirtualDisplayDriver\EDID\nefconw.exe" --remove-device-node --hardware-id Root\MttVDD --class-guid 4d36e968-e325-11ce-bfc1-08002be10318
+
+[2025-08-17T16:11:24.799Z] Cleanup attempt 7: "C:\VirtualDisplayDriver\EDID\nefconw.exe" --remove-device-node --hardware-id Root\MttVDD --class-guid 4d36e968-e325-11ce-bfc1-08002be10318
+[2025-08-17T16:11:24.850Z] Cleanup 7 failed: Command failed: "C:\VirtualDisplayDriver\EDID\nefconw.exe" --remove-device-node --hardware-id Root\MttVDD --class-guid 4d36e968-e325-11ce-bfc1-08002be10318
+
+[2025-08-17T16:11:25.105Z] REINSTALL BUTTON CLICKED - Event handler triggered
+[2025-08-17T16:11:25.105Z] Reinstall already in progress - skipping duplicate request
+[2025-08-17T16:11:25.105Z] Reinstall operation completed - cleared reinstalling flag
+[2025-08-17T16:11:25.853Z] Cleanup attempt 8: "C:\VirtualDisplayDriver\EDID\nefconw.exe" --remove-device-node --hardware-id Root\MttVDD --class-guid 4d36e968-e325-11ce-bfc1-08002be10318
+[2025-08-17T16:11:25.902Z] Cleanup 8 failed: Command failed: "C:\VirtualDisplayDriver\EDID\nefconw.exe" --remove-device-node --hardware-id Root\MttVDD --class-guid 4d36e968-e325-11ce-bfc1-08002be10318
+
+[2025-08-17T16:11:26.909Z] Cleanup attempt 9: "C:\VirtualDisplayDriver\EDID\nefconw.exe" --remove-device-node --hardware-id Root\MttVDD --class-guid 4d36e968-e325-11ce-bfc1-08002be10318
+[2025-08-17T16:11:26.955Z] Cleanup 9 failed: Command failed: "C:\VirtualDisplayDriver\EDID\nefconw.exe" --remove-device-node --hardware-id Root\MttVDD --class-guid 4d36e968-e325-11ce-bfc1-08002be10318
+
+[2025-08-17T16:11:27.961Z] Cleanup attempt 10: "C:\VirtualDisplayDriver\EDID\nefconw.exe" --remove-device-node --hardware-id Root\MttVDD --class-guid 4d36e968-e325-11ce-bfc1-08002be10318
+[2025-08-17T16:11:28.013Z] Cleanup 10 failed: Command failed: "C:\VirtualDisplayDriver\EDID\nefconw.exe" --remove-device-node --hardware-id Root\MttVDD --class-guid 4d36e968-e325-11ce-bfc1-08002be10318
+
+[2025-08-17T16:11:29.018Z] Using PnPUtil for specific device cleanup...
+[2025-08-17T16:11:29.018Z] Attempting to remove device: ROOT\\DISPLAY\\0001
+[2025-08-17T16:11:29.911Z] Disabled device: ROOT\\DISPLAY\\0001
+[2025-08-17T16:11:30.090Z] Successfully removed device: ROOT\\DISPLAY\\0001
+[2025-08-17T16:11:30.090Z] Attempting to remove device: ROOT\\DISPLAY\\0003
+[2025-08-17T16:11:30.261Z] Disabled device: ROOT\\DISPLAY\\0003
+[2025-08-17T16:11:30.433Z] Successfully removed device: ROOT\\DISPLAY\\0003
+[2025-08-17T16:11:30.433Z] Attempting to remove device: ROOT\\DISPLAY\\0004
+[2025-08-17T16:11:30.628Z] Disabled device: ROOT\\DISPLAY\\0004
+[2025-08-17T16:11:30.810Z] Successfully removed device: ROOT\\DISPLAY\\0004
+[2025-08-17T16:11:30.810Z] Attempting to remove device: ROOT\\DISPLAY\\0005
+[2025-08-17T16:11:30.990Z] Disabled device: ROOT\\DISPLAY\\0005
+[2025-08-17T16:11:31.163Z] Successfully removed device: ROOT\\DISPLAY\\0005
+[2025-08-17T16:11:31.163Z] Attempting to remove device: ROOT\\DISPLAY\\0006
+[2025-08-17T16:11:31.340Z] Disabled device: ROOT\\DISPLAY\\0006
+[2025-08-17T16:11:31.521Z] Successfully removed device: ROOT\\DISPLAY\\0006
+[2025-08-17T16:11:31.521Z] Attempting registry-based cleanup...
+[2025-08-17T16:11:31.522Z] Executing registry command: reg delete "HKEY_LOCAL_MACHINE\\SYSTEM\\CurrentControlSet\\Enum\\Root\\MttVDD" /f
+[2025-08-17T16:11:31.570Z] Registry cleanup failed: Command failed: reg delete "HKEY_LOCAL_MACHINE\\SYSTEM\\CurrentControlSet\\Enum\\Root\\MttVDD" /f
+ERROR: Invalid key name.
+Type "REG DELETE /?" for usage.
+
+[2025-08-17T16:14:25.149Z] Reinstall button found - attaching event handler
+[2025-08-17T16:14:25.195Z] === DETECTING ACTUAL DRIVER STATUS ===
+[2025-08-17T16:14:25.196Z] Executing device query: powershell "Get-WmiObject -Class Win32_PnPEntity | Where-Object { $_.DeviceID -like '*MttVDD*' -or $_.Name -like '*Virtual Display*' -or $_.HardwareID -like '*MttVDD*' } | Select-Object Name, DeviceID, Status, HardwareID | Format-Table -AutoSize"
+[2025-08-17T16:14:26.216Z] Device query stdout: 
+Name                           DeviceID          Status HardwareID       
+----                           --------          ------ ----------       
+                               ROOT\DISPLAY\0001 OK     {Root\MttVDD}    
+Parsec Virtual Display Adapter ROOT\DISPLAY\0002 OK     {Root\Parsec\VDA}
+                               ROOT\DISPLAY\0003 OK     {Root\MttVDD}    
+                               ROOT\DISPLAY\0004 OK     {Root\MttVDD}    
+                               ROOT\DISPLAY\0005 OK     {Root\MttVDD}    
+                               ROOT\DISPLAY\0006 OK     {Root\MttVDD}    
+
+
+
+[2025-08-17T16:14:26.217Z] Device query stderr: 
+[2025-08-17T16:14:26.217Z] MttVDD device found but driver not properly installed (missing name)
+[2025-08-17T16:14:26.218Z] Updating driver status: Not Installed (danger)
+[2025-08-17T16:14:28.109Z] === DETECTING ACTUAL DRIVER STATUS ===
+[2025-08-17T16:14:28.109Z] Executing device query: powershell "Get-WmiObject -Class Win32_PnPEntity | Where-Object { $_.DeviceID -like '*MttVDD*' -or $_.Name -like '*Virtual Display*' -or $_.HardwareID -like '*MttVDD*' } | Select-Object Name, DeviceID, Status, HardwareID | Format-Table -AutoSize"
+[2025-08-17T16:14:29.135Z] Device query stdout: 
+Name                           DeviceID          Status HardwareID       
+----                           --------          ------ ----------       
+                               ROOT\DISPLAY\0001 OK     {Root\MttVDD}    
+Parsec Virtual Display Adapter ROOT\DISPLAY\0002 OK     {Root\Parsec\VDA}
+                               ROOT\DISPLAY\0003 OK     {Root\MttVDD}    
+                               ROOT\DISPLAY\0004 OK     {Root\MttVDD}    
+                               ROOT\DISPLAY\0005 OK     {Root\MttVDD}    
+                               ROOT\DISPLAY\0006 OK     {Root\MttVDD}    
+
+
+
+[2025-08-17T16:14:29.135Z] Device query stderr: 
+[2025-08-17T16:14:29.136Z] MttVDD device found but driver not properly installed (missing name)
+[2025-08-17T16:14:29.136Z] Updating driver status: Not Installed (danger)
+[2025-08-17T16:14:29.659Z] REINSTALL BUTTON CLICKED - Event handler triggered
+[2025-08-17T16:14:29.659Z] Setting reinstalling flag to true
+[2025-08-17T16:14:29.659Z] === REINSTALL DRIVER FUNCTION CALLED ===
+[2025-08-17T16:14:29.660Z] Timestamp: 2025-08-17T16:14:29.660Z
+[2025-08-17T16:14:29.721Z] Running as Administrator: true
+[2025-08-17T16:14:29.721Z] === CHECKING FOR EXISTING DRIVERS ===
+[2025-08-17T16:14:30.650Z] Found 5 MttVDD devices: ["ROOT\\DISPLAY\\0001","ROOT\\DISPLAY\\0003","ROOT\\DISPLAY\\0004","ROOT\\DISPLAY\\0005","ROOT\\DISPLAY\\0006"]
+[2025-08-17T16:14:30.651Z] Found 5 existing drivers - attempting emergency cleanup first
+[2025-08-17T16:14:30.651Z] Starting emergency cleanup process...
+[2025-08-17T16:14:30.651Z] === EMERGENCY CLEANUP: Removing ALL MttVDD devices ===
+[2025-08-17T16:14:30.651Z] Cleanup attempt 1: "C:\VirtualDisplayDriver\EDID\nefconw.exe" --remove-device-node --hardware-id Root\MttVDD --class-guid 4d36e968-e325-11ce-bfc1-08002be10318
+[2025-08-17T16:14:30.707Z] Cleanup 1 failed: Command failed: "C:\VirtualDisplayDriver\EDID\nefconw.exe" --remove-device-node --hardware-id Root\MttVDD --class-guid 4d36e968-e325-11ce-bfc1-08002be10318
+
+[2025-08-17T16:14:31.719Z] Cleanup attempt 2: "C:\VirtualDisplayDriver\EDID\nefconw.exe" --remove-device-node --hardware-id Root\MttVDD --class-guid 4d36e968-e325-11ce-bfc1-08002be10318
+[2025-08-17T16:14:31.764Z] Cleanup 2 failed: Command failed: "C:\VirtualDisplayDriver\EDID\nefconw.exe" --remove-device-node --hardware-id Root\MttVDD --class-guid 4d36e968-e325-11ce-bfc1-08002be10318
+
+[2025-08-17T16:14:32.774Z] Cleanup attempt 3: "C:\VirtualDisplayDriver\EDID\nefconw.exe" --remove-device-node --hardware-id Root\MttVDD --class-guid 4d36e968-e325-11ce-bfc1-08002be10318
+[2025-08-17T16:14:32.822Z] Cleanup 3 failed: Command failed: "C:\VirtualDisplayDriver\EDID\nefconw.exe" --remove-device-node --hardware-id Root\MttVDD --class-guid 4d36e968-e325-11ce-bfc1-08002be10318
+
+[2025-08-17T16:14:33.824Z] Cleanup attempt 4: "C:\VirtualDisplayDriver\EDID\nefconw.exe" --remove-device-node --hardware-id Root\MttVDD --class-guid 4d36e968-e325-11ce-bfc1-08002be10318
+[2025-08-17T16:14:33.873Z] Cleanup 4 failed: Command failed: "C:\VirtualDisplayDriver\EDID\nefconw.exe" --remove-device-node --hardware-id Root\MttVDD --class-guid 4d36e968-e325-11ce-bfc1-08002be10318
+
+[2025-08-17T16:14:34.881Z] Cleanup attempt 5: "C:\VirtualDisplayDriver\EDID\nefconw.exe" --remove-device-node --hardware-id Root\MttVDD --class-guid 4d36e968-e325-11ce-bfc1-08002be10318
+[2025-08-17T16:14:34.927Z] Cleanup 5 failed: Command failed: "C:\VirtualDisplayDriver\EDID\nefconw.exe" --remove-device-node --hardware-id Root\MttVDD --class-guid 4d36e968-e325-11ce-bfc1-08002be10318
+
+[2025-08-17T16:14:35.940Z] Cleanup attempt 6: "C:\VirtualDisplayDriver\EDID\nefconw.exe" --remove-device-node --hardware-id Root\MttVDD --class-guid 4d36e968-e325-11ce-bfc1-08002be10318
+[2025-08-17T16:14:35.991Z] Cleanup 6 failed: Command failed: "C:\VirtualDisplayDriver\EDID\nefconw.exe" --remove-device-node --hardware-id Root\MttVDD --class-guid 4d36e968-e325-11ce-bfc1-08002be10318
+
+[2025-08-17T16:14:36.995Z] Cleanup attempt 7: "C:\VirtualDisplayDriver\EDID\nefconw.exe" --remove-device-node --hardware-id Root\MttVDD --class-guid 4d36e968-e325-11ce-bfc1-08002be10318
+[2025-08-17T16:14:37.041Z] Cleanup 7 failed: Command failed: "C:\VirtualDisplayDriver\EDID\nefconw.exe" --remove-device-node --hardware-id Root\MttVDD --class-guid 4d36e968-e325-11ce-bfc1-08002be10318
+
+[2025-08-17T16:14:38.053Z] Cleanup attempt 8: "C:\VirtualDisplayDriver\EDID\nefconw.exe" --remove-device-node --hardware-id Root\MttVDD --class-guid 4d36e968-e325-11ce-bfc1-08002be10318
+[2025-08-17T16:14:38.099Z] Cleanup 8 failed: Command failed: "C:\VirtualDisplayDriver\EDID\nefconw.exe" --remove-device-node --hardware-id Root\MttVDD --class-guid 4d36e968-e325-11ce-bfc1-08002be10318
+
+[2025-08-17T16:14:39.108Z] Cleanup attempt 9: "C:\VirtualDisplayDriver\EDID\nefconw.exe" --remove-device-node --hardware-id Root\MttVDD --class-guid 4d36e968-e325-11ce-bfc1-08002be10318
+[2025-08-17T16:14:39.158Z] Cleanup 9 failed: Command failed: "C:\VirtualDisplayDriver\EDID\nefconw.exe" --remove-device-node --hardware-id Root\MttVDD --class-guid 4d36e968-e325-11ce-bfc1-08002be10318
+
+[2025-08-17T16:14:40.162Z] Cleanup attempt 10: "C:\VirtualDisplayDriver\EDID\nefconw.exe" --remove-device-node --hardware-id Root\MttVDD --class-guid 4d36e968-e325-11ce-bfc1-08002be10318
+[2025-08-17T16:14:40.211Z] Cleanup 10 failed: Command failed: "C:\VirtualDisplayDriver\EDID\nefconw.exe" --remove-device-node --hardware-id Root\MttVDD --class-guid 4d36e968-e325-11ce-bfc1-08002be10318
+
+[2025-08-17T16:14:41.219Z] Using PnPUtil for specific device cleanup...
+[2025-08-17T16:14:41.220Z] Attempting to remove device: ROOT\\DISPLAY\\0001
+[2025-08-17T16:14:41.449Z] Disabled device: ROOT\\DISPLAY\\0001
+[2025-08-17T16:14:41.634Z] Successfully removed device: ROOT\\DISPLAY\\0001
+[2025-08-17T16:14:41.635Z] Attempting to remove device: ROOT\\DISPLAY\\0003
+[2025-08-17T16:14:41.817Z] Disabled device: ROOT\\DISPLAY\\0003
+[2025-08-17T16:14:41.990Z] Successfully removed device: ROOT\\DISPLAY\\0003
+[2025-08-17T16:14:41.990Z] Attempting to remove device: ROOT\\DISPLAY\\0004
+[2025-08-17T16:14:42.173Z] Disabled device: ROOT\\DISPLAY\\0004
+[2025-08-17T16:14:42.348Z] Successfully removed device: ROOT\\DISPLAY\\0004
+[2025-08-17T16:14:42.349Z] Attempting to remove device: ROOT\\DISPLAY\\0005
+[2025-08-17T16:14:42.521Z] Disabled device: ROOT\\DISPLAY\\0005
+[2025-08-17T16:14:42.700Z] Successfully removed device: ROOT\\DISPLAY\\0005
+[2025-08-17T16:14:42.700Z] Attempting to remove device: ROOT\\DISPLAY\\0006
+[2025-08-17T16:14:42.920Z] Disabled device: ROOT\\DISPLAY\\0006
+[2025-08-17T16:14:43.094Z] Successfully removed device: ROOT\\DISPLAY\\0006
+[2025-08-17T16:14:43.094Z] Attempting registry-based cleanup...
+[2025-08-17T16:14:43.094Z] Executing registry command: reg delete "HKEY_LOCAL_MACHINE\\SYSTEM\\CurrentControlSet\\Enum\\Root\\MttVDD" /f
+[2025-08-17T16:14:43.139Z] Registry cleanup failed: Command failed: reg delete "HKEY_LOCAL_MACHINE\\SYSTEM\\CurrentControlSet\\Enum\\Root\\MttVDD" /f
+ERROR: Invalid key name.
+Type "REG DELETE /?" for usage.
+
+[2025-08-17T16:14:43.139Z] Waiting 3 seconds for system to update...
+[2025-08-17T16:14:46.154Z] Verifying cleanup results...
+[2025-08-17T16:14:47.107Z] Found 5 MttVDD devices: ["ROOT\\DISPLAY\\0001","ROOT\\DISPLAY\\0003","ROOT\\DISPLAY\\0004","ROOT\\DISPLAY\\0005","ROOT\\DISPLAY\\0006"]
+[2025-08-17T16:14:47.108Z] Emergency cleanup complete. Remaining devices: 5
+[2025-08-17T16:14:47.108Z] Emergency cleanup success: false
+[2025-08-17T16:14:47.109Z] Emergency cleanup function returned: false
+[2025-08-17T16:14:47.109Z] Checking device count after cleanup...
+[2025-08-17T16:14:48.019Z] Found 5 MttVDD devices: ["ROOT\\DISPLAY\\0001","ROOT\\DISPLAY\\0003","ROOT\\DISPLAY\\0004","ROOT\\DISPLAY\\0005","ROOT\\DISPLAY\\0006"]
+[2025-08-17T16:14:48.020Z] After cleanup: 5 devices remain
+[2025-08-17T16:14:48.020Z] WARNING: 5 devices could not be removed - proceeding anyway with forced installation
+[2025-08-17T16:14:48.020Z] Cleanup phase completed - proceeding to installation phase
+[2025-08-17T16:14:48.021Z] All files found, proceeding with single-step installation...
+[2025-08-17T16:14:48.021Z] Using robust force-install approach
+[2025-08-17T16:14:48.021Z] Executing command: "C:\VirtualDisplayDriver\EDID\nefconw.exe" --install-driver --inf-path "C:\VirtualDisplayDriver\Driver Files\VDD x86 x64\MttVDD.inf" --hardware-id Root\MttVDD --force
+[2025-08-17T16:15:21.729Z] Install stdout: 2025-08-17 09:15:21,284 INFO [default] Driver installed successfully
+Driver installed successfully
+
+[2025-08-17T16:15:21.730Z] Install stderr: 
+[2025-08-17T16:15:21.730Z] Driver installation completed
+[2025-08-17T16:15:30.666Z] Emergency cleanup timed out after 60 seconds
+[2025-08-17T16:15:33.576Z] Found 5 MttVDD devices: ["ROOT\\DISPLAY\\0001","ROOT\\DISPLAY\\0003","ROOT\\DISPLAY\\0004","ROOT\\DISPLAY\\0005","ROOT\\DISPLAY\\0006"]
+[2025-08-17T16:15:33.577Z] Final device count: 5
+[2025-08-17T16:15:33.577Z] ERROR: Found 5 devices instead of 1!
+[2025-08-17T16:15:33.577Z] === EMERGENCY CLEANUP: Removing ALL MttVDD devices ===
+[2025-08-17T16:15:33.577Z] Cleanup attempt 1: "C:\VirtualDisplayDriver\EDID\nefconw.exe" --remove-device-node --hardware-id Root\MttVDD --class-guid 4d36e968-e325-11ce-bfc1-08002be10318
+[2025-08-17T16:16:47.195Z] Cleanup 1 failed: Command failed: "C:\VirtualDisplayDriver\EDID\nefconw.exe" --remove-device-node --hardware-id Root\MttVDD --class-guid 4d36e968-e325-11ce-bfc1-08002be10318
+
+[2025-08-17T16:16:49.152Z] Cleanup attempt 2: "C:\VirtualDisplayDriver\EDID\nefconw.exe" --remove-device-node --hardware-id Root\MttVDD --class-guid 4d36e968-e325-11ce-bfc1-08002be10318
+[2025-08-17T16:16:49.249Z] Cleanup 2 failed: Command failed: "C:\VirtualDisplayDriver\EDID\nefconw.exe" --remove-device-node --hardware-id Root\MttVDD --class-guid 4d36e968-e325-11ce-bfc1-08002be10318
+
+[2025-08-17T16:16:51.144Z] Cleanup attempt 3: "C:\VirtualDisplayDriver\EDID\nefconw.exe" --remove-device-node --hardware-id Root\MttVDD --class-guid 4d36e968-e325-11ce-bfc1-08002be10318
+[2025-08-17T16:16:51.198Z] Cleanup 3 failed: Command failed: "C:\VirtualDisplayDriver\EDID\nefconw.exe" --remove-device-node --hardware-id Root\MttVDD --class-guid 4d36e968-e325-11ce-bfc1-08002be10318
+
+[2025-08-17T16:16:53.154Z] Cleanup attempt 4: "C:\VirtualDisplayDriver\EDID\nefconw.exe" --remove-device-node --hardware-id Root\MttVDD --class-guid 4d36e968-e325-11ce-bfc1-08002be10318
+[2025-08-17T16:16:53.204Z] Cleanup 4 failed: Command failed: "C:\VirtualDisplayDriver\EDID\nefconw.exe" --remove-device-node --hardware-id Root\MttVDD --class-guid 4d36e968-e325-11ce-bfc1-08002be10318
+
+[2025-08-17T16:16:55.142Z] Cleanup attempt 5: "C:\VirtualDisplayDriver\EDID\nefconw.exe" --remove-device-node --hardware-id Root\MttVDD --class-guid 4d36e968-e325-11ce-bfc1-08002be10318
+[2025-08-17T16:16:55.191Z] Cleanup 5 failed: Command failed: "C:\VirtualDisplayDriver\EDID\nefconw.exe" --remove-device-node --hardware-id Root\MttVDD --class-guid 4d36e968-e325-11ce-bfc1-08002be10318
+
+[2025-08-17T16:16:57.150Z] Cleanup attempt 6: "C:\VirtualDisplayDriver\EDID\nefconw.exe" --remove-device-node --hardware-id Root\MttVDD --class-guid 4d36e968-e325-11ce-bfc1-08002be10318
+[2025-08-17T16:16:57.199Z] Cleanup 6 failed: Command failed: "C:\VirtualDisplayDriver\EDID\nefconw.exe" --remove-device-node --hardware-id Root\MttVDD --class-guid 4d36e968-e325-11ce-bfc1-08002be10318
+
+[2025-08-17T16:16:59.140Z] Cleanup attempt 7: "C:\VirtualDisplayDriver\EDID\nefconw.exe" --remove-device-node --hardware-id Root\MttVDD --class-guid 4d36e968-e325-11ce-bfc1-08002be10318
+[2025-08-17T16:16:59.195Z] Cleanup 7 failed: Command failed: "C:\VirtualDisplayDriver\EDID\nefconw.exe" --remove-device-node --hardware-id Root\MttVDD --class-guid 4d36e968-e325-11ce-bfc1-08002be10318
+
+[2025-08-17T16:17:01.148Z] Cleanup attempt 8: "C:\VirtualDisplayDriver\EDID\nefconw.exe" --remove-device-node --hardware-id Root\MttVDD --class-guid 4d36e968-e325-11ce-bfc1-08002be10318
+[2025-08-17T16:17:01.203Z] Cleanup 8 failed: Command failed: "C:\VirtualDisplayDriver\EDID\nefconw.exe" --remove-device-node --hardware-id Root\MttVDD --class-guid 4d36e968-e325-11ce-bfc1-08002be10318
+
+[2025-08-17T16:17:03.152Z] Cleanup attempt 9: "C:\VirtualDisplayDriver\EDID\nefconw.exe" --remove-device-node --hardware-id Root\MttVDD --class-guid 4d36e968-e325-11ce-bfc1-08002be10318
+[2025-08-17T16:17:03.213Z] Cleanup 9 failed: Command failed: "C:\VirtualDisplayDriver\EDID\nefconw.exe" --remove-device-node --hardware-id Root\MttVDD --class-guid 4d36e968-e325-11ce-bfc1-08002be10318
+
+[2025-08-17T16:17:05.150Z] Cleanup attempt 10: "C:\VirtualDisplayDriver\EDID\nefconw.exe" --remove-device-node --hardware-id Root\MttVDD --class-guid 4d36e968-e325-11ce-bfc1-08002be10318
+[2025-08-17T16:17:05.205Z] Cleanup 10 failed: Command failed: "C:\VirtualDisplayDriver\EDID\nefconw.exe" --remove-device-node --hardware-id Root\MttVDD --class-guid 4d36e968-e325-11ce-bfc1-08002be10318
+
+[2025-08-17T16:17:07.145Z] Using PnPUtil for specific device cleanup...
+[2025-08-17T16:17:07.146Z] Attempting to remove device: ROOT\\DISPLAY\\0001
+[2025-08-17T16:17:07.440Z] Disabled device: ROOT\\DISPLAY\\0001
+[2025-08-17T16:17:07.624Z] Successfully removed device: ROOT\\DISPLAY\\0001
+[2025-08-17T16:17:07.624Z] Attempting to remove device: ROOT\\DISPLAY\\0003
+[2025-08-17T16:17:07.807Z] Disabled device: ROOT\\DISPLAY\\0003
+[2025-08-17T16:17:07.988Z] Successfully removed device: ROOT\\DISPLAY\\0003
+[2025-08-17T16:17:07.989Z] Attempting to remove device: ROOT\\DISPLAY\\0004
+[2025-08-17T16:17:08.184Z] Disabled device: ROOT\\DISPLAY\\0004
+[2025-08-17T16:17:08.363Z] Successfully removed device: ROOT\\DISPLAY\\0004
+[2025-08-17T16:17:08.364Z] Attempting to remove device: ROOT\\DISPLAY\\0005
+[2025-08-17T16:17:08.536Z] Disabled device: ROOT\\DISPLAY\\0005
+[2025-08-17T16:17:08.729Z] Successfully removed device: ROOT\\DISPLAY\\0005
+[2025-08-17T16:17:08.729Z] Attempting to remove device: ROOT\\DISPLAY\\0006
+[2025-08-17T16:17:08.914Z] Disabled device: ROOT\\DISPLAY\\0006
+[2025-08-17T16:17:09.087Z] Successfully removed device: ROOT\\DISPLAY\\0006
+[2025-08-17T16:17:09.087Z] Attempting registry-based cleanup...
+[2025-08-17T16:17:09.087Z] Executing registry command: reg delete "HKEY_LOCAL_MACHINE\\SYSTEM\\CurrentControlSet\\Enum\\Root\\MttVDD" /f
+[2025-08-17T16:17:09.128Z] Registry cleanup failed: Command failed: reg delete "HKEY_LOCAL_MACHINE\\SYSTEM\\CurrentControlSet\\Enum\\Root\\MttVDD" /f
+ERROR: Invalid key name.
+Type "REG DELETE /?" for usage.
+
+[2025-08-17T16:17:09.128Z] Waiting 3 seconds for system to update...
+[2025-08-17T16:17:12.152Z] Verifying cleanup results...
+[2025-08-17T16:17:13.069Z] Found 4 MttVDD devices: ["ROOT\\DISPLAY\\0003","ROOT\\DISPLAY\\0004","ROOT\\DISPLAY\\0005","ROOT\\DISPLAY\\0006"]
+[2025-08-17T16:17:13.069Z] Emergency cleanup complete. Remaining devices: 4
+[2025-08-17T16:17:13.069Z] Emergency cleanup success: false
+[2025-08-17T16:17:13.070Z] Reinstall operation completed - cleared reinstalling flag
+[2025-08-17T16:17:16.151Z] === DETECTING ACTUAL DRIVER STATUS ===
+[2025-08-17T16:17:16.151Z] Executing device query: powershell "Get-WmiObject -Class Win32_PnPEntity | Where-Object { $_.DeviceID -like '*MttVDD*' -or $_.Name -like '*Virtual Display*' -or $_.HardwareID -like '*MttVDD*' } | Select-Object Name, DeviceID, Status, HardwareID | Format-Table -AutoSize"
+[2025-08-17T16:17:17.039Z] Device query stdout: 
+Name                           DeviceID          Status HardwareID       
+----                           --------          ------ ----------       
+Parsec Virtual Display Adapter ROOT\DISPLAY\0002 OK     {Root\Parsec\VDA}
+                               ROOT\DISPLAY\0003 OK     {Root\MttVDD}    
+                               ROOT\DISPLAY\0004 OK     {Root\MttVDD}    
+                               ROOT\DISPLAY\0005 OK     {Root\MttVDD}    
+                               ROOT\DISPLAY\0006 OK     {Root\MttVDD}    
+
+
+
+[2025-08-17T16:17:17.039Z] Device query stderr: 
+[2025-08-17T16:17:17.040Z] MttVDD device found but driver not properly installed (missing name)
+[2025-08-17T16:17:17.040Z] Updating driver status: Not Installed (danger)

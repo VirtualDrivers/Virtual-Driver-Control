@@ -898,21 +898,21 @@
                             </div>
                             <div class="card-content">
                                 <div class="status-item">
-                                    <div class="status-indicator success"></div>
+                                    <div class="status-indicator" id="driver-status-indicator"></div>
                                     <div class="status-info">
-                                        <strong>Driver Status:</strong> Installed and Running
+                                        <strong>Driver Status:</strong> <span id="driver-status-text">Checking...</span>
                                     </div>
                                 </div>
                                 <div class="status-item">
-                                    <div class="status-indicator success"></div>
+                                    <div class="status-indicator" id="service-status-indicator"></div>
                                     <div class="status-info">
-                                        <strong>Service:</strong> WUDF (Windows User Mode Driver Framework)
+                                        <strong>Service:</strong> <span id="service-status-text">Checking...</span>
                                     </div>
                                 </div>
                                 <div class="status-item">
-                                    <div class="status-indicator success"></div>
+                                    <div class="status-indicator" id="hardware-id-indicator"></div>
                                     <div class="status-info">
-                                        <strong>Hardware ID:</strong> Root\MttVDD
+                                        <strong>Hardware ID:</strong> <span id="hardware-id-text">Checking...</span>
                                     </div>
                                 </div>
                                 <div class="status-item">
@@ -944,9 +944,9 @@
                                         <i class="fas fa-trash"></i>
                                         Uninstall Driver
                                     </button>
-                                    <button class="btn btn-primary" id="reinstall-driver-btn">
-                                        <i class="fas fa-download"></i>
-                                        Reinstall Driver
+                                    <button class="btn btn-secondary" id="reinstall-driver-btn" disabled>
+                                        <i class="fas fa-ban"></i>
+                                        Reinstall Driver (Disabled for Safety)
                                     </button>
                                 </div>
                             </div>
