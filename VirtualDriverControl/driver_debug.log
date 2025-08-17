@@ -555,3 +555,390 @@ Parsec Virtual Display Adapter ROOT\DISPLAY\0002 OK     {Root\Parsec\VDA}
 [2025-08-17T16:17:17.039Z] Device query stderr: 
 [2025-08-17T16:17:17.040Z] MttVDD device found but driver not properly installed (missing name)
 [2025-08-17T16:17:17.040Z] Updating driver status: Not Installed (danger)
+[2025-08-17T16:30:15.081Z] Reinstall button found - attaching event handler
+[2025-08-17T16:30:15.134Z] === DETECTING ACTUAL DRIVER STATUS ===
+[2025-08-17T16:30:15.135Z] Executing device query: powershell "Get-WmiObject -Class Win32_PnPEntity | Where-Object { $_.DeviceID -like '*MttVDD*' -or $_.Name -like '*Virtual Display*' -or $_.HardwareID -like '*MttVDD*' } | Select-Object Name, DeviceID, Status, HardwareID | Format-Table -AutoSize"
+[2025-08-17T16:30:16.074Z] Device query stdout: 
+Name                           DeviceID          Status HardwareID       
+----                           --------          ------ ----------       
+Parsec Virtual Display Adapter ROOT\DISPLAY\0002 OK     {Root\Parsec\VDA}
+                               ROOT\DISPLAY\0003 OK     {Root\MttVDD}    
+                               ROOT\DISPLAY\0004 OK     {Root\MttVDD}    
+                               ROOT\DISPLAY\0005 OK     {Root\MttVDD}    
+                               ROOT\DISPLAY\0006 OK     {Root\MttVDD}    
+
+
+
+[2025-08-17T16:30:16.074Z] Device query stderr: 
+[2025-08-17T16:30:16.074Z] MttVDD device found but driver not properly installed (missing name)
+[2025-08-17T16:30:16.075Z] Updating driver status: Not Installed (danger)
+[2025-08-17T16:30:19.380Z] === DETECTING ACTUAL DRIVER STATUS ===
+[2025-08-17T16:30:19.381Z] Executing device query: powershell "Get-WmiObject -Class Win32_PnPEntity | Where-Object { $_.DeviceID -like '*MttVDD*' -or $_.Name -like '*Virtual Display*' -or $_.HardwareID -like '*MttVDD*' } | Select-Object Name, DeviceID, Status, HardwareID | Format-Table -AutoSize"
+[2025-08-17T16:30:20.285Z] Device query stdout: 
+Name                           DeviceID          Status HardwareID       
+----                           --------          ------ ----------       
+Parsec Virtual Display Adapter ROOT\DISPLAY\0002 OK     {Root\Parsec\VDA}
+                               ROOT\DISPLAY\0003 OK     {Root\MttVDD}    
+                               ROOT\DISPLAY\0004 OK     {Root\MttVDD}    
+                               ROOT\DISPLAY\0005 OK     {Root\MttVDD}    
+                               ROOT\DISPLAY\0006 OK     {Root\MttVDD}    
+
+
+
+[2025-08-17T16:30:20.285Z] Device query stderr: 
+[2025-08-17T16:30:20.286Z] MttVDD device found but driver not properly installed (missing name)
+[2025-08-17T16:30:20.286Z] Updating driver status: Not Installed (danger)
+[2025-08-17T16:30:24.523Z] INSTALL BUTTON CLICKED - Event handler triggered
+[2025-08-17T16:30:24.524Z] === INSTALL DRIVER FUNCTION CALLED ===
+[2025-08-17T16:30:24.524Z] Timestamp: 2025-08-17T16:30:24.524Z
+[2025-08-17T16:30:24.524Z] Current working directory: E:\GitHub\Virtual-Driver-Control\VirtualDriverControl
+[2025-08-17T16:30:24.524Z] App version: unknown
+[2025-08-17T16:30:24.525Z] Process platform: win32
+[2025-08-17T16:30:24.525Z] Process arch: x64
+[2025-08-17T16:30:24.525Z] Node version: v18.17.1
+[2025-08-17T16:30:24.525Z] Process argv: ["E:\\GitHub\\Virtual-Driver-Control\\VirtualDriverControl\\node_modules\\electron\\dist\\electron.exe","--type=renderer","--user-data-dir=C:\\Users\\alisa\\AppData\\Roaming\\virtual-driver-control","--app-path=E:\\GitHub\\Virtual-Driver-Control\\VirtualDriverControl","--no-sandbox","--no-zygote","--first-renderer-process","--lang=en-GB","--device-scale-factor=1","--num-raster-threads=4","--enable-main-frame-before-activation","--renderer-client-id=4","--time-ticks-at-unix-epoch=-1755174639139871","--launch-time-ticks=273575744132","--mojo-platform-channel-handle=2744","--field-trial-handle=1660,i,16841465969087905819,10195032378465698625,262144","--disable-features=SpareRendererForSitePerProcess,WinDelaySpellcheckServiceInit,WinRetrieveSuggestionsOnlyOnDemand","/prefetch:1"]
+[2025-08-17T16:30:24.582Z] Running as Administrator: true
+[2025-08-17T16:30:26.027Z] User confirmed install, proceeding...
+[2025-08-17T16:30:26.028Z] Node.js access available
+[2025-08-17T16:30:26.028Z] Platform: win32
+[2025-08-17T16:30:26.028Z] Running on Windows, proceeding with nefconw
+[2025-08-17T16:30:26.028Z] Checking nefconw path: C:\VirtualDisplayDriver\EDID\nefconw.exe
+[2025-08-17T16:30:26.029Z] nefconw.exe exists: true
+[2025-08-17T16:30:26.029Z] Checking driver directory: C:\VirtualDisplayDriver\Driver Files\VDD x86 x64
+[2025-08-17T16:30:26.029Z] Driver directory exists: true
+[2025-08-17T16:30:26.029Z] Checking INF file: C:\VirtualDisplayDriver\Driver Files\VDD x86 x64\MttVDD.inf
+[2025-08-17T16:30:26.030Z] INF file exists: true
+[2025-08-17T16:30:26.030Z] All required files found, proceeding with installation...
+[2025-08-17T16:30:26.030Z] Step 1: Installing driver package...
+[2025-08-17T16:30:26.031Z] Executing install command: "C:\VirtualDisplayDriver\EDID\nefconw.exe" --install-driver --inf-path "C:\VirtualDisplayDriver\Driver Files\VDD x86 x64\MttVDD.inf"
+[2025-08-17T16:30:44.362Z] Install stdout: 2025-08-17 09:30:43,942 INFO [default] Driver installed successfully
+Driver installed successfully
+
+[2025-08-17T16:30:44.362Z] Install stderr: 
+[2025-08-17T16:30:44.362Z] Driver package installed successfully
+[2025-08-17T16:30:44.363Z] Refreshing driver status after install...
+[2025-08-17T16:30:46.371Z] === DETECTING ACTUAL DRIVER STATUS ===
+[2025-08-17T16:30:46.372Z] Executing device query: powershell "Get-WmiObject -Class Win32_PnPEntity | Where-Object { $_.DeviceID -like '*MttVDD*' -or $_.Name -like '*Virtual Display*' -or $_.HardwareID -like '*MttVDD*' } | Select-Object Name, DeviceID, Status, HardwareID | Format-Table -AutoSize"
+[2025-08-17T16:30:49.365Z] === DETECTING ACTUAL DRIVER STATUS ===
+[2025-08-17T16:30:49.366Z] Executing device query: powershell "Get-WmiObject -Class Win32_PnPEntity | Where-Object { $_.DeviceID -like '*MttVDD*' -or $_.Name -like '*Virtual Display*' -or $_.HardwareID -like '*MttVDD*' } | Select-Object Name, DeviceID, Status, HardwareID | Format-Table -AutoSize"
+[2025-08-17T16:30:54.368Z] === DETECTING ACTUAL DRIVER STATUS ===
+[2025-08-17T16:30:54.369Z] Executing device query: powershell "Get-WmiObject -Class Win32_PnPEntity | Where-Object { $_.DeviceID -like '*MttVDD*' -or $_.Name -like '*Virtual Display*' -or $_.HardwareID -like '*MttVDD*' } | Select-Object Name, DeviceID, Status, HardwareID | Format-Table -AutoSize"
+[2025-08-17T16:30:54.672Z] Device query stdout: 
+Name                           DeviceID          Status HardwareID       
+----                           --------          ------ ----------       
+Parsec Virtual Display Adapter ROOT\DISPLAY\0002 OK     {Root\Parsec\VDA}
+Virtual Display Driver         ROOT\DISPLAY\0003 OK     {Root\MttVDD}    
+Virtual Display Driver         ROOT\DISPLAY\0004 OK     {Root\MttVDD}    
+Virtual Display Driver         ROOT\DISPLAY\0005 OK     {Root\MttVDD}    
+Virtual Display Driver         ROOT\DISPLAY\0006 OK     {Root\MttVDD}    
+
+
+
+[2025-08-17T16:30:54.673Z] Device query stderr: 
+[2025-08-17T16:30:54.673Z] MttVDD driver found and properly installed in Device Manager
+[2025-08-17T16:30:54.673Z] Updating driver status: Installed and Running (success)
+[2025-08-17T16:30:54.788Z] Device query stdout: 
+Name                           DeviceID          Status HardwareID       
+----                           --------          ------ ----------       
+Parsec Virtual Display Adapter ROOT\DISPLAY\0002 OK     {Root\Parsec\VDA}
+Virtual Display Driver         ROOT\DISPLAY\0003 OK     {Root\MttVDD}    
+Virtual Display Driver         ROOT\DISPLAY\0004 OK     {Root\MttVDD}    
+Virtual Display Driver         ROOT\DISPLAY\0005 OK     {Root\MttVDD}    
+Virtual Display Driver         ROOT\DISPLAY\0006 OK     {Root\MttVDD}    
+
+
+
+[2025-08-17T16:30:54.789Z] Device query stderr: 
+[2025-08-17T16:30:54.789Z] MttVDD driver found and properly installed in Device Manager
+[2025-08-17T16:30:54.789Z] Updating driver status: Installed and Running (success)
+[2025-08-17T16:30:55.901Z] Device query stdout: 
+Name                           DeviceID          Status HardwareID       
+----                           --------          ------ ----------       
+Parsec Virtual Display Adapter ROOT\DISPLAY\0002 OK     {Root\Parsec\VDA}
+Virtual Display Driver         ROOT\DISPLAY\0003 OK     {Root\MttVDD}    
+Virtual Display Driver         ROOT\DISPLAY\0004 OK     {Root\MttVDD}    
+Virtual Display Driver         ROOT\DISPLAY\0005 OK     {Root\MttVDD}    
+Virtual Display Driver         ROOT\DISPLAY\0006 OK     {Root\MttVDD}    
+
+
+
+[2025-08-17T16:30:55.902Z] Device query stderr: 
+[2025-08-17T16:30:55.902Z] MttVDD driver found and properly installed in Device Manager
+[2025-08-17T16:30:55.902Z] Updating driver status: Installed and Running (success)
+[2025-08-17T16:31:34.620Z] Reinstall button found - attaching event handler
+[2025-08-17T16:31:40.429Z] === DETECTING ACTUAL DRIVER STATUS ===
+[2025-08-17T16:31:40.429Z] Executing device query: powershell "Get-WmiObject -Class Win32_PnPEntity | Where-Object { $_.DeviceID -like '*MttVDD*' -or $_.Name -like '*Virtual Display*' -or $_.HardwareID -like '*MttVDD*' } | Select-Object Name, DeviceID, Status, HardwareID | Format-Table -AutoSize"
+[2025-08-17T16:31:41.379Z] Device query stdout: 
+Name                           DeviceID          Status HardwareID       
+----                           --------          ------ ----------       
+Parsec Virtual Display Adapter ROOT\DISPLAY\0002 OK     {Root\Parsec\VDA}
+Virtual Display Driver         ROOT\DISPLAY\0003 OK     {Root\MttVDD}    
+Virtual Display Driver         ROOT\DISPLAY\0004 OK     {Root\MttVDD}    
+Virtual Display Driver         ROOT\DISPLAY\0005 OK     {Root\MttVDD}    
+Virtual Display Driver         ROOT\DISPLAY\0006 OK     {Root\MttVDD}    
+
+
+
+[2025-08-17T16:31:41.379Z] Device query stderr: 
+[2025-08-17T16:31:41.379Z] MttVDD driver found and properly installed in Device Manager
+[2025-08-17T16:31:41.380Z] Updating driver status: Installed and Running (success)
+[2025-08-17T16:31:43.242Z] === DETECTING ACTUAL DRIVER STATUS ===
+[2025-08-17T16:31:43.243Z] Executing device query: powershell "Get-WmiObject -Class Win32_PnPEntity | Where-Object { $_.DeviceID -like '*MttVDD*' -or $_.Name -like '*Virtual Display*' -or $_.HardwareID -like '*MttVDD*' } | Select-Object Name, DeviceID, Status, HardwareID | Format-Table -AutoSize"
+[2025-08-17T16:31:44.190Z] Device query stdout: 
+Name                           DeviceID          Status HardwareID       
+----                           --------          ------ ----------       
+Parsec Virtual Display Adapter ROOT\DISPLAY\0002 OK     {Root\Parsec\VDA}
+Virtual Display Driver         ROOT\DISPLAY\0003 OK     {Root\MttVDD}    
+Virtual Display Driver         ROOT\DISPLAY\0004 OK     {Root\MttVDD}    
+Virtual Display Driver         ROOT\DISPLAY\0005 OK     {Root\MttVDD}    
+Virtual Display Driver         ROOT\DISPLAY\0006 OK     {Root\MttVDD}    
+
+
+
+[2025-08-17T16:31:44.190Z] Device query stderr: 
+[2025-08-17T16:31:44.190Z] MttVDD driver found and properly installed in Device Manager
+[2025-08-17T16:31:44.190Z] Updating driver status: Installed and Running (success)
+[2025-08-17T16:31:44.545Z] UNINSTALL BUTTON CLICKED - Event handler triggered
+[2025-08-17T16:31:44.546Z] === UNINSTALL DRIVER FUNCTION CALLED ===
+[2025-08-17T16:31:44.546Z] Timestamp: 2025-08-17T16:31:44.546Z
+[2025-08-17T16:31:44.546Z] Current working directory: E:\GitHub\Virtual-Driver-Control\VirtualDriverControl
+[2025-08-17T16:31:44.547Z] App version: unknown
+[2025-08-17T16:31:44.547Z] Process platform: win32
+[2025-08-17T16:31:44.547Z] Process arch: x64
+[2025-08-17T16:31:44.547Z] Node version: v18.17.1
+[2025-08-17T16:31:44.547Z] Process argv: ["E:\\GitHub\\Virtual-Driver-Control\\VirtualDriverControl\\node_modules\\electron\\dist\\electron.exe","--type=renderer","--user-data-dir=C:\\Users\\alisa\\AppData\\Roaming\\virtual-driver-control","--app-path=E:\\GitHub\\Virtual-Driver-Control\\VirtualDriverControl","--no-sandbox","--no-zygote","--first-renderer-process","--lang=en-GB","--device-scale-factor=1","--num-raster-threads=4","--enable-main-frame-before-activation","--renderer-client-id=4","--time-ticks-at-unix-epoch=-1755174639140046","--launch-time-ticks=273655223671","--mojo-platform-channel-handle=2704","--field-trial-handle=1664,i,12655210558188085399,9505486335071184866,262144","--disable-features=SpareRendererForSitePerProcess,WinDelaySpellcheckServiceInit,WinRetrieveSuggestionsOnlyOnDemand","/prefetch:1"]
+[2025-08-17T16:31:44.601Z] Running as Administrator: true
+[2025-08-17T16:31:46.575Z] User confirmed uninstall, proceeding...
+[2025-08-17T16:31:46.576Z] Node.js access available
+[2025-08-17T16:31:46.576Z] Platform: win32
+[2025-08-17T16:31:46.576Z] Running on Windows, proceeding with nefconw
+[2025-08-17T16:31:46.577Z] Checking nefconw path: C:\VirtualDisplayDriver\EDID\nefconw.exe
+[2025-08-17T16:31:46.577Z] nefconw.exe exists: true
+[2025-08-17T16:31:46.577Z] nefconw.exe found, proceeding with removal...
+[2025-08-17T16:31:46.578Z] Attempting to uninstall driver with comprehensive approach...
+[2025-08-17T16:31:46.578Z] Step 1: Attempting to uninstall driver package...
+[2025-08-17T16:31:46.578Z] Executing uninstall command: "C:\VirtualDisplayDriver\EDID\nefconw.exe" --uninstall-driver --inf-path "C:\VirtualDisplayDriver\Driver Files\VDD x86 x64\MttVDD.inf"
+[2025-08-17T16:32:16.591Z] Driver package uninstall failed: Uninstall timeout after 30 seconds
+[2025-08-17T16:32:16.592Z] Continuing with alternative methods...
+[2025-08-17T16:32:16.592Z] Step 2: Attempting to remove device node...
+[2025-08-17T16:32:16.592Z] Executing command: "C:\VirtualDisplayDriver\EDID\nefconw.exe" --remove-device-node --hardware-id Root\MttVDD --class-guid 4d36e968-e325-11ce-bfc1-08002be10318
+[2025-08-17T16:32:16.642Z] Device node removal failed: Command failed: "C:\VirtualDisplayDriver\EDID\nefconw.exe" --remove-device-node --hardware-id Root\MttVDD --class-guid 4d36e968-e325-11ce-bfc1-08002be10318
+
+[2025-08-17T16:32:16.642Z] Device node already removed - this is expected
+[2025-08-17T16:32:16.643Z] Step 3: Attempting alternative driver removal with PnPUtil...
+[2025-08-17T16:32:16.643Z] Checking for driver with command: pnputil /enum-drivers | findstr "MttVDD"
+[2025-08-17T16:32:16.749Z] PnPUtil removal failed: Command failed: pnputil /enum-drivers | findstr "MttVDD"
+
+[2025-08-17T16:32:16.750Z] Continuing without PnPUtil removal...
+[2025-08-17T16:32:16.750Z] Driver uninstall process completed
+[2025-08-17T16:32:16.750Z] Refreshing driver status after uninstall...
+[2025-08-17T16:32:18.757Z] First status refresh after uninstall
+[2025-08-17T16:32:18.758Z] === DETECTING ACTUAL DRIVER STATUS ===
+[2025-08-17T16:32:18.758Z] Executing device query: powershell "Get-WmiObject -Class Win32_PnPEntity | Where-Object { $_.DeviceID -like '*MttVDD*' -or $_.Name -like '*Virtual Display*' -or $_.HardwareID -like '*MttVDD*' } | Select-Object Name, DeviceID, Status, HardwareID | Format-Table -AutoSize"
+[2025-08-17T16:32:19.590Z] Device query stdout: 
+Name                           DeviceID          Status HardwareID       
+----                           --------          ------ ----------       
+Parsec Virtual Display Adapter ROOT\DISPLAY\0002 OK     {Root\Parsec\VDA}
+                               ROOT\DISPLAY\0003 OK     {Root\MttVDD}    
+                               ROOT\DISPLAY\0004 OK     {Root\MttVDD}    
+                               ROOT\DISPLAY\0005 OK     {Root\MttVDD}    
+                               ROOT\DISPLAY\0006 OK     {Root\MttVDD}    
+
+
+
+[2025-08-17T16:32:19.591Z] Device query stderr: 
+[2025-08-17T16:32:19.591Z] MttVDD device found but driver not properly installed (missing name)
+[2025-08-17T16:32:19.591Z] Updating driver status: Not Installed (danger)
+[2025-08-17T16:32:21.759Z] Second status refresh after uninstall
+[2025-08-17T16:32:21.760Z] === DETECTING ACTUAL DRIVER STATUS ===
+[2025-08-17T16:32:21.760Z] Executing device query: powershell "Get-WmiObject -Class Win32_PnPEntity | Where-Object { $_.DeviceID -like '*MttVDD*' -or $_.Name -like '*Virtual Display*' -or $_.HardwareID -like '*MttVDD*' } | Select-Object Name, DeviceID, Status, HardwareID | Format-Table -AutoSize"
+[2025-08-17T16:32:22.617Z] Device query stdout: 
+Name                           DeviceID          Status HardwareID       
+----                           --------          ------ ----------       
+Parsec Virtual Display Adapter ROOT\DISPLAY\0002 OK     {Root\Parsec\VDA}
+                               ROOT\DISPLAY\0003 OK     {Root\MttVDD}    
+                               ROOT\DISPLAY\0004 OK     {Root\MttVDD}    
+                               ROOT\DISPLAY\0005 OK     {Root\MttVDD}    
+                               ROOT\DISPLAY\0006 OK     {Root\MttVDD}    
+
+
+
+[2025-08-17T16:32:22.617Z] Device query stderr: 
+[2025-08-17T16:32:22.618Z] MttVDD device found but driver not properly installed (missing name)
+[2025-08-17T16:32:22.618Z] Updating driver status: Not Installed (danger)
+[2025-08-17T16:32:24.754Z] Final status refresh after uninstall
+[2025-08-17T16:32:24.755Z] === DETECTING ACTUAL DRIVER STATUS ===
+[2025-08-17T16:32:24.755Z] Executing device query: powershell "Get-WmiObject -Class Win32_PnPEntity | Where-Object { $_.DeviceID -like '*MttVDD*' -or $_.Name -like '*Virtual Display*' -or $_.HardwareID -like '*MttVDD*' } | Select-Object Name, DeviceID, Status, HardwareID | Format-Table -AutoSize"
+[2025-08-17T16:32:25.639Z] Device query stdout: 
+Name                           DeviceID          Status HardwareID       
+----                           --------          ------ ----------       
+Parsec Virtual Display Adapter ROOT\DISPLAY\0002 OK     {Root\Parsec\VDA}
+                               ROOT\DISPLAY\0003 OK     {Root\MttVDD}    
+                               ROOT\DISPLAY\0004 OK     {Root\MttVDD}    
+                               ROOT\DISPLAY\0005 OK     {Root\MttVDD}    
+                               ROOT\DISPLAY\0006 OK     {Root\MttVDD}    
+
+
+
+[2025-08-17T16:32:25.640Z] Device query stderr: 
+[2025-08-17T16:32:25.640Z] MttVDD device found but driver not properly installed (missing name)
+[2025-08-17T16:32:25.640Z] Updating driver status: Not Installed (danger)
+[2025-08-17T16:35:54.221Z] Reinstall button found - attaching event handler
+[2025-08-17T16:35:59.901Z] === DETECTING ACTUAL DRIVER STATUS ===
+[2025-08-17T16:35:59.902Z] Executing device query: powershell "Get-WmiObject -Class Win32_PnPEntity | Where-Object { $_.DeviceID -like '*MttVDD*' -or $_.Name -like '*Virtual Display*' -or $_.HardwareID -like '*MttVDD*' } | Select-Object Name, DeviceID, Status, HardwareID | Format-Table -AutoSize"
+[2025-08-17T16:36:00.837Z] Device query stdout: 
+Name                           DeviceID          Status HardwareID       
+----                           --------          ------ ----------       
+Parsec Virtual Display Adapter ROOT\DISPLAY\0002 OK     {Root\Parsec\VDA}
+                               ROOT\DISPLAY\0003 OK     {Root\MttVDD}    
+                               ROOT\DISPLAY\0004 OK     {Root\MttVDD}    
+                               ROOT\DISPLAY\0005 OK     {Root\MttVDD}    
+                               ROOT\DISPLAY\0006 OK     {Root\MttVDD}    
+
+
+
+[2025-08-17T16:36:00.837Z] Device query stderr: 
+[2025-08-17T16:36:00.838Z] MttVDD device found but driver not properly installed (missing name)
+[2025-08-17T16:36:00.838Z] Updating driver status: Not Installed (danger)
+[2025-08-17T16:36:01.845Z] === DETECTING ACTUAL DRIVER STATUS ===
+[2025-08-17T16:36:01.846Z] Executing device query: powershell "Get-WmiObject -Class Win32_PnPEntity | Where-Object { $_.DeviceID -like '*MttVDD*' -or $_.Name -like '*Virtual Display*' -or $_.HardwareID -like '*MttVDD*' } | Select-Object Name, DeviceID, Status, HardwareID | Format-Table -AutoSize"
+[2025-08-17T16:36:02.696Z] Device query stdout: 
+Name                           DeviceID          Status HardwareID       
+----                           --------          ------ ----------       
+Parsec Virtual Display Adapter ROOT\DISPLAY\0002 OK     {Root\Parsec\VDA}
+                               ROOT\DISPLAY\0003 OK     {Root\MttVDD}    
+                               ROOT\DISPLAY\0004 OK     {Root\MttVDD}    
+                               ROOT\DISPLAY\0005 OK     {Root\MttVDD}    
+                               ROOT\DISPLAY\0006 OK     {Root\MttVDD}    
+
+
+
+[2025-08-17T16:36:02.696Z] Device query stderr: 
+[2025-08-17T16:36:02.697Z] MttVDD device found but driver not properly installed (missing name)
+[2025-08-17T16:36:02.697Z] Updating driver status: Not Installed (danger)
+[2025-08-17T16:36:04.354Z] INSTALL BUTTON CLICKED - Event handler triggered
+[2025-08-17T16:36:04.355Z] === INSTALL DRIVER FUNCTION CALLED ===
+[2025-08-17T16:36:04.355Z] Timestamp: 2025-08-17T16:36:04.355Z
+[2025-08-17T16:36:04.412Z] Running as Administrator: true
+[2025-08-17T16:36:05.736Z] User confirmed install, proceeding...
+[2025-08-17T16:36:05.737Z] Using clean three-step installation approach...
+[2025-08-17T16:36:05.737Z] Step 1: Removing all existing device nodes...
+[2025-08-17T16:36:05.737Z] Executing: "C:\VirtualDisplayDriver\EDID\nefconw.exe" --remove-device-node --hardware-id Root\MttVDD --class-guid 4d36e968-e325-11ce-bfc1-08002be10318
+[2025-08-17T16:36:05.791Z] Remove command result: Command failed: "C:\VirtualDisplayDriver\EDID\nefconw.exe" --remove-device-node --hardware-id Root\MttVDD --class-guid 4d36e968-e325-11ce-bfc1-08002be10318
+
+[2025-08-17T16:36:05.792Z] Step 2: Creating single new device node...
+[2025-08-17T16:36:05.792Z] Executing: "C:\VirtualDisplayDriver\EDID\nefconw.exe" --create-device-node --hardware-id Root\MttVDD --class-name Display --class-guid 4D36E968-E325-11CE-BFC1-08002BE10318
+[2025-08-17T16:36:05.853Z] Create result: 2025-08-17 09:36:05,838 INFO [default] Device node created successfully
+Device node created successfully
+
+[2025-08-17T16:36:05.853Z] Step 3: Installing driver to single device node...
+[2025-08-17T16:36:05.853Z] Executing: "C:\VirtualDisplayDriver\EDID\nefconw.exe" --install-driver --inf-path "C:\VirtualDisplayDriver\Driver Files\VDD x86 x64\MttVDD.inf"
+[2025-08-17T16:36:33.918Z] Install result: 2025-08-17 09:36:33,168 INFO [default] Driver installed successfully
+Driver installed successfully
+
+[2025-08-17T16:36:33.918Z] Driver installation completed successfully
+[2025-08-17T16:36:36.927Z] === DETECTING ACTUAL DRIVER STATUS ===
+[2025-08-17T16:36:36.930Z] Executing device query: powershell "Get-WmiObject -Class Win32_PnPEntity | Where-Object { $_.DeviceID -like '*MttVDD*' -or $_.Name -like '*Virtual Display*' -or $_.HardwareID -like '*MttVDD*' } | Select-Object Name, DeviceID, Status, HardwareID | Format-Table -AutoSize"
+[2025-08-17T16:36:45.158Z] Device query stdout: 
+Name                           DeviceID          Status HardwareID       
+----                           --------          ------ ----------       
+Virtual Display Driver         ROOT\DISPLAY\0001 OK     {Root\MttVDD}    
+Parsec Virtual Display Adapter ROOT\DISPLAY\0002 OK     {Root\Parsec\VDA}
+Virtual Display Driver         ROOT\DISPLAY\0003 OK     {Root\MttVDD}    
+Virtual Display Driver         ROOT\DISPLAY\0004 OK     {Root\MttVDD}    
+Virtual Display Driver         ROOT\DISPLAY\0005 OK     {Root\MttVDD}    
+Virtual Display Driver         ROOT\DISPLAY\0006 OK     {Root\MttVDD}    
+
+
+
+[2025-08-17T16:36:45.158Z] Device query stderr: 
+[2025-08-17T16:36:45.159Z] MttVDD driver found and properly installed in Device Manager
+[2025-08-17T16:36:45.159Z] Updating driver status: Installed and Running (success)
+[2025-08-17T16:37:20.379Z] UNINSTALL BUTTON CLICKED - Event handler triggered
+[2025-08-17T16:37:20.380Z] === UNINSTALL DRIVER FUNCTION CALLED ===
+[2025-08-17T16:37:20.381Z] Timestamp: 2025-08-17T16:37:20.381Z
+[2025-08-17T16:37:20.381Z] Current working directory: E:\GitHub\Virtual-Driver-Control\VirtualDriverControl
+[2025-08-17T16:37:20.381Z] App version: unknown
+[2025-08-17T16:37:20.381Z] Process platform: win32
+[2025-08-17T16:37:20.382Z] Process arch: x64
+[2025-08-17T16:37:20.382Z] Node version: v18.17.1
+[2025-08-17T16:37:20.382Z] Process argv: ["E:\\GitHub\\Virtual-Driver-Control\\VirtualDriverControl\\node_modules\\electron\\dist\\electron.exe","--type=renderer","--user-data-dir=C:\\Users\\alisa\\AppData\\Roaming\\virtual-driver-control","--app-path=E:\\GitHub\\Virtual-Driver-Control\\VirtualDriverControl","--no-sandbox","--no-zygote","--first-renderer-process","--lang=en-GB","--device-scale-factor=1","--num-raster-threads=4","--enable-main-frame-before-activation","--renderer-client-id=4","--time-ticks-at-unix-epoch=-1755174639139397","--launch-time-ticks=273914693345","--mojo-platform-channel-handle=2700","--field-trial-handle=1652,i,9557475802117896208,13248510398618129444,262144","--disable-features=SpareRendererForSitePerProcess,WinDelaySpellcheckServiceInit,WinRetrieveSuggestionsOnlyOnDemand","/prefetch:1"]
+[2025-08-17T16:37:20.439Z] Running as Administrator: true
+[2025-08-17T16:37:22.558Z] User confirmed uninstall, proceeding...
+[2025-08-17T16:37:22.559Z] Node.js access available
+[2025-08-17T16:37:22.559Z] Platform: win32
+[2025-08-17T16:37:22.559Z] Running on Windows, proceeding with nefconw
+[2025-08-17T16:37:22.560Z] Checking nefconw path: C:\VirtualDisplayDriver\EDID\nefconw.exe
+[2025-08-17T16:37:22.560Z] nefconw.exe exists: true
+[2025-08-17T16:37:22.560Z] nefconw.exe found, proceeding with removal...
+[2025-08-17T16:37:22.561Z] Attempting to uninstall driver with comprehensive approach...
+[2025-08-17T16:37:22.561Z] Step 1: Attempting to uninstall driver package...
+[2025-08-17T16:37:22.561Z] Executing uninstall command: "C:\VirtualDisplayDriver\EDID\nefconw.exe" --uninstall-driver --inf-path "C:\VirtualDisplayDriver\Driver Files\VDD x86 x64\MttVDD.inf"
+[2025-08-17T16:37:52.576Z] Driver package uninstall failed: Uninstall timeout after 30 seconds
+[2025-08-17T16:37:52.576Z] Continuing with alternative methods...
+[2025-08-17T16:37:52.577Z] Step 2: Attempting to remove device node...
+[2025-08-17T16:37:52.577Z] Executing command: "C:\VirtualDisplayDriver\EDID\nefconw.exe" --remove-device-node --hardware-id Root\MttVDD --class-guid 4d36e968-e325-11ce-bfc1-08002be10318
+[2025-08-17T16:37:52.632Z] Device node removal failed: Command failed: "C:\VirtualDisplayDriver\EDID\nefconw.exe" --remove-device-node --hardware-id Root\MttVDD --class-guid 4d36e968-e325-11ce-bfc1-08002be10318
+
+[2025-08-17T16:37:52.632Z] Device node already removed - this is expected
+[2025-08-17T16:37:52.632Z] Step 3: Attempting alternative driver removal with PnPUtil...
+[2025-08-17T16:37:52.633Z] Checking for driver with command: pnputil /enum-drivers | findstr "MttVDD"
+[2025-08-17T16:37:52.743Z] PnPUtil removal failed: Command failed: pnputil /enum-drivers | findstr "MttVDD"
+
+[2025-08-17T16:37:52.743Z] Continuing without PnPUtil removal...
+[2025-08-17T16:37:52.744Z] Driver uninstall process completed
+[2025-08-17T16:37:52.744Z] Refreshing driver status after uninstall...
+[2025-08-17T16:37:54.757Z] First status refresh after uninstall
+[2025-08-17T16:37:54.758Z] === DETECTING ACTUAL DRIVER STATUS ===
+[2025-08-17T16:37:54.758Z] Executing device query: powershell "Get-WmiObject -Class Win32_PnPEntity | Where-Object { $_.DeviceID -like '*MttVDD*' -or $_.Name -like '*Virtual Display*' -or $_.HardwareID -like '*MttVDD*' } | Select-Object Name, DeviceID, Status, HardwareID | Format-Table -AutoSize"
+[2025-08-17T16:37:55.608Z] Device query stdout: 
+Name                           DeviceID          Status HardwareID       
+----                           --------          ------ ----------       
+                               ROOT\DISPLAY\0001 OK     {Root\MttVDD}    
+Parsec Virtual Display Adapter ROOT\DISPLAY\0002 OK     {Root\Parsec\VDA}
+                               ROOT\DISPLAY\0003 OK     {Root\MttVDD}    
+                               ROOT\DISPLAY\0004 OK     {Root\MttVDD}    
+                               ROOT\DISPLAY\0005 OK     {Root\MttVDD}    
+                               ROOT\DISPLAY\0006 OK     {Root\MttVDD}    
+
+
+
+[2025-08-17T16:37:55.608Z] Device query stderr: 
+[2025-08-17T16:37:55.608Z] MttVDD device found but driver not properly installed (missing name)
+[2025-08-17T16:37:55.609Z] Updating driver status: Not Installed (danger)
+[2025-08-17T16:37:57.752Z] Second status refresh after uninstall
+[2025-08-17T16:37:57.753Z] === DETECTING ACTUAL DRIVER STATUS ===
+[2025-08-17T16:37:57.753Z] Executing device query: powershell "Get-WmiObject -Class Win32_PnPEntity | Where-Object { $_.DeviceID -like '*MttVDD*' -or $_.Name -like '*Virtual Display*' -or $_.HardwareID -like '*MttVDD*' } | Select-Object Name, DeviceID, Status, HardwareID | Format-Table -AutoSize"
+[2025-08-17T16:37:58.606Z] Device query stdout: 
+Name                           DeviceID          Status HardwareID       
+----                           --------          ------ ----------       
+                               ROOT\DISPLAY\0001 OK     {Root\MttVDD}    
+Parsec Virtual Display Adapter ROOT\DISPLAY\0002 OK     {Root\Parsec\VDA}
+                               ROOT\DISPLAY\0003 OK     {Root\MttVDD}    
+                               ROOT\DISPLAY\0004 OK     {Root\MttVDD}    
+                               ROOT\DISPLAY\0005 OK     {Root\MttVDD}    
+                               ROOT\DISPLAY\0006 OK     {Root\MttVDD}    
+
+
+
+[2025-08-17T16:37:58.607Z] Device query stderr: 
+[2025-08-17T16:37:58.607Z] MttVDD device found but driver not properly installed (missing name)
+[2025-08-17T16:37:58.607Z] Updating driver status: Not Installed (danger)
+[2025-08-17T16:38:00.753Z] Final status refresh after uninstall
+[2025-08-17T16:38:00.754Z] === DETECTING ACTUAL DRIVER STATUS ===
+[2025-08-17T16:38:00.754Z] Executing device query: powershell "Get-WmiObject -Class Win32_PnPEntity | Where-Object { $_.DeviceID -like '*MttVDD*' -or $_.Name -like '*Virtual Display*' -or $_.HardwareID -like '*MttVDD*' } | Select-Object Name, DeviceID, Status, HardwareID | Format-Table -AutoSize"
+[2025-08-17T16:38:01.584Z] Device query stdout: 
+Name                           DeviceID          Status HardwareID       
+----                           --------          ------ ----------       
+                               ROOT\DISPLAY\0001 OK     {Root\MttVDD}    
+Parsec Virtual Display Adapter ROOT\DISPLAY\0002 OK     {Root\Parsec\VDA}
+                               ROOT\DISPLAY\0003 OK     {Root\MttVDD}    
+                               ROOT\DISPLAY\0004 OK     {Root\MttVDD}    
+                               ROOT\DISPLAY\0005 OK     {Root\MttVDD}    
+                               ROOT\DISPLAY\0006 OK     {Root\MttVDD}    
+
+
+
+[2025-08-17T16:38:01.587Z] Device query stderr: 
+[2025-08-17T16:38:01.587Z] MttVDD device found but driver not properly installed (missing name)
+[2025-08-17T16:38:01.588Z] Updating driver status: Not Installed (danger)
