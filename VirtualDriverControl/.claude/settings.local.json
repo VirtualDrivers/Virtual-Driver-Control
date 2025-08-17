@@ -4,7 +4,12 @@
       "Bash(npm start)",
       "Bash(npm run dev:*)",
       "Bash(rm:*)",
-      "WebFetch(domain:raw.githubusercontent.com)"
+      "WebFetch(domain:raw.githubusercontent.com)",
+      "Bash(npm install:*)",
+      "Bash(npm run build-portable:*)",
+      "Bash(npm run build:*)",
+      "Bash(sudo apt:*)",
+      "Bash(sudo apt install:*)"
     ],
     "deny": [],
     "ask": []
