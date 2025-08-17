@@ -1,0 +1,30 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(grep:*)",
+      "Bash(sed:*)",
+      "Bash(rg:*)",
+      "Bash(/home/mike/.nvm/versions/node/v22.14.0/lib/node_modules/@anthropic-ai/claude-code/vendor/ripgrep/x64-linux/rg -A 50 \"private async Task.*SendCommandToDriver\" \"/mnt/e/GitHub/Virtual-Driver-Control/VDD Control/VDD Control/MainWindow.cs\")",
+      "Bash(/home/mike/.nvm/versions/node/v22.14.0/lib/node_modules/@anthropic-ai/claude-code/vendor/ripgrep/x64-linux/rg -A 20 \"TryConnectToDriver\" \"/mnt/e/GitHub/Virtual-Driver-Control/VDD Control/VDD Control/MainWindow.cs\")",
+      "Bash(/home/mike/.nvm/versions/node/v22.14.0/lib/node_modules/@anthropic-ai/claude-code/vendor/ripgrep/x64-linux/rg -A 10 \"Toggle\" \"/mnt/e/GitHub/Virtual-Driver-Control/VDD Control/VDD Control/MainWindow.cs\")",
+      "Bash(/home/mike/.nvm/versions/node/v22.14.0/lib/node_modules/@anthropic-ai/claude-code/vendor/ripgrep/x64-linux/rg -A 20 \"hDRToolStripMenuItem_Click\" \"/mnt/e/GitHub/Virtual-Driver-Control/VDD Control/VDD Control/MainWindow.cs\")",
+      "Bash(/home/mike/.nvm/versions/node/v22.14.0/lib/node_modules/@anthropic-ai/claude-code/vendor/ripgrep/x64-linux/rg -l \"CommandToDriver\" \"/mnt/e/GitHub/Virtual-Driver-Control/VDD Control/VDD Control/MainWindow.cs\")",
+      "Bash(/home/mike/.nvm/versions/node/v22.14.0/lib/node_modules/@anthropic-ai/claude-code/vendor/ripgrep/x64-linux/rg -A 10 \"SetHDRCommand|SetEDIDCommand|SetLoggingCommand\" \"/mnt/e/GitHub/Virtual-Driver-Control/VDD Control/VDD Control/MainWindow.cs\")",
+      "Bash(mkdir:*)",
+      "Bash(dotnet build:*)",
+      "Bash(ls:*)",
+      "Bash(cp:*)",
+      "Bash(mv:*)",
+      "Bash(rm:*)",
+      "Bash(find:*)",
+      "Bash(cd \"/mnt/e/GitHub/Virtual-Driver-Control/VDD Control\")",
+      "Bash(ls -la)",
+      "Bash(cd \"/mnt/e/GitHub/Virtual-Driver-Control/VDD Control/PortableBuild\")",
+      "Bash(find \"/mnt/e/GitHub/Virtual-Driver-Control/VDD Control/VDD Control\" -name \"WebAssets\" -type d)",
+      "Bash(ls -la \"/mnt/e/GitHub/Virtual-Driver-Control/VDD Control/VDD Control/WebAssets\")",
+      "Bash(find \"/mnt/e/GitHub/Virtual-Driver-Control\" -name \"*Community*\" -type d)",
+      "Bash(find \"/mnt/e/GitHub/Virtual-Driver-Control\" -name \"*script*\" -type f)"
+    ],
+    "deny": []
+  }
+}
