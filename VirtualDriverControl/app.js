@@ -515,25 +515,25 @@ class VirtualDriverControl {
             this.setCheckboxFromXML(xmlDoc, 'hdr_advanced color_space enabled', 'advanced-gamma');
             this.setInputFromXML(xmlDoc, 'hdr_advanced color_space gamma_correction', 'gamma-correction');
             this.setSelectFromXML(xmlDoc, 'hdr_advanced color_space primary_color_space', 'primary-color-space');
-            this.setCheckboxFromXML(xmlDoc, 'hdr_advanced color_space enable_matrix_transform', 'enable-matrix-transform');
+            this.setCheckboxFromXML(xmlDoc, 'hdr_advanced color_space enable_matrix_transform', 'matrix-transform');
 
             // Auto Resolutions
-            this.setCheckboxFromXML(xmlDoc, 'auto_resolutions enabled', 'auto-resolution-generation');
+            this.setCheckboxFromXML(xmlDoc, 'auto_resolutions enabled', 'auto-resolutions');
             this.setSelectFromXML(xmlDoc, 'auto_resolutions source_priority', 'source-priority');
-            this.setInputFromXML(xmlDoc, 'auto_resolutions edid_mode_filtering min_refresh_rate', 'min-refresh-rate');
-            this.setInputFromXML(xmlDoc, 'auto_resolutions edid_mode_filtering max_refresh_rate', 'max-refresh-rate');
+            this.setInputFromXML(xmlDoc, 'auto_resolutions edid_mode_filtering min_refresh_rate', 'min-refresh');
+            this.setInputFromXML(xmlDoc, 'auto_resolutions edid_mode_filtering max_refresh_rate', 'max-refresh');
             this.setCheckboxFromXML(xmlDoc, 'auto_resolutions edid_mode_filtering exclude_fractional_rates', 'exclude-fractional-rates');
-            this.setInputFromXML(xmlDoc, 'auto_resolutions edid_mode_filtering min_resolution_width', 'min-resolution-width');
-            this.setInputFromXML(xmlDoc, 'auto_resolutions edid_mode_filtering min_resolution_height', 'min-resolution-height');
-            this.setInputFromXML(xmlDoc, 'auto_resolutions edid_mode_filtering max_resolution_width', 'max-resolution-width');
-            this.setInputFromXML(xmlDoc, 'auto_resolutions edid_mode_filtering max_resolution_height', 'max-resolution-height');
+            this.setInputFromXML(xmlDoc, 'auto_resolutions edid_mode_filtering min_resolution_width', 'min-width');
+            this.setInputFromXML(xmlDoc, 'auto_resolutions edid_mode_filtering min_resolution_height', 'min-height');
+            this.setInputFromXML(xmlDoc, 'auto_resolutions edid_mode_filtering max_resolution_width', 'max-width');
+            this.setInputFromXML(xmlDoc, 'auto_resolutions edid_mode_filtering max_resolution_height', 'max-height');
             this.setCheckboxFromXML(xmlDoc, 'auto_resolutions preferred_mode use_edid_preferred', 'use-edid-preferred');
             this.setInputFromXML(xmlDoc, 'auto_resolutions preferred_mode fallback_width', 'fallback-width');
             this.setInputFromXML(xmlDoc, 'auto_resolutions preferred_mode fallback_height', 'fallback-height');
             this.setInputFromXML(xmlDoc, 'auto_resolutions preferred_mode fallback_refresh', 'fallback-refresh');
 
             // Advanced Color Processing
-            this.setCheckboxFromXML(xmlDoc, 'color_advanced bit_depth_management auto_select_from_color_space', 'auto-select-bit-depth');
+            this.setCheckboxFromXML(xmlDoc, 'color_advanced bit_depth_management auto_select_from_color_space', 'auto-bit-depth');
             this.setInputFromXML(xmlDoc, 'color_advanced bit_depth_management force_bit_depth', 'force-bit-depth');
             this.setCheckboxFromXML(xmlDoc, 'color_advanced bit_depth_management fp16_surface_support', 'fp16-surface-support');
             this.setInputFromXML(xmlDoc, 'color_advanced color_format_extended sdr_white_level', 'sdr-white-level');
@@ -694,20 +694,20 @@ class VirtualDriverControl {
                     enabled: document.getElementById('advanced-gamma')?.checked || false,
                     gamma_correction: parseFloat(document.getElementById('gamma-correction')?.value) || 2.2,
                     primary_color_space: document.getElementById('primary-color-space')?.value || 'sRGB',
-                    enable_matrix_transform: document.getElementById('enable-matrix-transform')?.checked || false
+                    enable_matrix_transform: document.getElementById('matrix-transform')?.checked || false
                 }
             },
             auto_resolutions: {
-                enabled: document.getElementById('auto-resolution-generation')?.checked || false,
+                enabled: document.getElementById('auto-resolutions')?.checked || false,
                 source_priority: document.getElementById('source-priority')?.value || 'manual',
                 edid_mode_filtering: {
-                    min_refresh_rate: parseInt(document.getElementById('min-refresh-rate')?.value) || 24,
-                    max_refresh_rate: parseInt(document.getElementById('max-refresh-rate')?.value) || 240,
+                    min_refresh_rate: parseInt(document.getElementById('min-refresh')?.value) || 24,
+                    max_refresh_rate: parseInt(document.getElementById('max-refresh')?.value) || 240,
                     exclude_fractional_rates: document.getElementById('exclude-fractional-rates')?.checked || false,
-                    min_resolution_width: parseInt(document.getElementById('min-resolution-width')?.value) || 640,
-                    min_resolution_height: parseInt(document.getElementById('min-resolution-height')?.value) || 480,
-                    max_resolution_width: parseInt(document.getElementById('max-resolution-width')?.value) || 7680,
-                    max_resolution_height: parseInt(document.getElementById('max-resolution-height')?.value) || 4320
+                    min_resolution_width: parseInt(document.getElementById('min-width')?.value) || 640,
+                    min_resolution_height: parseInt(document.getElementById('min-height')?.value) || 480,
+                    max_resolution_width: parseInt(document.getElementById('max-width')?.value) || 7680,
+                    max_resolution_height: parseInt(document.getElementById('max-height')?.value) || 4320
                 },
                 preferred_mode: {
                     use_edid_preferred: document.getElementById('use-edid-preferred')?.checked || false,
@@ -718,7 +718,7 @@ class VirtualDriverControl {
             },
             color_advanced: {
                 bit_depth_management: {
-                    auto_select_from_color_space: document.getElementById('auto-select-bit-depth')?.checked || false,
+                    auto_select_from_color_space: document.getElementById('auto-bit-depth')?.checked || false,
                     force_bit_depth: parseInt(document.getElementById('force-bit-depth')?.value) || 8,
                     fp16_surface_support: document.getElementById('fp16-surface-support')?.checked || true
                 },
