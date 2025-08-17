@@ -2022,10 +2022,10 @@ class VirtualDriverControl {
                                 VDD (${versionData.version})
                                 ${releaseTagHtml}
                             </div>
+                            ${versionData.description ? `<div class="version-description">${versionData.description}</div>` : ''}
                             <div class="version-platforms">
                                 ${platformsHtml}
                             </div>
-                            ${versionData.description ? `<div class="version-description">${versionData.description}</div>` : ''}
                         </div>
                         <div class="version-status ${statusClass}">
                             <i class="fas fa-${statusIcon}"></i>
