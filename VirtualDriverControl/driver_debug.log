@@ -942,3 +942,81 @@ Parsec Virtual Display Adapter ROOT\DISPLAY\0002 OK     {Root\Parsec\VDA}
 [2025-08-17T16:38:01.587Z] Device query stderr: 
 [2025-08-17T16:38:01.587Z] MttVDD device found but driver not properly installed (missing name)
 [2025-08-17T16:38:01.588Z] Updating driver status: Not Installed (danger)
+[2025-08-17T17:52:03.834Z] === DETECTING ACTUAL DRIVER STATUS ===
+[2025-08-17T17:52:03.834Z] Executing device query: powershell "Get-WmiObject -Class Win32_PnPEntity | Where-Object { $_.DeviceID -like '*MttVDD*' -or $_.Name -like '*Virtual Display*' -or $_.HardwareID -like '*MttVDD*' } | Select-Object Name, DeviceID, Status, HardwareID | Format-Table -AutoSize"
+[2025-08-17T17:52:04.781Z] Device query stdout: 
+Name                           DeviceID          Status HardwareID       
+----                           --------          ------ ----------       
+Virtual Display Driver         ROOT\DISPLAY\0001 OK     {root\mttvdd}    
+Parsec Virtual Display Adapter ROOT\DISPLAY\0002 OK     {Root\Parsec\VDA}
+
+
+
+[2025-08-17T17:52:04.781Z] Device query stderr: 
+[2025-08-17T17:52:04.782Z] MttVDD driver not found in Device Manager
+[2025-08-17T17:52:04.782Z] Updating driver status: Not Installed (danger)
+[2025-08-17T17:52:06.248Z] === DETECTING ACTUAL DRIVER STATUS ===
+[2025-08-17T17:52:06.249Z] Executing device query: powershell "Get-WmiObject -Class Win32_PnPEntity | Where-Object { $_.DeviceID -like '*MttVDD*' -or $_.Name -like '*Virtual Display*' -or $_.HardwareID -like '*MttVDD*' } | Select-Object Name, DeviceID, Status, HardwareID | Format-Table -AutoSize"
+[2025-08-17T17:52:06.904Z] Device query stdout: 
+Name                           DeviceID          Status HardwareID       
+----                           --------          ------ ----------       
+Virtual Display Driver         ROOT\DISPLAY\0001 OK     {root\mttvdd}    
+Parsec Virtual Display Adapter ROOT\DISPLAY\0002 OK     {Root\Parsec\VDA}
+
+
+
+[2025-08-17T17:52:06.905Z] Device query stderr: 
+[2025-08-17T17:52:06.905Z] MttVDD driver not found in Device Manager
+[2025-08-17T17:52:06.905Z] Updating driver status: Not Installed (danger)
+[2025-08-17T17:55:08.589Z] === DETECTING ACTUAL DRIVER STATUS ===
+[2025-08-17T17:55:08.589Z] Executing device query: powershell "Get-WmiObject -Class Win32_PnPEntity | Where-Object { $_.DeviceID -like '*MttVDD*' -or $_.Name -like '*Virtual Display*' -or $_.HardwareID -like '*MttVDD*' } | Select-Object Name, DeviceID, Status, HardwareID | Format-Table -AutoSize"
+[2025-08-17T17:55:09.489Z] Device query stdout: 
+Name                           DeviceID          Status HardwareID       
+----                           --------          ------ ----------       
+Virtual Display Driver         ROOT\DISPLAY\0001 OK     {root\mttvdd}    
+Parsec Virtual Display Adapter ROOT\DISPLAY\0002 OK     {Root\Parsec\VDA}
+
+
+
+[2025-08-17T17:55:09.489Z] Device query stderr: 
+[2025-08-17T17:55:09.490Z] MttVDD driver not found in Device Manager
+[2025-08-17T17:55:09.490Z] Updating driver status: Not Installed (danger)
+[2025-08-17T17:55:12.166Z] === DETECTING ACTUAL DRIVER STATUS ===
+[2025-08-17T17:55:12.167Z] Executing device query: powershell "Get-WmiObject -Class Win32_PnPEntity | Where-Object { $_.DeviceID -like '*MttVDD*' -or $_.Name -like '*Virtual Display*' -or $_.HardwareID -like '*MttVDD*' } | Select-Object Name, DeviceID, Status, HardwareID | Format-Table -AutoSize"
+[2025-08-17T17:55:12.833Z] Device query stdout: 
+Name                           DeviceID          Status HardwareID       
+----                           --------          ------ ----------       
+Virtual Display Driver         ROOT\DISPLAY\0001 OK     {root\mttvdd}    
+Parsec Virtual Display Adapter ROOT\DISPLAY\0002 OK     {Root\Parsec\VDA}
+
+
+
+[2025-08-17T17:55:12.833Z] Device query stderr: 
+[2025-08-17T17:55:12.834Z] MttVDD driver not found in Device Manager
+[2025-08-17T17:55:12.834Z] Updating driver status: Not Installed (danger)
+[2025-08-17T17:56:45.423Z] === DETECTING ACTUAL DRIVER STATUS ===
+[2025-08-17T17:56:45.424Z] Executing device query: powershell "Get-WmiObject -Class Win32_PnPEntity | Where-Object { $_.DeviceID -like '*MttVDD*' -or $_.Name -like '*Virtual Display*' -or $_.HardwareID -like '*MttVDD*' } | Select-Object Name, DeviceID, Status, HardwareID | Format-Table -AutoSize"
+[2025-08-17T17:56:46.307Z] Device query stdout: 
+Name                           DeviceID          Status HardwareID       
+----                           --------          ------ ----------       
+Virtual Display Driver         ROOT\DISPLAY\0001 OK     {root\mttvdd}    
+Parsec Virtual Display Adapter ROOT\DISPLAY\0002 OK     {Root\Parsec\VDA}
+
+
+
+[2025-08-17T17:56:46.307Z] Device query stderr: 
+[2025-08-17T17:56:46.307Z] MttVDD driver not found in Device Manager
+[2025-08-17T17:56:46.308Z] Updating driver status: Not Installed (danger)
+[2025-08-17T17:56:49.815Z] === DETECTING ACTUAL DRIVER STATUS ===
+[2025-08-17T17:56:49.816Z] Executing device query: powershell "Get-WmiObject -Class Win32_PnPEntity | Where-Object { $_.DeviceID -like '*MttVDD*' -or $_.Name -like '*Virtual Display*' -or $_.HardwareID -like '*MttVDD*' } | Select-Object Name, DeviceID, Status, HardwareID | Format-Table -AutoSize"
+[2025-08-17T17:56:50.535Z] Device query stdout: 
+Name                           DeviceID          Status HardwareID       
+----                           --------          ------ ----------       
+Virtual Display Driver         ROOT\DISPLAY\0001 OK     {root\mttvdd}    
+Parsec Virtual Display Adapter ROOT\DISPLAY\0002 OK     {Root\Parsec\VDA}
+
+
+
+[2025-08-17T17:56:50.535Z] Device query stderr: 
+[2025-08-17T17:56:50.535Z] MttVDD driver not found in Device Manager
+[2025-08-17T17:56:50.536Z] Updating driver status: Not Installed (danger)

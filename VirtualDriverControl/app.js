@@ -2335,44 +2335,7 @@ class VirtualDriverControl {
                 }
             }
             
-            // Method 2: Parse text content for version patterns
-            const rootText = xmlDoc.documentElement.textContent || '';
-            const lines = rootText.split('\n').map(line => line.trim()).filter(line => line.length > 0);
-            
-            for (const line of lines) {
-                // Look for version patterns in the text
-                const versionMatch = line.match(/(\d{2}\.\d{1,2}\.\d{1,2})/);
-                if (versionMatch && !versions.some(v => v.version === versionMatch[1])) {
-                    // Try to extract URL from the same line
-                    const urlMatch = line.match(/(https?:\/\/[^\s]+)/);
-                    
-                    // Extract description (everything after the URL or version)
-                    let description = line;
-                    if (urlMatch) {
-                        description = line.split(urlMatch[0])[1]?.trim() || '';
-                    } else if (versionMatch) {
-                        description = line.split(versionMatch[0])[1]?.trim() || '';
-                    }
-                    
-                    // Clean up description
-                    description = description.replace(/^[•\-\s]+/, '').trim();
-                    
-                    const releaseType = this.detectReleaseTypeFromText(line || description);
-                    
-                    versions.push({
-                        version: versionMatch[1],
-                        downloadUrl: urlMatch ? urlMatch[1] : null,
-                        description: description || null,
-                        platform: line.includes('x64') ? 'x64' : 
-                                 line.includes('ARM64') ? 'ARM64' : 
-                                 line.includes('x86') ? 'x86' : 'x64',
-                        releaseType: releaseType,
-                        source: 'text parsing'
-                    });
-                }
-            }
-            
-            // Method 3: Look for any elements with version-like text content
+            // Method 2: Look for any elements with version-like text content (fallback only)
             if (versions.length === 0) {
                 const allElements = xmlDoc.querySelectorAll('*');
                 allElements.forEach(element => {

@@ -3,7 +3,8 @@
     "allow": [
       "Bash(npm start)",
       "Bash(npm run dev:*)",
-      "Bash(rm:*)"
+      "Bash(rm:*)",
+      "WebFetch(domain:raw.githubusercontent.com)"
     ],
     "deny": [],
     "ask": []
