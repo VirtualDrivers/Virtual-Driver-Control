@@ -1,0 +1,82 @@
+[2025-08-17T14:14:56.279Z] === STOP DRIVER FUNCTION CALLED ===
+[2025-08-17T14:14:56.280Z] Platform: win32
+[2025-08-17T14:14:56.280Z] Checking nefconw.exe at: C:\VirtualDisplayDriver\nefconw.exe
+[2025-08-17T14:14:56.281Z] nefconw.exe exists: false
+[2025-08-17T14:14:56.281Z] Checking devcon.exe at: C:\VirtualDisplayDriver\EDID\devcon.exe
+[2025-08-17T14:14:56.281Z] devcon.exe exists: false
+[2025-08-17T14:14:56.282Z] ERROR: Neither nefconw.exe nor devcon.exe found
+[2025-08-17T14:14:59.159Z] === START DRIVER FUNCTION CALLED ===
+[2025-08-17T14:14:59.160Z] Platform: win32
+[2025-08-17T14:14:59.160Z] Checking nefconw.exe at: C:\VirtualDisplayDriver\nefconw.exe
+[2025-08-17T14:14:59.160Z] nefconw.exe exists: false
+[2025-08-17T14:14:59.161Z] Checking devcon.exe at: C:\VirtualDisplayDriver\EDID\devcon.exe
+[2025-08-17T14:14:59.161Z] devcon.exe exists: false
+[2025-08-17T14:14:59.162Z] ERROR: Neither nefconw.exe nor devcon.exe found
+[2025-08-17T14:15:00.549Z] === UNINSTALL DRIVER FUNCTION CALLED ===
+[2025-08-17T14:15:01.582Z] User confirmed uninstall, proceeding...
+[2025-08-17T14:15:01.582Z] Node.js access available
+[2025-08-17T14:15:01.583Z] Platform: win32
+[2025-08-17T14:15:01.583Z] Running on Windows, proceeding with nefconw
+[2025-08-17T14:15:01.583Z] Checking nefconw path: C:\VirtualDisplayDriver\nefconw.exe
+[2025-08-17T14:15:01.583Z] nefconw.exe exists: false
+[2025-08-17T14:15:01.584Z] ERROR: nefconw.exe not found
+[2025-08-17T14:15:08.280Z] === REINSTALL DRIVER FUNCTION CALLED ===
+[2025-08-17T14:15:08.280Z] Platform: win32
+[2025-08-17T14:15:08.281Z] Checking nefconw.exe at: C:\VirtualDisplayDriver\nefconw.exe
+[2025-08-17T14:15:08.281Z] nefconw.exe exists: false
+[2025-08-17T14:15:08.282Z] ERROR: nefconw.exe not found
+[2025-08-17T14:17:53.335Z] === UNINSTALL DRIVER FUNCTION CALLED ===
+[2025-08-17T14:17:54.599Z] User confirmed uninstall, proceeding...
+[2025-08-17T14:17:54.600Z] Node.js access available
+[2025-08-17T14:17:54.601Z] Platform: win32
+[2025-08-17T14:17:54.601Z] Running on Windows, proceeding with nefconw
+[2025-08-17T14:17:54.601Z] Checking nefconw path: C:\VirtualDisplayDriver\EDID\nefconw.exe
+[2025-08-17T14:17:54.602Z] nefconw.exe exists: true
+[2025-08-17T14:17:54.602Z] nefconw.exe found, proceeding with removal...
+[2025-08-17T14:17:54.602Z] Attempting to remove driver with nefconw...
+[2025-08-17T14:17:54.603Z] Executing command: "C:\VirtualDisplayDriver\EDID\nefconw.exe" --remove-device-node --hardware-id Root\MttVDD --class-guid 4d36e968-e325-11ce-bfc1-08002be10318
+[2025-08-17T14:17:54.667Z] Command execution failed: Command failed: "C:\VirtualDisplayDriver\EDID\nefconw.exe" --remove-device-node --hardware-id Root\MttVDD --class-guid 4d36e968-e325-11ce-bfc1-08002be10318
+
+[2025-08-17T14:17:54.667Z] Error stdout: 2025-08-17 07:17:54,661 ERROR [default] This command requires elevated privileges. Please run as Administrator and make sure the UAC is enabled.
+This command requires elevated privileges. Please run as Administrator and make sure the UAC is enabled.
+
+[2025-08-17T14:17:54.668Z] Error stderr: none
+[2025-08-17T14:17:54.668Z] Error code: 1
+[2025-08-17T14:17:54.668Z] Listing devices to help debug the issue...
+[2025-08-17T14:18:15.630Z] === REINSTALL DRIVER FUNCTION CALLED ===
+[2025-08-17T14:18:15.631Z] Platform: win32
+[2025-08-17T14:18:15.632Z] Checking nefconw.exe at: C:\VirtualDisplayDriver\EDID\nefconw.exe
+[2025-08-17T14:18:15.632Z] nefconw.exe exists: true
+[2025-08-17T14:18:15.632Z] Checking driver directory at: C:\VirtualDisplayDriver\Driver Files\VDD x86 x64
+[2025-08-17T14:18:15.633Z] Driver directory exists: true
+[2025-08-17T14:18:15.634Z] Checking INF file at: C:\VirtualDisplayDriver\Driver Files\VDD x86 x64\MttVDD.inf
+[2025-08-17T14:18:15.635Z] INF file exists: true
+[2025-08-17T14:18:15.635Z] All files found, proceeding with reinstall...
+[2025-08-17T14:18:15.636Z] Step 1: Removing existing device node
+[2025-08-17T14:18:15.636Z] Executing command: "C:\VirtualDisplayDriver\EDID\nefconw.exe" --remove-device-node --hardware-id Root\MttVDD --class-guid 4d36e968-e325-11ce-bfc1-08002be10318
+[2025-08-17T14:18:15.683Z] Command execution failed: Command failed: "C:\VirtualDisplayDriver\EDID\nefconw.exe" --remove-device-node --hardware-id Root\MttVDD --class-guid 4d36e968-e325-11ce-bfc1-08002be10318
+
+[2025-08-17T14:18:15.684Z] Error stdout: 2025-08-17 07:18:15,678 ERROR [default] This command requires elevated privileges. Please run as Administrator and make sure the UAC is enabled.
+This command requires elevated privileges. Please run as Administrator and make sure the UAC is enabled.
+
+[2025-08-17T14:18:15.685Z] Error stderr: none
+[2025-08-17T14:18:15.685Z] Error code: 1
+[2025-08-17T14:18:15.685Z] Listing devices to help debug the issue...
+[2025-08-17T15:03:10.980Z] === UNINSTALL DRIVER FUNCTION CALLED ===
+[2025-08-17T15:03:12.049Z] User confirmed uninstall, proceeding...
+[2025-08-17T15:03:12.050Z] Node.js access available
+[2025-08-17T15:03:12.050Z] Platform: win32
+[2025-08-17T15:03:12.050Z] Running on Windows, proceeding with nefconw
+[2025-08-17T15:03:12.051Z] Checking nefconw path: C:\VirtualDisplayDriver\EDID\nefconw.exe
+[2025-08-17T15:03:12.051Z] nefconw.exe exists: true
+[2025-08-17T15:03:12.051Z] nefconw.exe found, proceeding with removal...
+[2025-08-17T15:03:12.052Z] Attempting to remove driver with nefconw...
+[2025-08-17T15:03:12.052Z] Executing command: "C:\VirtualDisplayDriver\EDID\nefconw.exe" --remove-device-node --hardware-id Root\MttVDD --class-guid 4d36e968-e325-11ce-bfc1-08002be10318
+[2025-08-17T15:03:12.105Z] Command execution failed: Command failed: "C:\VirtualDisplayDriver\EDID\nefconw.exe" --remove-device-node --hardware-id Root\MttVDD --class-guid 4d36e968-e325-11ce-bfc1-08002be10318
+
+[2025-08-17T15:03:12.105Z] Error stdout: 2025-08-17 08:03:12,099 ERROR [default] This command requires elevated privileges. Please run as Administrator and make sure the UAC is enabled.
+This command requires elevated privileges. Please run as Administrator and make sure the UAC is enabled.
+
+[2025-08-17T15:03:12.105Z] Error stderr: none
+[2025-08-17T15:03:12.106Z] Error code: 1
+[2025-08-17T15:03:12.106Z] Listing devices to help debug the issue...

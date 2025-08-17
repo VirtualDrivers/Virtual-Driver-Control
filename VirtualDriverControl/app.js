@@ -1,6 +1,28 @@
 // Virtual Driver Control - Clean WinUI3 Implementation
 
 class VirtualDriverControl {
+    
+    // Logging function to write to file
+    logToFile(message) {
+        try {
+            const fs = window.require('fs');
+            const path = window.require('path');
+            const os = window.require('os');
+            
+            const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+            const logMessage = `[${new Date().toISOString()}] ${message}\n`;
+            
+            // Write to a log file in the app directory
+            const logPath = path.join(__dirname, 'driver_debug.log');
+            fs.appendFileSync(logPath, logMessage);
+            
+            // Also log to console
+            console.log(message);
+        } catch (error) {
+            console.error('Failed to write to log file:', error);
+            console.log(message);
+        }
+    }
     constructor() {
         this.currentTheme = 'light';
         // Remove any mode-related classes from body
@@ -19,6 +41,7 @@ class VirtualDriverControl {
         this.setupResolutions();
         this.setupEDIDUpload();
         this.setupColorCustomization();
+        this.setupMonitorCountListener();
         await this.loadSettings();
         
         // Apply colors to initially active navigation item
@@ -786,6 +809,7 @@ class VirtualDriverControl {
 
     // Setup export/import functionality
     setupFileOperations() {
+        console.log('Setting up file operations...');
         const saveBtn = document.getElementById('save-btn');
         const loadBtn = document.getElementById('load-btn');
         const saveReloadDriverBtn = document.getElementById('save-reload-driver-btn');
@@ -831,19 +855,6 @@ class VirtualDriverControl {
             });
         }
 
-        const stopDriverBtn = document.getElementById('stop-driver-btn');
-        if (stopDriverBtn) {
-            stopDriverBtn.addEventListener('click', () => {
-                this.stopDriver();
-            });
-        }
-
-        const startDriverBtn = document.getElementById('start-driver-btn');
-        if (startDriverBtn) {
-            startDriverBtn.addEventListener('click', () => {
-                this.startDriver();
-            });
-        }
 
         const uninstallDriverBtn = document.getElementById('uninstall-driver-btn');
         if (uninstallDriverBtn) {
@@ -864,6 +875,17 @@ class VirtualDriverControl {
         if (openLogFolderBtn) {
             openLogFolderBtn.addEventListener('click', () => {
                 this.openLogFolder();
+            });
+        }
+    }
+
+    // Setup monitor count change listener
+    setupMonitorCountListener() {
+        const monitorCountInput = document.getElementById('monitor-count');
+        if (monitorCountInput) {
+            monitorCountInput.addEventListener('change', () => {
+                // Update driver status display when monitor count changes
+                this.detectVirtualDisplays();
             });
         }
     }
@@ -1152,6 +1174,63 @@ class VirtualDriverControl {
         }
     }
 
+    // List devices to help debug driver management issues
+    async listDevices() {
+        try {
+            if (typeof window !== 'undefined' && window.require) {
+                const { exec } = window.require('child_process');
+                const fs = window.require('fs');
+                const util = window.require('util');
+                const execPromise = util.promisify(exec);
+                
+                const nefconPath = 'C:\\VirtualDisplayDriver\\EDID\\nefconw.exe';
+                const devconPath = 'C:\\VirtualDisplayDriver\\EDID\\devcon.exe';
+                
+                if (fs.existsSync(nefconPath)) {
+                    console.log('Found nefconw.exe at:', nefconPath);
+                } else if (fs.existsSync(devconPath)) {
+                    console.log('Found devcon.exe at:', devconPath);
+                } else {
+                    console.error('Neither nefconw.exe nor devcon.exe found');
+                    return;
+                }
+                
+                // Use devcon for device listing (nefconw doesn't have find command)
+                const toolPath = fs.existsSync(devconPath) ? devconPath : nefconPath;
+                
+                console.log('Listing all devices containing "Mtt" or "VDD":');
+                
+                // Only use devcon for device listing if available
+                if (fs.existsSync(devconPath)) {
+                    try {
+                        const { stdout } = await execPromise(`"${devconPath}" find "*Mtt*"`);
+                        console.log('Devices with "Mtt":', stdout);
+                    } catch (error) {
+                        console.log('No devices found with "Mtt"');
+                    }
+                    
+                    try {
+                        const { stdout } = await execPromise(`"${devconPath}" find "*VDD*"`);
+                        console.log('Devices with "VDD":', stdout);
+                    } catch (error) {
+                        console.log('No devices found with "VDD"');
+                    }
+                    
+                    try {
+                        const { stdout } = await execPromise(`"${devconPath}" find "*Virtual*Display*"`);
+                        console.log('Virtual Display devices:', stdout);
+                    } catch (error) {
+                        console.log('No Virtual Display devices found');
+                    }
+                } else {
+                    console.log('DevCon not available for device listing, using nefconw.exe for operations');
+                }
+            }
+        } catch (error) {
+            console.error('Error listing devices:', error);
+        }
+    }
+
     // Send command to driver via named pipe
     async sendPipeCommand(command) {
         return new Promise((resolve, reject) => {
@@ -1211,6 +1290,9 @@ class VirtualDriverControl {
         try {
             console.log('Refreshing system status...');
             
+            // List devices for debugging
+            await this.listDevices();
+            
             // Re-run all detection methods
             await this.detectVirtualDisplays();
             await this.detectIddCxVersion();
@@ -1224,160 +1306,175 @@ class VirtualDriverControl {
         }
     }
 
-    // Stop/disable the virtual display driver
-    async stopDriver() {
-        try {
-            this.showNotification('Stopping virtual display driver...', 'info');
-            
-            if (typeof window !== 'undefined' && window.require) {
-                const { exec } = window.require('child_process');
-                const util = window.require('util');
-                const execPromise = util.promisify(exec);
-                
-                if (process.platform === 'win32') {
-                    try {
-                        const devconPath = 'C:\\VirtualDisplayDriver\\EDID\\devcon.exe';
-                        await execPromise(`"${devconPath}" disable "Root\\MttVDD"`);
-                        
-                        this.showNotification('Virtual display driver stopped successfully', 'success');
-                        console.log('Driver stopped successfully');
-                        
-                        // Refresh status
-                        setTimeout(() => this.refreshSystemStatus(), 1000);
-                        
-                    } catch (devconError) {
-                        console.error('DevCon disable failed:', devconError);
-                        this.showNotification('Failed to stop driver. Please run as administrator.', 'error');
-                    }
-                } else {
-                    this.showNotification('Driver management is only supported on Windows', 'warning');
-                }
-            } else {
-                this.showNotification('Driver management requires elevated permissions', 'warning');
-            }
-        } catch (error) {
-            this.showNotification('Error stopping driver', 'error');
-            console.error('Stop driver error:', error);
-        }
-    }
 
-    // Start/enable the virtual display driver
-    async startDriver() {
-        try {
-            this.showNotification('Starting virtual display driver...', 'info');
-            
-            if (typeof window !== 'undefined' && window.require) {
-                const { exec } = window.require('child_process');
-                const util = window.require('util');
-                const execPromise = util.promisify(exec);
-                
-                if (process.platform === 'win32') {
-                    try {
-                        const devconPath = 'C:\\VirtualDisplayDriver\\EDID\\devcon.exe';
-                        await execPromise(`"${devconPath}" enable "Root\\MttVDD"`);
-                        
-                        this.showNotification('Virtual display driver started successfully', 'success');
-                        console.log('Driver started successfully');
-                        
-                        // Refresh status
-                        setTimeout(() => this.refreshSystemStatus(), 1000);
-                        
-                    } catch (devconError) {
-                        console.error('DevCon enable failed:', devconError);
-                        this.showNotification('Failed to start driver. Please run as administrator.', 'error');
-                    }
-                } else {
-                    this.showNotification('Driver management is only supported on Windows', 'warning');
-                }
-            } else {
-                this.showNotification('Driver management requires elevated permissions', 'warning');
-            }
-        } catch (error) {
-            this.showNotification('Error starting driver', 'error');
-            console.error('Start driver error:', error);
-        }
-    }
 
     // Uninstall the virtual display driver
     async uninstallDriver() {
         try {
+            this.logToFile('=== UNINSTALL DRIVER FUNCTION CALLED ===');
+            
             // Show confirmation dialog
             const confirmed = confirm('Are you sure you want to uninstall the Virtual Display Driver? This will remove the driver from your system.');
             
             if (!confirmed) {
+                this.logToFile('User cancelled uninstall');
                 return;
             }
             
-            this.showNotification('Uninstalling virtual display driver...', 'info');
+            this.logToFile('User confirmed uninstall, proceeding...');
             
             if (typeof window !== 'undefined' && window.require) {
+                this.logToFile('Node.js access available');
                 const { exec } = window.require('child_process');
+                const fs = window.require('fs');
                 const util = window.require('util');
                 const execPromise = util.promisify(exec);
                 
+                this.logToFile(`Platform: ${process.platform}`);
+                
                 if (process.platform === 'win32') {
+                    this.logToFile('Running on Windows, proceeding with nefconw');
                     try {
-                        const devconPath = 'C:\\VirtualDisplayDriver\\EDID\\devcon.exe';
-                        await execPromise(`"${devconPath}" remove "Root\\MttVDD"`);
+                        const nefconPath = 'C:\\VirtualDisplayDriver\\EDID\\nefconw.exe';
+                        this.logToFile(`Checking nefconw path: ${nefconPath}`);
                         
-                        this.showNotification('Virtual display driver uninstalled successfully', 'success');
-                        console.log('Driver uninstalled successfully');
+                        const nefconExists = fs.existsSync(nefconPath);
+                        this.logToFile(`nefconw.exe exists: ${nefconExists}`);
+                        
+                        if (!nefconExists) {
+                            this.logToFile('ERROR: nefconw.exe not found');
+                            return;
+                        }
+                        this.logToFile('nefconw.exe found, proceeding with removal...');
+                        
+                        this.logToFile('Attempting to remove driver with nefconw...');
+                        
+                        const removeCmd = `"${nefconPath}" --remove-device-node --hardware-id Root\\MttVDD --class-guid 4d36e968-e325-11ce-bfc1-08002be10318`;
+                        this.logToFile(`Executing command: ${removeCmd}`);
+                        
+                        const result = await execPromise(removeCmd);
+                        this.logToFile(`Command stdout: ${result.stdout}`);
+                        this.logToFile(`Command stderr: ${result.stderr}`);
+                        this.logToFile('Driver uninstalled successfully with nefconw');
                         
                         // Refresh status
                         setTimeout(() => this.refreshSystemStatus(), 2000);
                         
-                    } catch (devconError) {
-                        console.error('DevCon remove failed:', devconError);
-                        this.showNotification('Failed to uninstall driver. Please run as administrator.', 'error');
+                    } catch (commandError) {
+                        this.logToFile(`Command execution failed: ${commandError.message}`);
+                        this.logToFile(`Error stdout: ${commandError.stdout || 'none'}`);
+                        this.logToFile(`Error stderr: ${commandError.stderr || 'none'}`);
+                        this.logToFile(`Error code: ${commandError.code || 'none'}`);
+                        this.logToFile('Listing devices to help debug the issue...');
+                        await this.listDevices();
                     }
                 } else {
-                    this.showNotification('Driver management is only supported on Windows', 'warning');
+                    this.logToFile('WARNING: Driver management is only supported on Windows');
                 }
             } else {
-                this.showNotification('Driver management requires elevated permissions', 'warning');
+                this.logToFile('WARNING: Driver management requires elevated permissions');
             }
         } catch (error) {
-            this.showNotification('Error uninstalling driver', 'error');
-            console.error('Uninstall driver error:', error);
+            this.logToFile(`Uninstall driver error: ${error.message}`);
         }
     }
 
     // Reinstall the virtual display driver
     async reinstallDriver() {
         try {
-            this.showNotification('Reinstalling virtual display driver...', 'info');
+            this.logToFile('=== REINSTALL DRIVER FUNCTION CALLED ===');
             
             if (typeof window !== 'undefined' && window.require) {
                 const { exec } = window.require('child_process');
+                const fs = window.require('fs');
                 const util = window.require('util');
                 const execPromise = util.promisify(exec);
                 
+                this.logToFile(`Platform: ${process.platform}`);
+                
                 if (process.platform === 'win32') {
                     try {
-                        const devconPath = 'C:\\VirtualDisplayDriver\\EDID\\devcon.exe';
-                        const infPath = 'C:\\VirtualDisplayDriver\\Driver Files\\VDD x86 x64\\MttVDD.inf';
+                        const nefconPath = 'C:\\VirtualDisplayDriver\\EDID\\nefconw.exe';
+                        const driverDir = 'C:\\VirtualDisplayDriver\\Driver Files\\VDD x86 x64';
+                        const infPath = `${driverDir}\\MttVDD.inf`;
                         
-                        await execPromise(`"${devconPath}" install "${infPath}" "Root\\MttVDD"`);
+                        // Check if files exist
+                        this.logToFile(`Checking nefconw.exe at: ${nefconPath}`);
+                        const nefconExists = fs.existsSync(nefconPath);
+                        this.logToFile(`nefconw.exe exists: ${nefconExists}`);
                         
-                        this.showNotification('Virtual display driver reinstalled successfully', 'success');
-                        console.log('Driver reinstalled successfully');
+                        if (!nefconExists) {
+                            this.logToFile('ERROR: nefconw.exe not found');
+                            return;
+                        }
+                        
+                        this.logToFile(`Checking driver directory at: ${driverDir}`);
+                        const driverDirExists = fs.existsSync(driverDir);
+                        this.logToFile(`Driver directory exists: ${driverDirExists}`);
+                        
+                        if (!driverDirExists) {
+                            this.logToFile('ERROR: Driver directory not found');
+                            return;
+                        }
+                        
+                        this.logToFile(`Checking INF file at: ${infPath}`);
+                        const infExists = fs.existsSync(infPath);
+                        this.logToFile(`INF file exists: ${infExists}`);
+                        
+                        if (!infExists) {
+                            this.logToFile('ERROR: Driver INF file not found');
+                            return;
+                        }
+                        
+                        this.logToFile('All files found, proceeding with reinstall...');
+                        
+                        // Step 1: Remove existing device node
+                        this.logToFile('Step 1: Removing existing device node');
+                        const removeCmd = `"${nefconPath}" --remove-device-node --hardware-id Root\\MttVDD --class-guid 4d36e968-e325-11ce-bfc1-08002be10318`;
+                        this.logToFile(`Executing command: ${removeCmd}`);
+                        const removeResult = await execPromise(removeCmd);
+                        this.logToFile(`Remove stdout: ${removeResult.stdout}`);
+                        this.logToFile(`Remove stderr: ${removeResult.stderr}`);
+                        this.logToFile('Existing device node removed');
+                        
+                        // Step 2: Create new device node
+                        this.logToFile('Step 2: Creating new device node');
+                        const createCmd = `"${nefconPath}" --create-device-node --hardware-id Root\\MttVDD --class-name Display --class-guid 4D36E968-E325-11CE-BFC1-08002BE10318`;
+                        this.logToFile(`Executing command: ${createCmd}`);
+                        const createResult = await execPromise(createCmd);
+                        this.logToFile(`Create stdout: ${createResult.stdout}`);
+                        this.logToFile(`Create stderr: ${createResult.stderr}`);
+                        this.logToFile('New device node created');
+                        
+                        // Step 3: Install driver
+                        this.logToFile('Step 3: Installing driver');
+                        const installCmd = `"${nefconPath}" --install-driver --inf-path "${infPath}"`;
+                        this.logToFile(`Executing command: ${installCmd}`);
+                        const installResult = await execPromise(installCmd);
+                        this.logToFile(`Install stdout: ${installResult.stdout}`);
+                        this.logToFile(`Install stderr: ${installResult.stderr}`);
+                        
+                        this.logToFile('Driver reinstalled successfully');
                         
                         // Refresh status
                         setTimeout(() => this.refreshSystemStatus(), 2000);
                         
-                    } catch (devconError) {
-                        console.error('DevCon install failed:', devconError);
-                        this.showNotification('Failed to reinstall driver. Please run as administrator.', 'error');
+                    } catch (commandError) {
+                        this.logToFile(`Command execution failed: ${commandError.message}`);
+                        this.logToFile(`Error stdout: ${commandError.stdout || 'none'}`);
+                        this.logToFile(`Error stderr: ${commandError.stderr || 'none'}`);
+                        this.logToFile(`Error code: ${commandError.code || 'none'}`);
+                        this.logToFile('Listing devices to help debug the issue...');
+                        await this.listDevices();
                     }
                 } else {
-                    this.showNotification('Driver management is only supported on Windows', 'warning');
+                    this.logToFile('WARNING: Driver management is only supported on Windows');
                 }
             } else {
-                this.showNotification('Driver management requires elevated permissions', 'warning');
+                this.logToFile('WARNING: Driver management requires elevated permissions');
             }
         } catch (error) {
-            this.showNotification('Error reinstalling driver', 'error');
-            console.error('Reinstall driver error:', error);
+            this.logToFile(`Reinstall driver error: ${error.message}`);
         }
     }
 
@@ -1440,6 +1537,14 @@ class VirtualDriverControl {
     // Detect virtual display count
     async detectVirtualDisplays() {
         try {
+            // First, try to read monitor count from XML configuration
+            const configuredCount = await this.getConfiguredMonitorCount();
+            if (configuredCount > 0) {
+                this.updateVirtualDisplayCount(configuredCount, false);
+                return configuredCount;
+            }
+
+            // Fallback: try to detect from system if XML config not available
             if (typeof window !== 'undefined' && window.require) {
                 const { exec } = window.require('child_process');
                 const util = window.require('util');
@@ -1481,9 +1586,9 @@ class VirtualDriverControl {
                     console.warn('Display query failed:', queryError);
                     // Fallback: try to count from current configuration
                     const monitorCountInput = document.getElementById('monitor-count');
-                    const configuredCount = monitorCountInput ? parseInt(monitorCountInput.value) || 1 : 1;
-                    this.updateVirtualDisplayCount(configuredCount, true);
-                    return configuredCount;
+                    const fallbackCount = monitorCountInput ? parseInt(monitorCountInput.value) || 1 : 1;
+                    this.updateVirtualDisplayCount(fallbackCount, true);
+                    return fallbackCount;
                 }
             } else {
                 console.warn('Node.js access not available for display detection');
@@ -1497,26 +1602,66 @@ class VirtualDriverControl {
         }
     }
 
+    // Get configured monitor count from XML file
+    async getConfiguredMonitorCount() {
+        try {
+            if (typeof window !== 'undefined' && window.require) {
+                const fs = window.require('fs');
+                const settingsPath = 'C:\\VirtualDisplayDriver\\vdd_settings.xml';
+
+                // Check if file exists
+                if (!fs.existsSync(settingsPath)) {
+                    console.log('VDD settings file not found');
+                    return 0;
+                }
+
+                // Read and parse XML file
+                const xmlContent = fs.readFileSync(settingsPath, 'utf8');
+                const parser = new DOMParser();
+                const xmlDoc = parser.parseFromString(xmlContent, 'text/xml');
+
+                // Check for parsing errors
+                const parseError = xmlDoc.querySelector('parsererror');
+                if (parseError) {
+                    console.error('XML parsing error:', parseError.textContent);
+                    return 0;
+                }
+
+                // Get monitor count from XML
+                const monitorCount = xmlDoc.querySelector('monitors count')?.textContent?.trim();
+                if (monitorCount) {
+                    const count = parseInt(monitorCount);
+                    if (!isNaN(count) && count > 0) {
+                        console.log('Read configured monitor count from XML:', count);
+                        return count;
+                    }
+                }
+
+                console.log('No valid monitor count found in XML file');
+                return 0;
+            } else {
+                console.warn('File system access not available');
+                return 0;
+            }
+        } catch (error) {
+            console.error('Error reading configured monitor count:', error);
+            return 0;
+        }
+    }
+
     // Update virtual display count in UI
     updateVirtualDisplayCount(count, isEstimate = false) {
         const countElement = document.getElementById('virtual-monitor-count');
         const statusIndicator = countElement?.parentElement?.parentElement?.querySelector('.status-indicator');
         
         if (countElement) {
-            const displayText = isEstimate ? `${count} Configured` : `${count} Active`;
+            const displayText = isEstimate ? `${count} Configured` : `${count} Configured`;
             countElement.textContent = displayText;
         }
 
-        // Update status indicator color based on count
+        // Update status indicator color - always use accent color
         if (statusIndicator) {
-            statusIndicator.className = 'status-indicator';
-            if (count === 0) {
-                statusIndicator.classList.add('danger');
-            } else if (count === 1) {
-                statusIndicator.classList.add('warning');
-            } else {
-                statusIndicator.classList.add('success');
-            }
+            statusIndicator.className = 'status-indicator success';
         }
 
         console.log(`Virtual displays detected: ${count} ${isEstimate ? '(estimated)' : '(active)'}`);
