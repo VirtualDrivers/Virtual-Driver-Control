@@ -956,6 +956,35 @@ textarea.form-input {
   flex-shrink: 0;
 }
 
+/* Info Box */
+.info-box {
+  background: rgba(33, 150, 243, 0.1);
+  border: 1px solid #2196f3;
+  border-radius: var(--radius-medium);
+  padding: 12px;
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  color: var(--text-primary);
+  margin-top: 16px;
+}
+
+.info-box i {
+  color: #2196f3;
+  margin-top: 2px;
+  flex-shrink: 0;
+}
+
+.info-box ul {
+  margin: 8px 0 0 0;
+  padding-left: 20px;
+}
+
+.info-box li {
+  margin-bottom: 4px;
+  line-height: 1.4;
+}
+
 /* Log Viewer */
 .log-viewer {
   font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
@@ -1647,6 +1676,215 @@ textarea.form-input {
 
 [data-theme="dark"] .release-tag.alpha {
   background: rgba(244, 67, 54, 0.2);
+
+/* Notification System */
+.notification-container {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 10000;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-width: 400px;
+}
+
+.notification {
+  padding: 16px 20px;
+  border-radius: var(--radius-medium);
+  border: 1px solid;
+  background: var(--bg-primary);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  animation: slideInNotification 0.3s ease-out;
+  position: relative;
+  min-height: 60px;
+}
+
+.notification.dismissing {
+  animation: slideOutNotification 0.3s ease-in forwards;
+}
+
+.notification-icon {
+  font-size: 18px;
+  margin-top: 2px;
+  flex-shrink: 0;
+}
+
+.notification-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.notification-title {
+  font-weight: 600;
+  font-size: 14px;
+  line-height: 1.3;
+}
+
+.notification-message {
+  font-size: 13px;
+  line-height: 1.4;
+  opacity: 0.9;
+}
+
+.notification-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.notification-btn {
+  padding: 4px 12px;
+  border: 1px solid;
+  border-radius: var(--radius-small);
+  background: transparent;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.notification-close {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: none;
+  border: none;
+  font-size: 16px;
+  cursor: pointer;
+  opacity: 0.6;
+  transition: var(--transition);
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-small);
+}
+
+.notification-close:hover {
+  opacity: 1;
+  background: rgba(0, 0, 0, 0.1);
+}
+
+/* Notification Types */
+.notification.success {
+  border-color: var(--success-border, #4caf50);
+  background: var(--success-bg, rgba(76, 175, 80, 0.1));
+}
+
+.notification.success .notification-icon {
+  color: var(--success-color, #4caf50);
+}
+
+.notification.info {
+  border-color: var(--info-border, #2196f3);
+  background: var(--info-bg, rgba(33, 150, 243, 0.1));
+}
+
+.notification.info .notification-icon {
+  color: var(--info-color, #2196f3);
+}
+
+.notification.warning {
+  border-color: var(--warning-border, #ff9800);
+  background: var(--warning-bg, rgba(255, 152, 0, 0.1));
+}
+
+.notification.warning .notification-icon {
+  color: var(--warning-color, #ff9800);
+}
+
+.notification.error {
+  border-color: var(--danger-border, #f44336);
+  background: var(--error-bg, rgba(244, 67, 54, 0.1));
+}
+
+.notification.error .notification-icon {
+  color: var(--error-color, #f44336);
+}
+
+.notification.update {
+  border-color: var(--accent-primary, #107c10);
+  background: var(--update-bg, rgba(16, 124, 16, 0.1));
+}
+
+.notification.update .notification-icon {
+  color: var(--accent-primary, #107c10);
+}
+
+/* Notification Buttons */
+.notification.success .notification-btn {
+  border-color: var(--success-color, #4caf50);
+  color: var(--success-color, #4caf50);
+}
+
+.notification.info .notification-btn {
+  border-color: var(--info-color, #2196f3);
+  color: var(--info-color, #2196f3);
+}
+
+.notification.warning .notification-btn {
+  border-color: var(--warning-color, #ff9800);
+  color: var(--warning-color, #ff9800);
+}
+
+.notification.error .notification-btn {
+  border-color: var(--error-color, #f44336);
+  color: var(--error-color, #f44336);
+}
+
+.notification.update .notification-btn {
+  border-color: var(--accent-primary, #107c10);
+  color: var(--accent-primary, #107c10);
+}
+
+.notification-btn.primary {
+  background: currentColor;
+  color: white !important;
+}
+
+.notification-btn:hover {
+  background: currentColor;
+  color: white !important;
+}
+
+/* Dark theme adjustments */
+[data-theme="dark"] .notification {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+[data-theme="dark"] .notification-close:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+/* Animations */
+@keyframes slideInNotification {
+  from {
+    transform: translateX(400px);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slideOutNotification {
+  from {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateX(400px);
+    opacity: 0;
+  }
+}
   color: #e57373;
   border-color: #f44336;
 }

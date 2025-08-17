@@ -208,11 +208,11 @@ class VirtualDriverControl {
         await this.checkAvailableVersions();
     }
 
-    // Utility method to show notifications (placeholder)
-    showNotification(message, type = 'info') {
-        console.log(`Notification [${type}]: ${message}`);
-        // Future: implement toast notifications
+    // Show visual notification to user (disabled)
+    showNotification(message, type = 'info', options = {}) {
+        console.log(`[${type}]: ${message}`);
     }
+
 
     // Load VDD settings from C:\VirtualDisplayDriver\vdd_settings.xml
     async loadVDDSettings() {
@@ -535,7 +535,7 @@ class VirtualDriverControl {
             // Advanced Color Processing
             this.setCheckboxFromXML(xmlDoc, 'color_advanced bit_depth_management auto_select_from_color_space', 'auto-bit-depth');
             this.setInputFromXML(xmlDoc, 'color_advanced bit_depth_management force_bit_depth', 'force-bit-depth');
-            this.setCheckboxFromXML(xmlDoc, 'color_advanced bit_depth_management fp16_surface_support', 'fp16-surface-support');
+            this.setCheckboxFromXML(xmlDoc, 'color_advanced bit_depth_management fp16_surface_support', 'fp16-surface');
             this.setInputFromXML(xmlDoc, 'color_advanced color_format_extended sdr_white_level', 'sdr-white-level');
 
             console.log('Successfully populated UI from VDD settings');
@@ -720,7 +720,7 @@ class VirtualDriverControl {
                 bit_depth_management: {
                     auto_select_from_color_space: document.getElementById('auto-bit-depth')?.checked || false,
                     force_bit_depth: parseInt(document.getElementById('force-bit-depth')?.value) || 8,
-                    fp16_surface_support: document.getElementById('fp16-surface-support')?.checked || true
+                    fp16_surface_support: document.getElementById('fp16-surface')?.checked || true
                 },
                 color_format_extended: {
                     sdr_white_level: parseFloat(document.getElementById('sdr-white-level')?.value) || 80.0
@@ -822,6 +822,50 @@ class VirtualDriverControl {
                 this.checkAvailableVersions();
             });
         }
+
+        // Driver Management Buttons
+        const refreshStatusBtn = document.getElementById('refresh-status-btn');
+        if (refreshStatusBtn) {
+            refreshStatusBtn.addEventListener('click', () => {
+                this.refreshSystemStatus();
+            });
+        }
+
+        const stopDriverBtn = document.getElementById('stop-driver-btn');
+        if (stopDriverBtn) {
+            stopDriverBtn.addEventListener('click', () => {
+                this.stopDriver();
+            });
+        }
+
+        const startDriverBtn = document.getElementById('start-driver-btn');
+        if (startDriverBtn) {
+            startDriverBtn.addEventListener('click', () => {
+                this.startDriver();
+            });
+        }
+
+        const uninstallDriverBtn = document.getElementById('uninstall-driver-btn');
+        if (uninstallDriverBtn) {
+            uninstallDriverBtn.addEventListener('click', () => {
+                this.uninstallDriver();
+            });
+        }
+
+        const reinstallDriverBtn = document.getElementById('reinstall-driver-btn');
+        if (reinstallDriverBtn) {
+            reinstallDriverBtn.addEventListener('click', () => {
+                this.reinstallDriver();
+            });
+        }
+
+        // Log folder button
+        const openLogFolderBtn = document.getElementById('open-log-folder-btn');
+        if (openLogFolderBtn) {
+            openLogFolderBtn.addEventListener('click', () => {
+                this.openLogFolder();
+            });
+        }
     }
 
     // Load configuration from XML (full implementation)
@@ -861,7 +905,9 @@ class VirtualDriverControl {
                 fs.writeFileSync(settingsPath, xmlContent, 'utf8');
                 console.log('Successfully saved VDD settings to file');
                 
-                this.showNotification('Configuration saved to C:\\VirtualDisplayDriver\\vdd_settings.xml', 'success');
+                this.showNotification('Driver configuration saved successfully!', 'success', {
+                    title: 'Settings Saved'
+                });
                 
             } catch (error) {
                 console.error('Error saving VDD settings:', error);
@@ -885,7 +931,9 @@ class VirtualDriverControl {
                 
                 // Check if file exists
                 if (!fs.existsSync(settingsPath)) {
-                    this.showNotification('Configuration file not found at C:\\VirtualDisplayDriver\\vdd_settings.xml', 'error');
+                    this.showNotification('Configuration file not found. Please check if the driver is installed correctly.', 'warning', {
+                        title: 'File Not Found'
+                    });
                     return;
                 }
 
@@ -896,7 +944,9 @@ class VirtualDriverControl {
                 // Parse XML and populate UI using existing method
                 this.parseAndPopulateSettings(xmlContent);
                 
-                this.showNotification('Configuration loaded from C:\\VirtualDisplayDriver\\vdd_settings.xml', 'success');
+                this.showNotification('Driver configuration loaded successfully!', 'success', {
+                    title: 'Settings Loaded'
+                });
                 
             } catch (error) {
                 console.error('Error loading VDD settings:', error);
@@ -1077,59 +1127,313 @@ class VirtualDriverControl {
         }
     }
 
-    // Reload the virtual display driver
+    // Reload the virtual display driver using named pipe communication
     async reloadDriver() {
         try {
-            this.showNotification('Reloading virtual display driver...', 'info');
-            
             // Check if we're running in Electron with Node.js access
+            if (typeof window !== 'undefined' && window.require) {
+                console.log('Reloading VDD driver via named pipe...');
+                
+                try {
+                    await this.sendPipeCommand('RELOAD_DRIVER');
+                    console.log('Driver reloaded successfully');
+                    
+                    // Refresh status after a short delay
+                    setTimeout(() => this.refreshSystemStatus(), 1000);
+                    
+                } catch (pipeError) {
+                    console.error('Named pipe communication failed:', pipeError);
+                }
+            } else {
+                console.warn('Node.js access not available for driver operations');
+            }
+        } catch (error) {
+            console.error('Driver reload error:', error);
+        }
+    }
+
+    // Send command to driver via named pipe
+    async sendPipeCommand(command) {
+        return new Promise((resolve, reject) => {
+            const net = window.require('net');
+            const pipePath = '\\\\.\\pipe\\MTTVirtualDisplayPipe';
+            
+            console.log(`Sending command: ${command}`);
+            
+            const client = net.createConnection(pipePath, () => {
+                // Send the command immediately when connected
+                client.write(command);
+            });
+            
+            let responseReceived = false;
+            
+            client.on('data', (data) => {
+                if (responseReceived) return;
+                responseReceived = true;
+                
+                const response = data.toString().trim();
+                console.log(`Response: ${response}`);
+                
+                client.end();
+                
+                if (response.includes('SUCCESS') || response.includes('OK') || response.length > 0) {
+                    resolve(response);
+                } else {
+                    reject(new Error(`Driver command failed: ${response}`));
+                }
+            });
+            
+            client.on('error', (error) => {
+                if (!responseReceived) {
+                    console.error('Pipe error:', error.message);
+                    reject(new Error(`Communication failed: ${error.message}`));
+                }
+            });
+            
+            client.on('end', () => {
+                if (!responseReceived) {
+                    resolve('Command sent');
+                }
+            });
+            
+            // Reduced timeout for faster response
+            setTimeout(() => {
+                if (!client.destroyed && !responseReceived) {
+                    client.destroy();
+                    reject(new Error('Command timeout'));
+                }
+            }, 3000); // 3 second timeout
+        });
+    }
+
+    // Refresh system status information
+    async refreshSystemStatus() {
+        try {
+            console.log('Refreshing system status...');
+            
+            // Re-run all detection methods
+            await this.detectVirtualDisplays();
+            await this.detectIddCxVersion();
+            await this.detectDriverVersion();
+            await this.checkAvailableVersions();
+            
+            console.log('System status refreshed');
+            
+        } catch (error) {
+            console.error('Refresh status error:', error);
+        }
+    }
+
+    // Stop/disable the virtual display driver
+    async stopDriver() {
+        try {
+            this.showNotification('Stopping virtual display driver...', 'info');
+            
             if (typeof window !== 'undefined' && window.require) {
                 const { exec } = window.require('child_process');
                 const util = window.require('util');
                 const execPromise = util.promisify(exec);
                 
-                // Windows driver reload commands
                 if (process.platform === 'win32') {
-                    console.log('Attempting to reload VDD driver...');
-                    
                     try {
-                        // First try to remove the driver
-                        await execPromise('devcon.exe remove "Root\\MttVDD"');
-                        console.log('Driver removed successfully');
+                        const devconPath = 'C:\\VirtualDisplayDriver\\EDID\\devcon.exe';
+                        await execPromise(`"${devconPath}" disable "Root\\MttVDD"`);
                         
-                        // Wait a moment for cleanup
-                        await new Promise(resolve => setTimeout(resolve, 2000));
+                        this.showNotification('Virtual display driver stopped successfully', 'success');
+                        console.log('Driver stopped successfully');
                         
-                        // Then reinstall the driver
-                        await execPromise('devcon.exe install "Driver Files\\VDD x86 x64\\MttVDD.inf" "Root\\MttVDD"');
-                        console.log('Driver reinstalled successfully');
+                        // Refresh status
+                        setTimeout(() => this.refreshSystemStatus(), 1000);
                         
-                        this.showNotification('Virtual display driver reloaded successfully', 'success');
                     } catch (devconError) {
-                        console.warn('DevCon command failed, trying alternative method:', devconError);
-                        
-                        // Alternative: restart VDD service if available
-                        try {
-                            await execPromise('sc stop MttVDD');
-                            await new Promise(resolve => setTimeout(resolve, 1000));
-                            await execPromise('sc start MttVDD');
-                            
-                            this.showNotification('Virtual display driver service restarted', 'success');
-                        } catch (serviceError) {
-                            console.warn('Service restart failed:', serviceError);
-                            this.showNotification('Driver reload completed (manual verification recommended)', 'warning');
-                        }
+                        console.error('DevCon disable failed:', devconError);
+                        this.showNotification('Failed to stop driver. Please run as administrator.', 'error');
                     }
                 } else {
-                    this.showNotification('Driver reload not supported on this platform', 'warning');
+                    this.showNotification('Driver management is only supported on Windows', 'warning');
                 }
             } else {
-                this.showNotification('Driver reload requires elevated permissions', 'warning');
-                console.warn('Node.js access not available for driver operations');
+                this.showNotification('Driver management requires elevated permissions', 'warning');
             }
         } catch (error) {
-            this.showNotification('Error reloading driver', 'error');
-            console.error('Driver reload error:', error);
+            this.showNotification('Error stopping driver', 'error');
+            console.error('Stop driver error:', error);
+        }
+    }
+
+    // Start/enable the virtual display driver
+    async startDriver() {
+        try {
+            this.showNotification('Starting virtual display driver...', 'info');
+            
+            if (typeof window !== 'undefined' && window.require) {
+                const { exec } = window.require('child_process');
+                const util = window.require('util');
+                const execPromise = util.promisify(exec);
+                
+                if (process.platform === 'win32') {
+                    try {
+                        const devconPath = 'C:\\VirtualDisplayDriver\\EDID\\devcon.exe';
+                        await execPromise(`"${devconPath}" enable "Root\\MttVDD"`);
+                        
+                        this.showNotification('Virtual display driver started successfully', 'success');
+                        console.log('Driver started successfully');
+                        
+                        // Refresh status
+                        setTimeout(() => this.refreshSystemStatus(), 1000);
+                        
+                    } catch (devconError) {
+                        console.error('DevCon enable failed:', devconError);
+                        this.showNotification('Failed to start driver. Please run as administrator.', 'error');
+                    }
+                } else {
+                    this.showNotification('Driver management is only supported on Windows', 'warning');
+                }
+            } else {
+                this.showNotification('Driver management requires elevated permissions', 'warning');
+            }
+        } catch (error) {
+            this.showNotification('Error starting driver', 'error');
+            console.error('Start driver error:', error);
+        }
+    }
+
+    // Uninstall the virtual display driver
+    async uninstallDriver() {
+        try {
+            // Show confirmation dialog
+            const confirmed = confirm('Are you sure you want to uninstall the Virtual Display Driver? This will remove the driver from your system.');
+            
+            if (!confirmed) {
+                return;
+            }
+            
+            this.showNotification('Uninstalling virtual display driver...', 'info');
+            
+            if (typeof window !== 'undefined' && window.require) {
+                const { exec } = window.require('child_process');
+                const util = window.require('util');
+                const execPromise = util.promisify(exec);
+                
+                if (process.platform === 'win32') {
+                    try {
+                        const devconPath = 'C:\\VirtualDisplayDriver\\EDID\\devcon.exe';
+                        await execPromise(`"${devconPath}" remove "Root\\MttVDD"`);
+                        
+                        this.showNotification('Virtual display driver uninstalled successfully', 'success');
+                        console.log('Driver uninstalled successfully');
+                        
+                        // Refresh status
+                        setTimeout(() => this.refreshSystemStatus(), 2000);
+                        
+                    } catch (devconError) {
+                        console.error('DevCon remove failed:', devconError);
+                        this.showNotification('Failed to uninstall driver. Please run as administrator.', 'error');
+                    }
+                } else {
+                    this.showNotification('Driver management is only supported on Windows', 'warning');
+                }
+            } else {
+                this.showNotification('Driver management requires elevated permissions', 'warning');
+            }
+        } catch (error) {
+            this.showNotification('Error uninstalling driver', 'error');
+            console.error('Uninstall driver error:', error);
+        }
+    }
+
+    // Reinstall the virtual display driver
+    async reinstallDriver() {
+        try {
+            this.showNotification('Reinstalling virtual display driver...', 'info');
+            
+            if (typeof window !== 'undefined' && window.require) {
+                const { exec } = window.require('child_process');
+                const util = window.require('util');
+                const execPromise = util.promisify(exec);
+                
+                if (process.platform === 'win32') {
+                    try {
+                        const devconPath = 'C:\\VirtualDisplayDriver\\EDID\\devcon.exe';
+                        const infPath = 'C:\\VirtualDisplayDriver\\Driver Files\\VDD x86 x64\\MttVDD.inf';
+                        
+                        await execPromise(`"${devconPath}" install "${infPath}" "Root\\MttVDD"`);
+                        
+                        this.showNotification('Virtual display driver reinstalled successfully', 'success');
+                        console.log('Driver reinstalled successfully');
+                        
+                        // Refresh status
+                        setTimeout(() => this.refreshSystemStatus(), 2000);
+                        
+                    } catch (devconError) {
+                        console.error('DevCon install failed:', devconError);
+                        this.showNotification('Failed to reinstall driver. Please run as administrator.', 'error');
+                    }
+                } else {
+                    this.showNotification('Driver management is only supported on Windows', 'warning');
+                }
+            } else {
+                this.showNotification('Driver management requires elevated permissions', 'warning');
+            }
+        } catch (error) {
+            this.showNotification('Error reinstalling driver', 'error');
+            console.error('Reinstall driver error:', error);
+        }
+    }
+
+    // Open the log folder and find the latest log file
+    openLogFolder() {
+        try {
+            const logPath = 'C:\\VirtualDisplayDriver\\Logs';
+            
+            if (typeof window !== 'undefined' && window.require) {
+                const { shell } = window.require('electron');
+                const fs = window.require('fs');
+                const path = window.require('path');
+                
+                // Check if log directory exists
+                if (fs.existsSync(logPath)) {
+                    try {
+                        // Find the latest log file
+                        const files = fs.readdirSync(logPath);
+                        const logFiles = files.filter(file => 
+                            file.startsWith('log_') && file.endsWith('.txt')
+                        );
+                        
+                        if (logFiles.length > 0) {
+                            // Sort by filename (which includes date) to get the latest
+                            logFiles.sort((a, b) => b.localeCompare(a));
+                            const latestLogFile = logFiles[0];
+                            const latestLogPath = path.join(logPath, latestLogFile);
+                            
+                            console.log(`Latest log file: ${latestLogFile}`);
+                            
+                            // Open the latest log file directly
+                            shell.openPath(latestLogPath);
+                        } else {
+                            // No log files found, just open the folder
+                            console.log('No log files found, opening folder');
+                            shell.openPath(logPath);
+                        }
+                    } catch (readError) {
+                        console.warn('Error reading log directory, opening folder instead:', readError);
+                        shell.openPath(logPath);
+                    }
+                } else {
+                    // Try to create the directory
+                    try {
+                        fs.mkdirSync(logPath, { recursive: true });
+                        shell.openPath(logPath);
+                        console.log('Log directory created');
+                    } catch (createError) {
+                        console.error('Log directory does not exist and could not be created:', createError);
+                    }
+                }
+            } else {
+                console.warn('File system access not available');
+            }
+        } catch (error) {
+            console.error('Open log folder error:', error);
         }
     }
 
@@ -2038,12 +2342,38 @@ class VirtualDriverControl {
             versionsContainer.innerHTML = versionsHtml;
             console.log(`Displayed ${uniqueVersions.length} available versions`);
             
+            // Check for newer versions and show update notification
+            this.checkForUpdates(uniqueVersions, currentDriverVersion);
+            
         } catch (error) {
             console.error('Error displaying versions:', error);
             this.displayVersionError('Failed to display version information');
         }
     }
     
+    // Check for updates (notifications disabled)
+    checkForUpdates(availableVersions, currentVersion) {
+        if (!availableVersions || availableVersions.length === 0) return;
+        
+        // Find the latest stable version
+        const stableVersions = availableVersions.filter(v => 
+            !v.releaseType || v.releaseType === 'stable'
+        );
+        
+        if (stableVersions.length === 0) return;
+        
+        // Sort by version number to get the latest
+        stableVersions.sort((a, b) => this.compareVersions(b.version, a.version));
+        const latestVersion = stableVersions[0];
+        
+        // Compare with current version
+        const versionComparison = this.compareVersions(latestVersion.version, currentVersion);
+        
+        if (versionComparison > 0) {
+            console.log(`Update available: ${latestVersion.version} (current: ${currentVersion})`);
+        }
+    }
+
     // Display error message for version fetching
     displayVersionError(message) {
         const versionsContainer = document.getElementById('available-versions');
