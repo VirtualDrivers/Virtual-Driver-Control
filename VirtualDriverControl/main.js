@@ -4,6 +4,13 @@ const fs = require('fs');
 const { spawn } = require('child_process');
 const { promisify } = require('util');
 
+// Ensure we're in the correct directory
+if (__dirname) {
+  process.chdir(__dirname);
+}
+console.log('App directory:', __dirname);
+console.log('Working directory:', process.cwd());
+
 let mainWindow;
 
 // Allowed file paths for security
@@ -135,17 +142,22 @@ async function checkAdministratorPrivileges() {
 async function restartAsAdministrator() {
   try {
     const exePath = process.execPath;
+    const appPath = __dirname;
     
     console.log('Restarting as Administrator...');
     console.log('Executable path:', exePath);
+    console.log('App directory:', appPath);
     
     // Use secure command execution with sanitized paths
+    // Pass the app directory as argument so Electron can find main.js
+    // Escape the path properly for PowerShell
+    const escapedAppPath = appPath.replace(/"/g, '`"').replace(/\$/g, '`$');
     await executeCommandSecure('powershell.exe', [
       '-NoProfile',
       '-NonInteractive',
       '-ExecutionPolicy', 'Bypass',
       '-Command',
-      `Start-Process -FilePath "${exePath.replace(/"/g, '`"')}" -Verb RunAs`
+      `Start-Process -FilePath "${exePath.replace(/"/g, '`"')}" -ArgumentList "${escapedAppPath}" -WorkingDirectory "${escapedAppPath}" -Verb RunAs`
     ], { timeout: 10000 });
     
     console.log('Administrator restart command executed successfully');

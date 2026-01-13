@@ -39,40 +39,65 @@ class VirtualDriverControl {
     }
 
     async init() {
-        this.setupNavigation();
-        this.setupThemeSelector();
-        this.setupFileOperations();
-        this.setupGPUEnumeration();
-        this.setupRefreshRates();
-        this.setupExternalLinks();
-        this.setupResolutions();
-        this.setupEDIDUpload();
-        this.setupColorCustomization();
-        this.setupMonitorCountListener();
-        await this.loadSettings();
-        
-        // Apply colors to initially active navigation item
-        const initialActiveNavItem = document.querySelector('.nav-item.active');
-        if (initialActiveNavItem) {
-            this.applyColorsToActiveNavItem(initialActiveNavItem);
+        try {
+            console.log('Starting app initialization...');
+            this.setupNavigation();
+            console.log('Navigation setup complete');
+            this.setupThemeSelector();
+            console.log('Theme selector setup complete');
+            this.setupFileOperations();
+            console.log('File operations setup complete');
+            this.setupGPUEnumeration();
+            console.log('GPU enumeration setup complete');
+            this.setupRefreshRates();
+            console.log('Refresh rates setup complete');
+            this.setupExternalLinks();
+            console.log('External links setup complete');
+            this.setupResolutions();
+            console.log('Resolutions setup complete');
+            this.setupEDIDUpload();
+            console.log('EDID upload setup complete');
+            this.setupColorCustomization();
+            console.log('Color customization setup complete');
+            this.setupMonitorCountListener();
+            console.log('Monitor count listener setup complete');
+            await this.loadSettings();
+            console.log('Settings loaded');
+            
+            // Apply colors to initially active navigation item
+            const initialActiveNavItem = document.querySelector('.nav-item.active');
+            if (initialActiveNavItem) {
+                this.applyColorsToActiveNavItem(initialActiveNavItem);
+            }
+            
+            console.log('App initialized successfully');
+        } catch (error) {
+            console.error('Error during initialization:', error);
+            throw error;
         }
-        
-        console.log('App initialized successfully');
     }
 
     setupNavigation() {
         // Get navigation elements
         const navItems = document.querySelectorAll('.nav-item');
+        console.log(`Found ${navItems.length} navigation items`);
 
         // Navigation item clicks
-        navItems.forEach(item => {
-            item.addEventListener('click', () => {
-                const page = item.getAttribute('data-page');
+        navItems.forEach((item, index) => {
+            const page = item.getAttribute('data-page');
+            console.log(`Setting up nav item ${index}: ${page}`);
+            item.addEventListener('click', (e) => {
+                console.log(`Nav item clicked: ${page}`);
+                e.preventDefault();
+                e.stopPropagation();
                 if (page) {
                     this.showPage(page);
                     this.setActiveNavItem(item);
                 }
             });
+            // Ensure pointer events are enabled
+            item.style.pointerEvents = 'auto';
+            item.style.cursor = 'pointer';
         });
     }
 
@@ -906,28 +931,50 @@ class VirtualDriverControl {
         const saveReloadDriverBtn = document.getElementById('save-reload-driver-btn');
         const reloadDriverBtn = document.getElementById('reload-driver-btn');
         
+        console.log('Buttons found:', { saveBtn: !!saveBtn, loadBtn: !!loadBtn, saveReloadDriverBtn: !!saveReloadDriverBtn, reloadDriverBtn: !!reloadDriverBtn });
+        
         if (saveBtn) {
-            saveBtn.addEventListener('click', () => {
+            saveBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                console.log('Save button clicked');
                 this.saveConfigurationToFile();
             });
+            saveBtn.style.pointerEvents = 'auto';
+            saveBtn.style.cursor = 'pointer';
         }
         
         if (loadBtn) {
-            loadBtn.addEventListener('click', () => {
+            loadBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                console.log('Load button clicked');
                 this.loadConfigurationFromFile();
             });
+            loadBtn.style.pointerEvents = 'auto';
+            loadBtn.style.cursor = 'pointer';
         }
 
         if (saveReloadDriverBtn) {
-            saveReloadDriverBtn.addEventListener('click', () => {
+            saveReloadDriverBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                console.log('Save & Reload Driver button clicked');
                 this.saveAndReloadDriver();
             });
+            saveReloadDriverBtn.style.pointerEvents = 'auto';
+            saveReloadDriverBtn.style.cursor = 'pointer';
         }
 
         if (reloadDriverBtn) {
-            reloadDriverBtn.addEventListener('click', () => {
+            reloadDriverBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                console.log('Reload Driver button clicked');
                 this.reloadDriver();
             });
+            reloadDriverBtn.style.pointerEvents = 'auto';
+            reloadDriverBtn.style.cursor = 'pointer';
         }
         
         const refreshVersionsBtn = document.getElementById('refresh-versions-btn');
@@ -3330,7 +3377,6 @@ class VirtualDriverControl {
             item.appendChild(removeBtn);
             
             // Add remove functionality
-            const removeBtn = item.querySelector('.refresh-rate-remove');
             removeBtn.addEventListener('click', () => {
                 this.removeRefreshRate(rate);
             });
@@ -4269,25 +4315,6 @@ class VirtualDriverControl {
         
         container.appendChild(contentDiv);
     }
-                        ${analysis.chromaticity.blue_x !== null ? `
-                            <div class="edid-property">
-                                <span class="edid-property-name">Blue X:</span>
-                                <span class="edid-property-value">${analysis.chromaticity.blue_x.toFixed(4)}</span>
-                            </div>
-                        ` : ''}
-                        ${analysis.chromaticity.white_x !== null ? `
-                            <div class="edid-property">
-                                <span class="edid-property-name">White X:</span>
-                                <span class="edid-property-value">${analysis.chromaticity.white_x.toFixed(4)}</span>
-                            </div>
-                        ` : ''}
-                    </div>
-                `;
-            }
-        }
-        
-        // Note: The rest of displayEDIDAnalysis is now handled by the safe DOM method version above
-    }
 
     // Display EDID error (updated for security)
     displayEDIDError(errorMessage) {
@@ -4398,7 +4425,8 @@ class VirtualDriverControl {
 }
 
 // Global functions for Community Scripts management
-async function updateCommunityScripts() {
+// Expose these functions immediately so they're available for onclick handlers
+window.updateCommunityScripts = async function updateCommunityScripts() {
     const statusElement = document.getElementById('scripts-download-status');
     const progressElement = document.getElementById('scripts-progress');
     const buttonElement = document.getElementById('update-scripts-btn');
@@ -4474,7 +4502,7 @@ async function updateCommunityScripts() {
     }
 }
 
-async function fetchGitHubContents(url) {
+window.fetchGitHubContents = async function fetchGitHubContents(url) {
     const response = await fetch(url);
     if (!response.ok) {
         throw new Error(`GitHub API error: ${response.status}`);
@@ -4482,7 +4510,7 @@ async function fetchGitHubContents(url) {
     return await response.json();
 }
 
-async function downloadScriptFile(file, targetDir) {
+window.downloadScriptFile = async function downloadScriptFile(file, targetDir) {
     // Fetch file content
     const response = await fetch(file.download_url);
     if (!response.ok) {
@@ -4501,7 +4529,7 @@ async function downloadScriptFile(file, targetDir) {
     }
 }
 
-async function removeAllScripts() {
+window.removeAllScripts = async function removeAllScripts() {
     try {
         if (!window.electronAPI) {
             throw new Error('Electron API not available');
@@ -4556,7 +4584,7 @@ async function removeAllScripts() {
     }
 }
 
-async function refreshLocalScripts() {
+window.refreshLocalScripts = async function refreshLocalScripts() {
     const scriptsListElement = document.getElementById('local-scripts-list');
     
     try {
@@ -4987,9 +5015,22 @@ function escapeHtml(text) {
     return div.innerHTML;
 }
 
+// Global functions are now exposed above as they're defined
+
 // Initialize the app when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
-    window.app = new VirtualDriverControl();
-    console.log('Virtual Driver Control loaded');
-});
+    try {
+        window.app = new VirtualDriverControl();
+        console.log('Virtual Driver Control loaded');
+    } catch (error) {
+        console.error('Error initializing Virtual Driver Control:', error);
+        // Show error to user
+        document.body.innerHTML = `
+            <div style="padding: 20px; font-family: Arial; color: red;">
+                <h1>Error Loading Application</h1>
+                <p>There was an error initializing the application:</p>
+                <pre>${error.message}\n${error.stack}</pre>
+            </div>
+        `;
+    }
 });
