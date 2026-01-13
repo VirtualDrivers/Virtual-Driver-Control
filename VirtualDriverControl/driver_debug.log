@@ -1499,3 +1499,15 @@ Parsec Virtual Display Adapter ROOT\DISPLAY\0002 OK     {Root\Parsec\VDA}
 [2025-08-17T19:09:34.436Z] Device query stderr: 
 [2025-08-17T19:09:34.436Z] Virtual Display Driver not found in Device Manager
 [2025-08-17T19:09:34.436Z] Updating driver status: Not Installed (danger)
+[2025-12-31T21:14:36.704Z] === DETECTING ACTUAL DRIVER STATUS ===
+[2025-12-31T21:14:36.705Z] Executing device query: powershell "Get-WmiObject -Class Win32_PnPEntity | Where-Object { $_.DeviceID -like '*MttVDD*' -or $_.Name -like '*Virtual Display*' -or $_.HardwareID -like '*MttVDD*' } | Select-Object Name, DeviceID, Status, HardwareID | Format-Table -AutoSize"
+[2025-12-31T21:14:37.578Z] Device query stdout: 
+[2025-12-31T21:14:37.578Z] Device query stderr: 
+[2025-12-31T21:14:37.579Z] Virtual Display Driver not found in Device Manager
+[2025-12-31T21:14:37.580Z] Updating driver status: Not Installed (danger)
+[2025-12-31T21:14:49.097Z] === DETECTING ACTUAL DRIVER STATUS ===
+[2025-12-31T21:14:49.098Z] Executing device query: powershell "Get-WmiObject -Class Win32_PnPEntity | Where-Object { $_.DeviceID -like '*MttVDD*' -or $_.Name -like '*Virtual Display*' -or $_.HardwareID -like '*MttVDD*' } | Select-Object Name, DeviceID, Status, HardwareID | Format-Table -AutoSize"
+[2025-12-31T21:14:49.720Z] Device query stdout: 
+[2025-12-31T21:14:49.720Z] Device query stderr: 
+[2025-12-31T21:14:49.721Z] Virtual Display Driver not found in Device Manager
+[2025-12-31T21:14:49.721Z] Updating driver status: Not Installed (danger)

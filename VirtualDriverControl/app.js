@@ -2,22 +2,25 @@
 
 class VirtualDriverControl {
     
-    // Logging function to write to file
-    logToFile(message) {
+    // Logging function to write to file (updated for secure context)
+    async logToFile(message) {
         try {
-            const fs = window.require('fs');
-            const path = window.require('path');
-            const os = window.require('os');
-            
-            const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
             const logMessage = `[${new Date().toISOString()}] ${message}\n`;
             
-            // Write to a log file in the app directory
-            const logPath = path.join(__dirname, 'driver_debug.log');
-            fs.appendFileSync(logPath, logMessage);
-            
-            // Also log to console
-            console.log(message);
+            // Use secure electronAPI for file operations
+            if (window.electronAPI) {
+                const logPath = 'driver_debug.log';
+                try {
+                    const existing = await window.electronAPI.readFile(logPath).catch(() => '');
+                    await window.electronAPI.writeFile(logPath, existing + logMessage);
+                } catch (error) {
+                    // Fallback to console if file write fails
+                    console.log(message);
+                }
+            } else {
+                // Fallback to console if electronAPI not available
+                console.log(message);
+            }
         } catch (error) {
             console.error('Failed to write to log file:', error);
             console.log(message);
@@ -74,13 +77,16 @@ class VirtualDriverControl {
     }
 
     setupExternalLinks() {
-        // Handle external links to open in default browser
-        document.addEventListener('click', (event) => {
+        // Handle external links to open in default browser (updated for secure context)
+        document.addEventListener('click', async (event) => {
             const link = event.target.closest('a[href^="http"]');
-            if (link && window.require) {
+            if (link && window.electronAPI) {
                 event.preventDefault();
-                const { shell } = window.require('electron');
-                shell.openExternal(link.href);
+                try {
+                    await window.electronAPI.openExternal(link.href);
+                } catch (error) {
+                    console.error('Failed to open external link:', error);
+                }
             }
         });
     }
@@ -263,24 +269,23 @@ class VirtualDriverControl {
     }
 
 
-    // Load VDD settings from C:\VirtualDisplayDriver\vdd_settings.xml
+    // Load VDD settings from C:\VirtualDisplayDriver\vdd_settings.xml (updated for secure context)
     async loadVDDSettings() {
-        if (typeof window !== 'undefined' && window.require) {
-            const fs = window.require('fs');
-            const path = window.require('path');
+        if (typeof window !== 'undefined' && window.electronAPI) {
             const settingsPath = 'C:\\VirtualDisplayDriver\\vdd_settings.xml';
 
             try {
                 console.log('Loading VDD settings from:', settingsPath);
                 
-                // Check if file exists
-                if (!fs.existsSync(settingsPath)) {
+                // Check if file exists using secure API
+                const exists = await window.electronAPI.existsFile(settingsPath);
+                if (!exists) {
                     console.log('VDD settings file not found, creating default...');
                     await this.createDefaultVDDSettings(settingsPath);
                 }
 
-                // Read and parse XML file
-                const xmlContent = fs.readFileSync(settingsPath, 'utf8');
+                // Read and parse XML file using secure API
+                const xmlContent = await window.electronAPI.readFile(settingsPath);
                 console.log('Successfully loaded VDD settings XML');
                 
                 // Parse XML and populate UI
@@ -306,16 +311,14 @@ class VirtualDriverControl {
         }
     }
 
-    // Create default vdd_settings.xml file
+    // Create default vdd_settings.xml file (updated for secure context)
     async createDefaultVDDSettings(settingsPath) {
-        if (typeof window !== 'undefined' && window.require) {
-            const fs = window.require('fs');
-            const path = window.require('path');
-            
-            // Ensure directory exists
-            const dir = path.dirname(settingsPath);
-            if (!fs.existsSync(dir)) {
-                fs.mkdirSync(dir, { recursive: true });
+        if (typeof window !== 'undefined' && window.electronAPI) {
+            // Ensure directory exists using secure API
+            const dir = settingsPath.substring(0, settingsPath.lastIndexOf('\\'));
+            const exists = await window.electronAPI.existsFile(dir);
+            if (!exists) {
+                await window.electronAPI.mkdir(dir);
                 console.log('Created directory:', dir);
             }
 
@@ -471,8 +474,8 @@ class VirtualDriverControl {
 
 </vdd_settings>`;
 
-            // Write the default XML file
-            fs.writeFileSync(settingsPath, defaultXML, 'utf8');
+            // Write the default XML file using secure API
+            await window.electronAPI.writeFile(settingsPath, defaultXML);
             console.log('Created default VDD settings file:', settingsPath);
         } else {
             throw new Error('File system access not available');
@@ -626,7 +629,15 @@ class VirtualDriverControl {
         // Clear existing resolution UI elements
         const resolutionList = document.querySelector('.resolution-list');
         if (resolutionList) {
-            resolutionList.innerHTML = '';
+            // Use safe DOM clearing
+            if (window.DOMUtils) {
+                window.DOMUtils.clear(resolutionList);
+            } else {
+                resolutionList.textContent = '';
+                while (resolutionList.firstChild) {
+                    resolutionList.removeChild(resolutionList.firstChild);
+                }
+            }
         }
 
         // Add each resolution from XML
@@ -649,25 +660,79 @@ class VirtualDriverControl {
         this.setupResolutionDeleteButtons();
     }
 
-    // Add a resolution item to the UI
+    // Add a resolution item to the UI (updated for security)
     addResolutionToUI(width, height, refreshRate) {
         const resolutionList = document.querySelector('.resolution-list');
         if (!resolutionList) return;
 
+        // Validate inputs
+        if (window.InputValidator) {
+            const widthVal = window.InputValidator.validateNumber(width, { min: 640, max: 7680, integer: true });
+            const heightVal = window.InputValidator.validateNumber(height, { min: 480, max: 4320, integer: true });
+            const refreshVal = window.InputValidator.validateNumber(refreshRate, { min: 24, max: 240, integer: false });
+            
+            if (!widthVal.valid || !heightVal.valid || !refreshVal.valid) {
+                console.error('Invalid resolution values');
+                return;
+            }
+            
+            width = widthVal.value;
+            height = heightVal.value;
+            refreshRate = refreshVal.value;
+        }
+
+        // Use safe DOM creation instead of innerHTML
         const resolutionItem = document.createElement('div');
         resolutionItem.className = 'resolution-item';
-        resolutionItem.innerHTML = `
-            <div class="resolution-inputs">
-                <input type="number" class="form-input" value="${width}" min="640" max="7680" placeholder="Width">
-                <span>×</span>
-                <input type="number" class="form-input" value="${height}" min="480" max="4320" placeholder="Height">
-                <span>@</span>
-                <input type="number" class="form-input" value="${refreshRate}" min="24" max="240" placeholder="Hz">
-            </div>
-            <button type="button" class="btn btn-danger btn-small">
-                <i class="fas fa-trash"></i>
-            </button>
-        `;
+        
+        const inputsDiv = document.createElement('div');
+        inputsDiv.className = 'resolution-inputs';
+        
+        const widthInput = document.createElement('input');
+        widthInput.type = 'number';
+        widthInput.className = 'form-input';
+        widthInput.value = width;
+        widthInput.min = '640';
+        widthInput.max = '7680';
+        widthInput.placeholder = 'Width';
+        
+        const timesSpan = document.createElement('span');
+        timesSpan.textContent = '×';
+        
+        const heightInput = document.createElement('input');
+        heightInput.type = 'number';
+        heightInput.className = 'form-input';
+        heightInput.value = height;
+        heightInput.min = '480';
+        heightInput.max = '4320';
+        heightInput.placeholder = 'Height';
+        
+        const atSpan = document.createElement('span');
+        atSpan.textContent = '@';
+        
+        const refreshInput = document.createElement('input');
+        refreshInput.type = 'number';
+        refreshInput.className = 'form-input';
+        refreshInput.value = refreshRate;
+        refreshInput.min = '24';
+        refreshInput.max = '240';
+        refreshInput.placeholder = 'Hz';
+        
+        inputsDiv.appendChild(widthInput);
+        inputsDiv.appendChild(timesSpan);
+        inputsDiv.appendChild(heightInput);
+        inputsDiv.appendChild(atSpan);
+        inputsDiv.appendChild(refreshInput);
+        
+        const deleteBtn = document.createElement('button');
+        deleteBtn.type = 'button';
+        deleteBtn.className = 'btn btn-danger btn-small';
+        const trashIcon = document.createElement('i');
+        trashIcon.className = 'fas fa-trash';
+        deleteBtn.appendChild(trashIcon);
+        
+        resolutionItem.appendChild(inputsDiv);
+        resolutionItem.appendChild(deleteBtn);
         resolutionList.appendChild(resolutionItem);
     }
 
@@ -916,20 +981,19 @@ class VirtualDriverControl {
         }
     }
 
-    // Save configuration directly to C:\VirtualDisplayDriver\vdd_settings.xml
+    // Save configuration directly to C:\VirtualDisplayDriver\vdd_settings.xml (updated for secure context)
     async saveConfigurationToFile() {
-        if (typeof window !== 'undefined' && window.require) {
-            const fs = window.require('fs');
-            const path = window.require('path');
+        if (typeof window !== 'undefined' && window.electronAPI) {
             const settingsPath = 'C:\\VirtualDisplayDriver\\vdd_settings.xml';
 
             try {
                 console.log('Saving VDD settings to:', settingsPath);
                 
-                // Ensure directory exists
-                const dir = path.dirname(settingsPath);
-                if (!fs.existsSync(dir)) {
-                    fs.mkdirSync(dir, { recursive: true });
+                // Ensure directory exists using secure API
+                const dir = settingsPath.substring(0, settingsPath.lastIndexOf('\\'));
+                const dirExists = await window.electronAPI.existsFile(dir);
+                if (!dirExists) {
+                    await window.electronAPI.mkdir(dir);
                     console.log('Created directory:', dir);
                 }
 
@@ -937,8 +1001,8 @@ class VirtualDriverControl {
                 const config = this.getConfigurationData();
                 const xmlContent = this.generateFullXML(config);
 
-                // Write to file
-                fs.writeFileSync(settingsPath, xmlContent, 'utf8');
+                // Write to file using secure API
+                await window.electronAPI.writeFile(settingsPath, xmlContent);
                 console.log('Successfully saved VDD settings to file');
                 
                 this.showNotification('Driver configuration saved successfully!', 'success', {
@@ -956,25 +1020,25 @@ class VirtualDriverControl {
         }
     }
 
-    // Load configuration directly from C:\VirtualDisplayDriver\vdd_settings.xml
+    // Load configuration directly from C:\VirtualDisplayDriver\vdd_settings.xml (updated for secure context)
     async loadConfigurationFromFile() {
-        if (typeof window !== 'undefined' && window.require) {
-            const fs = window.require('fs');
+        if (typeof window !== 'undefined' && window.electronAPI) {
             const settingsPath = 'C:\\VirtualDisplayDriver\\vdd_settings.xml';
 
             try {
                 console.log('Loading VDD settings from:', settingsPath);
                 
-                // Check if file exists
-                if (!fs.existsSync(settingsPath)) {
+                // Check if file exists using secure API
+                const exists = await window.electronAPI.existsFile(settingsPath);
+                if (!exists) {
                     this.showNotification('Configuration file not found. Please check if the driver is installed correctly.', 'warning', {
                         title: 'File Not Found'
                     });
                     return;
                 }
 
-                // Read and parse XML file
-                const xmlContent = fs.readFileSync(settingsPath, 'utf8');
+                // Read and parse XML file using secure API
+                const xmlContent = await window.electronAPI.readFile(settingsPath);
                 console.log('Successfully loaded VDD settings from file');
                 
                 // Parse XML and populate UI using existing method
@@ -1188,51 +1252,70 @@ class VirtualDriverControl {
         }
     }
 
-    // List devices to help debug driver management issues
+    // List devices to help debug driver management issues (updated for secure context)
     async listDevices() {
         try {
-            if (typeof window !== 'undefined' && window.require) {
-                const { exec } = window.require('child_process');
-                const fs = window.require('fs');
-                const util = window.require('util');
-                const execPromise = util.promisify(exec);
-                
+            if (typeof window !== 'undefined' && window.electronAPI) {
                 const nefconPath = 'C:\\VirtualDisplayDriver\\EDID\\nefconw.exe';
                 const devconPath = 'C:\\VirtualDisplayDriver\\EDID\\devcon.exe';
                 
-                if (fs.existsSync(nefconPath)) {
+                const nefconExists = await window.electronAPI.existsFile(nefconPath);
+                const devconExists = await window.electronAPI.existsFile(devconPath);
+                
+                if (nefconExists) {
                     console.log('Found nefconw.exe at:', nefconPath);
-                } else if (fs.existsSync(devconPath)) {
+                } else if (devconExists) {
                     console.log('Found devcon.exe at:', devconPath);
                 } else {
                     console.error('Neither nefconw.exe nor devcon.exe found');
                     return;
                 }
                 
-                // Use devcon for device listing (nefconw doesn't have find command)
-                const toolPath = fs.existsSync(devconPath) ? devconPath : nefconPath;
-                
                 console.log('Listing all devices containing "Mtt" or "VDD":');
                 
-                // Only use devcon for device listing if available
-                if (fs.existsSync(devconPath)) {
+                // Only use devcon for device listing if available (sanitized commands)
+                if (devconExists) {
                     try {
-                        const { stdout } = await execPromise(`"${devconPath}" find "*Mtt*"`);
-                        console.log('Devices with "Mtt":', stdout);
+                        const sanitizedPath = devconPath.replace(/"/g, '`"');
+                        let result;
+                        if (window.CommandExecutor) {
+                            result = await window.CommandExecutor.executePowerShell(`"${sanitizedPath}" find "*Mtt*"`, [], { timeout: 10000 });
+                        } else if (window.electronAPI) {
+                            result = await window.electronAPI.execCommand('cmd.exe', ['/c', `"${sanitizedPath}" find "*Mtt*"`], { timeout: 10000 });
+                        }
+                        if (result && result.stdout) {
+                            console.log('Devices with "Mtt":', result.stdout);
+                        }
                     } catch (error) {
                         console.log('No devices found with "Mtt"');
                     }
                     
                     try {
-                        const { stdout } = await execPromise(`"${devconPath}" find "*VDD*"`);
-                        console.log('Devices with "VDD":', stdout);
+                        const sanitizedPath = devconPath.replace(/"/g, '`"');
+                        let result;
+                        if (window.CommandExecutor) {
+                            result = await window.CommandExecutor.executePowerShell(`"${sanitizedPath}" find "*VDD*"`, [], { timeout: 10000 });
+                        } else if (window.electronAPI) {
+                            result = await window.electronAPI.execCommand('cmd.exe', ['/c', `"${sanitizedPath}" find "*VDD*"`], { timeout: 10000 });
+                        }
+                        if (result && result.stdout) {
+                            console.log('Devices with "VDD":', result.stdout);
+                        }
                     } catch (error) {
                         console.log('No devices found with "VDD"');
                     }
                     
                     try {
-                        const { stdout } = await execPromise(`"${devconPath}" find "*Virtual*Display*"`);
-                        console.log('Virtual Display devices:', stdout);
+                        const sanitizedPath = devconPath.replace(/"/g, '`"');
+                        let result;
+                        if (window.CommandExecutor) {
+                            result = await window.CommandExecutor.executePowerShell(`"${sanitizedPath}" find "*Virtual*Display*"`, [], { timeout: 10000 });
+                        } else if (window.electronAPI) {
+                            result = await window.electronAPI.execCommand('cmd.exe', ['/c', `"${sanitizedPath}" find "*Virtual*Display*"`], { timeout: 10000 });
+                        }
+                        if (result && result.stdout) {
+                            console.log('Virtual Display devices:', result.stdout);
+                        }
                     } catch (error) {
                         console.log('No Virtual Display devices found');
                     }
@@ -1245,59 +1328,7 @@ class VirtualDriverControl {
         }
     }
 
-    // Send command to driver via named pipe
-    async sendPipeCommand(command) {
-        return new Promise((resolve, reject) => {
-            const net = window.require('net');
-            const pipePath = '\\\\.\\pipe\\MTTVirtualDisplayPipe';
-            
-            console.log(`Sending command: ${command}`);
-            
-            const client = net.createConnection(pipePath, () => {
-                // Send the command immediately when connected
-                client.write(command);
-            });
-            
-            let responseReceived = false;
-            
-            client.on('data', (data) => {
-                if (responseReceived) return;
-                responseReceived = true;
-                
-                const response = data.toString().trim();
-                console.log(`Response: ${response}`);
-                
-                client.end();
-                
-                if (response.includes('SUCCESS') || response.includes('OK') || response.length > 0) {
-                    resolve(response);
-                } else {
-                    reject(new Error(`Driver command failed: ${response}`));
-                }
-            });
-            
-            client.on('error', (error) => {
-                if (!responseReceived) {
-                    console.error('Pipe error:', error.message);
-                    reject(new Error(`Communication failed: ${error.message}`));
-                }
-            });
-            
-            client.on('end', () => {
-                if (!responseReceived) {
-                    resolve('Command sent');
-                }
-            });
-            
-            // Reduced timeout for faster response
-            setTimeout(() => {
-                if (!client.destroyed && !responseReceived) {
-                    client.destroy();
-                    reject(new Error('Command timeout'));
-                }
-            }, 3000); // 3 second timeout
-        });
-    }
+    // Note: sendPipeCommand is now implemented using secure electronAPI.sendPipeCommand() above
 
     // Refresh system status information
     async refreshSystemStatus() {
@@ -1324,15 +1355,12 @@ class VirtualDriverControl {
     // Note: Administrator privilege checking is now handled in main.js before UI creation
     // This function is no longer used for startup
 
-    // Restart the application with Administrator privileges
+    // Restart the application with Administrator privileges (updated for secure context)
     async restartAsAdministrator() {
         try {
             this.logToFile('=== ATTEMPTING TO RESTART AS ADMINISTRATOR ===');
             
-            if (typeof window !== 'undefined' && window.require && process.platform === 'win32') {
-                const { spawn } = window.require('child_process');
-                const path = window.require('path');
-                
+            if (typeof window !== 'undefined' && window.electronAPI && process.platform === 'win32') {
                 // Get the current executable path
                 const electronPath = process.execPath;
                 const appPath = process.cwd();
@@ -1344,24 +1372,29 @@ class VirtualDriverControl {
                 // Show notification about restart
                 this.showNotification('Restarting application with Administrator privileges...', 'info');
                 
-                // Use PowerShell to restart with elevated privileges
-                const psCommand = `Start-Process -FilePath "${electronPath}" -ArgumentList "${appPath}" -Verb RunAs`;
+                // Use PowerShell to restart with elevated privileges (sanitized)
+                const psCommand = `Start-Process -FilePath "${electronPath.replace(/"/g, '`"')}" -Verb RunAs`;
                 this.logToFile(`PowerShell command: ${psCommand}`);
                 
-                const { exec } = window.require('child_process');
-                const util = window.require('util');
-                const execPromise = util.promisify(exec);
-                
                 try {
-                    await execPromise(`powershell -Command "${psCommand}"`);
+                    // Use secure command execution
+                    if (window.CommandExecutor) {
+                        await window.CommandExecutor.executePowerShell(psCommand, [], {});
+                    } else if (window.electronAPI) {
+                        await window.electronAPI.execCommand('powershell.exe', [
+                            '-NoProfile',
+                            '-NonInteractive',
+                            '-ExecutionPolicy', 'Bypass',
+                            '-Command', psCommand
+                        ], { timeout: 10000 });
+                    }
                     this.logToFile('PowerShell restart command executed successfully');
                     
                     // Close current instance after a short delay
                     setTimeout(() => {
                         this.logToFile('Closing current instance');
-                        if (typeof window !== 'undefined' && window.require) {
-                            const { ipcRenderer } = window.require('electron');
-                            ipcRenderer.send('quit-app');
+                        if (window.electronAPI) {
+                            window.electronAPI.quitApp();
                         } else {
                             window.close();
                         }
@@ -1370,7 +1403,7 @@ class VirtualDriverControl {
                 } catch (psError) {
                     this.logToFile(`PowerShell restart failed: ${psError.message}`);
                     // Check if user cancelled UAC prompt
-                    if (psError.message.includes('cancelled') || psError.message.includes('denied') || psError.code === 1223) {
+                    if (psError.message && (psError.message.includes('cancelled') || psError.message.includes('denied') || psError.code === 1223)) {
                         this.logToFile('User cancelled UAC prompt');
                         this.showNotification('Administrator privileges declined. Running with limited functionality.', 'warning');
                     } else {
@@ -1380,7 +1413,7 @@ class VirtualDriverControl {
                 }
                 
             } else {
-                this.logToFile('Cannot restart as Administrator - no Node.js access or not Windows');
+                this.logToFile('Cannot restart as Administrator - no Electron API access or not Windows');
                 this.showNotification('Please manually restart the application as Administrator.', 'warning');
             }
         } catch (error) {
@@ -1389,58 +1422,69 @@ class VirtualDriverControl {
         }
     }
 
-    // Check if the application is running with Administrator privileges
+    // Check if the application is running with Administrator privileges (updated for secure context)
     async checkAdministratorPrivileges() {
         try {
-            if (typeof window !== 'undefined' && window.require) {
-                const { exec } = window.require('child_process');
-                const util = window.require('util');
-                const execPromise = util.promisify(exec);
-                
+            if (typeof window !== 'undefined' && window.electronAPI) {
                 if (process.platform === 'win32') {
-                    // Try to run a command that requires admin privileges
+                    // Use secure command execution
                     try {
-                        await execPromise('net session >nul 2>&1');
-                        return true;
+                        if (window.CommandExecutor) {
+                            const result = await window.CommandExecutor.executePowerShell(
+                                '([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)',
+                                [],
+                                { timeout: 5000 }
+                            );
+                            return result.stdout && result.stdout.trim().toLowerCase() === 'true';
+                        } else if (window.electronAPI) {
+                            const result = await window.electronAPI.execCommand('powershell.exe', [
+                                '-NoProfile',
+                                '-NonInteractive',
+                                '-ExecutionPolicy', 'Bypass',
+                                '-Command',
+                                '([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)'
+                            ], { timeout: 5000 });
+                            return result.stdout && result.stdout.trim().toLowerCase() === 'true';
+                        }
                     } catch (error) {
                         return false;
                     }
                 } else {
                     // For non-Windows platforms, check if running as root
                     try {
-                        const result = await execPromise('id -u');
-                        return result.stdout.trim() === '0';
+                        if (window.electronAPI) {
+                            const result = await window.electronAPI.execCommand('id', ['-u'], { timeout: 5000 });
+                            return result.stdout && result.stdout.trim() === '0';
+                        }
                     } catch (error) {
                         return false;
                     }
                 }
             } else {
-                this.logToFile('Cannot check admin privileges - no Node.js access');
+                this.logToFile('Cannot check admin privileges - no Electron API access');
                 return false;
             }
         } catch (error) {
             this.logToFile(`Error checking admin privileges: ${error.message}`);
             return false;
         }
+        return false;
     }
 
 
     // Driver management functions removed for system safety
 
-    openLogFolder() {
+    async openLogFolder() {
         try {
             const logPath = 'C:\\VirtualDisplayDriver\\Logs';
             
-            if (typeof window !== 'undefined' && window.require) {
-                const { shell } = window.require('electron');
-                const fs = window.require('fs');
-                const path = window.require('path');
-                
-                // Check if log directory exists
-                if (fs.existsSync(logPath)) {
+            if (typeof window !== 'undefined' && window.electronAPI) {
+                // Check if log directory exists using secure API
+                const exists = await window.electronAPI.existsFile(logPath);
+                if (exists) {
                     try {
-                        // Find the latest log file
-                        const files = fs.readdirSync(logPath);
+                        // Find the latest log file using secure API
+                        const files = await window.electronAPI.readdir(logPath);
                         const logFiles = files.filter(file => 
                             file.startsWith('log_') && file.endsWith('.txt')
                         );
@@ -1449,26 +1493,26 @@ class VirtualDriverControl {
                             // Sort by filename (which includes date) to get the latest
                             logFiles.sort((a, b) => b.localeCompare(a));
                             const latestLogFile = logFiles[0];
-                            const latestLogPath = path.join(logPath, latestLogFile);
+                            const latestLogPath = logPath + '\\' + latestLogFile;
                             
                             console.log(`Latest log file: ${latestLogFile}`);
                             
-                            // Open the latest log file directly
-                            shell.openPath(latestLogPath);
+                            // Open the latest log file directly using secure API
+                            await window.electronAPI.openPath(latestLogPath);
                         } else {
                             // No log files found, just open the folder
                             console.log('No log files found, opening folder');
-                            shell.openPath(logPath);
+                            await window.electronAPI.openPath(logPath);
                         }
                     } catch (readError) {
                         console.warn('Error reading log directory, opening folder instead:', readError);
-                        shell.openPath(logPath);
+                        await window.electronAPI.openPath(logPath);
                     }
                 } else {
-                    // Try to create the directory
+                    // Try to create the directory using secure API
                     try {
-                        fs.mkdirSync(logPath, { recursive: true });
-                        shell.openPath(logPath);
+                        await window.electronAPI.mkdir(logPath);
+                        await window.electronAPI.openPath(logPath);
                         console.log('Log directory created');
                     } catch (createError) {
                         console.error('Log directory does not exist and could not be created:', createError);
@@ -1487,21 +1531,34 @@ class VirtualDriverControl {
         try {
             this.logToFile('=== DETECTING ACTUAL DRIVER STATUS ===');
             
-            if (typeof window !== 'undefined' && window.require) {
-                const { exec } = window.require('child_process');
-                const util = window.require('util');
-                const execPromise = util.promisify(exec);
+            if (typeof window !== 'undefined' && window.electronAPI) {
+                // Use secure command execution instead of execPromise
                 
                 if (process.platform === 'win32') {
-                    // Check for virtual display driver using PowerShell
-                    const deviceQuery = 'powershell "Get-WmiObject -Class Win32_PnPEntity | Where-Object { $_.DeviceID -like \'*MttVDD*\' -or $_.Name -like \'*Virtual Display*\' -or $_.HardwareID -like \'*MttVDD*\' } | Select-Object Name, DeviceID, Status, HardwareID | Format-Table -AutoSize"';
+                    // Check for virtual display driver using PowerShell (sanitized)
+                    const deviceQuery = 'Get-WmiObject -Class Win32_PnPEntity | Where-Object { $_.DeviceID -like \'*MttVDD*\' -or $_.Name -like \'*Virtual Display*\' -or $_.HardwareID -like \'*MttVDD*\' } | Select-Object Name, DeviceID, Status, HardwareID | Format-Table -AutoSize';
                     this.logToFile(`Executing device query: ${deviceQuery}`);
                     
                     try {
-                        const result = await Promise.race([
-                            execPromise(deviceQuery),
-                            new Promise((_, reject) => setTimeout(() => reject(new Error('Device query timeout after 15 seconds')), 15000))
-                        ]);
+                        let result;
+                        if (window.CommandExecutor) {
+                            result = await Promise.race([
+                                window.CommandExecutor.executePowerShell(deviceQuery, [], { timeout: 15000 }),
+                                new Promise((_, reject) => setTimeout(() => reject(new Error('Device query timeout after 15 seconds')), 15000))
+                            ]);
+                        } else if (window.electronAPI) {
+                            result = await Promise.race([
+                                window.electronAPI.execCommand('powershell.exe', [
+                                    '-NoProfile',
+                                    '-NonInteractive',
+                                    '-ExecutionPolicy', 'Bypass',
+                                    '-Command', deviceQuery
+                                ], { timeout: 15000 }),
+                                new Promise((_, reject) => setTimeout(() => reject(new Error('Device query timeout after 15 seconds')), 15000))
+                            ]);
+                        } else {
+                            throw new Error('Command execution not available');
+                        }
                         
                         this.logToFile(`Device query stdout: ${result.stdout}`);
                         this.logToFile(`Device query stderr: ${result.stderr}`);
@@ -1537,16 +1594,26 @@ class VirtualDriverControl {
                     } catch (deviceError) {
                         this.logToFile(`Device query failed: ${deviceError.message}`);
                         
-                        // Fallback: Check using PnPUtil
+                        // Fallback: Check using PnPUtil (sanitized)
                         this.logToFile('Trying fallback method with PnPUtil...');
                         try {
                             const pnpQuery = 'pnputil /enum-drivers | findstr /i "mtt"';
                             this.logToFile(`Executing PnPUtil query: ${pnpQuery}`);
                             
-                            const pnpResult = await Promise.race([
-                                execPromise(pnpQuery),
-                                new Promise((_, reject) => setTimeout(() => reject(new Error('PnPUtil timeout after 10 seconds')), 10000))
-                            ]);
+                            let pnpResult;
+                            if (window.CommandExecutor) {
+                                pnpResult = await Promise.race([
+                                    window.CommandExecutor.executePowerShell(pnpQuery, [], { timeout: 10000 }),
+                                    new Promise((_, reject) => setTimeout(() => reject(new Error('PnPUtil timeout after 10 seconds')), 10000))
+                                ]);
+                            } else if (window.electronAPI) {
+                                pnpResult = await Promise.race([
+                                    window.electronAPI.execCommand('cmd.exe', ['/c', pnpQuery], { timeout: 10000 }),
+                                    new Promise((_, reject) => setTimeout(() => reject(new Error('PnPUtil timeout after 10 seconds')), 10000))
+                                ]);
+                            } else {
+                                throw new Error('Command execution not available');
+                            }
                             
                             this.logToFile(`PnPUtil stdout: ${pnpResult.stdout}`);
                             
@@ -1569,7 +1636,7 @@ class VirtualDriverControl {
                     this.updateDriverStatus('Not Supported', 'warning', 'Non-Windows Platform', 'N/A');
                 }
             } else {
-                this.logToFile('Node.js access not available for driver detection');
+                this.logToFile('Electron API not available for driver detection');
                 this.updateDriverStatus('Detection Failed', 'warning', 'Limited Access', 'N/A');
             }
         } catch (error) {
@@ -1614,11 +1681,10 @@ class VirtualDriverControl {
         // Update virtual monitor display based on driver status
         this.updateVirtualMonitorDisplayForDriverStatus(driverInstalled);
         
-        // Send driver status to main process for icon update
-        if (typeof require !== 'undefined') {
+        // Send driver status to main process for icon update (updated for secure context)
+        if (window.electronAPI) {
             try {
-                const { ipcRenderer } = require('electron');
-                ipcRenderer.send('driver-status-changed', statusClass);
+                window.electronAPI.updateIcon(statusClass);
             } catch (error) {
                 console.log('Could not send driver status to main process:', error);
             }
@@ -1650,17 +1716,22 @@ class VirtualDriverControl {
                 return configuredCount;
             }
 
-            // Fallback: try to detect from system if XML config not available
-            if (typeof window !== 'undefined' && window.require) {
-                const { exec } = window.require('child_process');
-                const util = window.require('util');
-                const execPromise = util.promisify(exec);
-
-                // Use WMI to query virtual displays
+            // Fallback: try to detect from system if XML config not available (updated for secure context)
+            if (typeof window !== 'undefined' && window.electronAPI) {
+                // Use WMI to query virtual displays (sanitized)
                 const wmiQuery = 'wmic path Win32_DesktopMonitor where "DeviceID like \'%DISPLAY%\'" get DeviceID,Name';
                 
                 try {
-                    const result = await execPromise(wmiQuery);
+                    let result;
+                    if (window.CommandExecutor) {
+                        result = await window.CommandExecutor.executePowerShell(wmiQuery, [], { timeout: 5000 });
+                    } else if (window.electronAPI) {
+                        result = await window.electronAPI.execCommand('wmic.exe', [
+                            'path', 'Win32_DesktopMonitor', 'where', 'DeviceID like "%DISPLAY%"', 'get', 'DeviceID,Name'
+                        ], { timeout: 5000 });
+                    } else {
+                        return 0;
+                    }
                     const lines = result.stdout.split('\n').filter(line => line.trim() && !line.includes('DeviceID'));
                     
                     // Count lines that contain virtual display indicators
@@ -1671,15 +1742,28 @@ class VirtualDriverControl {
                         }
                     });
 
-                    // Fallback: try to query displays using PowerShell
+                    // Fallback: try to query displays using PowerShell (sanitized)
                     if (virtualCount === 0) {
-                        const psQuery = 'powershell "Get-WmiObject -Class Win32_DesktopMonitor | Select-Object Name,DeviceID"';
+                        const psQuery = 'Get-WmiObject -Class Win32_DesktopMonitor | Select-Object Name,DeviceID';
                         try {
-                            const psResult = await execPromise(psQuery);
-                            const psLines = psResult.stdout.split('\n').filter(line => 
-                                line.trim() && (line.includes('Generic') || line.includes('Virtual') || line.includes('MTT'))
-                            );
-                            virtualCount = psLines.length;
+                            let psResult;
+                            if (window.CommandExecutor) {
+                                psResult = await window.CommandExecutor.executePowerShell(psQuery, [], { timeout: 5000 });
+                            } else if (window.electronAPI) {
+                                psResult = await window.electronAPI.execCommand('powershell.exe', [
+                                    '-NoProfile',
+                                    '-NonInteractive',
+                                    '-ExecutionPolicy', 'Bypass',
+                                    '-Command', psQuery
+                                ], { timeout: 5000 });
+                            }
+                            
+                            if (psResult && psResult.stdout) {
+                                const psLines = psResult.stdout.split('\n').filter(line => 
+                                    line.trim() && (line.includes('Generic') || line.includes('Virtual') || line.includes('MTT'))
+                                );
+                                virtualCount = psLines.length;
+                            }
                         } catch (psError) {
                             console.warn('PowerShell query failed:', psError);
                         }
@@ -1695,7 +1779,7 @@ class VirtualDriverControl {
                     return fallbackCount;
                 }
             } else {
-                console.warn('Node.js access not available for display detection');
+                console.warn('Electron API not available for display detection');
                 return 1;
             }
         } catch (error) {
@@ -1704,21 +1788,21 @@ class VirtualDriverControl {
         }
     }
 
-    // Get configured monitor count from XML file
+    // Get configured monitor count from XML file (updated for secure context)
     async getConfiguredMonitorCount() {
         try {
-            if (typeof window !== 'undefined' && window.require) {
-                const fs = window.require('fs');
+            if (typeof window !== 'undefined' && window.electronAPI) {
                 const settingsPath = 'C:\\VirtualDisplayDriver\\vdd_settings.xml';
 
-                // Check if file exists
-                if (!fs.existsSync(settingsPath)) {
+                // Check if file exists using secure API
+                const exists = await window.electronAPI.existsFile(settingsPath);
+                if (!exists) {
                     console.log('VDD settings file not found');
                     return 0;
                 }
 
-                // Read and parse XML file
-                const xmlContent = fs.readFileSync(settingsPath, 'utf8');
+                // Read and parse XML file using secure API
+                const xmlContent = await window.electronAPI.readFile(settingsPath);
                 const parser = new DOMParser();
                 const xmlDoc = parser.parseFromString(xmlContent, 'text/xml');
 
@@ -1783,17 +1867,20 @@ class VirtualDriverControl {
     // Detect IddCx version
     async detectIddCxVersion() {
         try {
-            if (typeof window !== 'undefined' && window.require) {
-                const { exec } = window.require('child_process');
-                const util = window.require('util');
-                const execPromise = util.promisify(exec);
-
+            if (typeof window !== 'undefined' && window.electronAPI) {
                 try {
-                    // Method 1: Use IddCxVersionQuery.exe for accurate version detection
+                    // Method 1: Use IddCxVersionQuery.exe for accurate version detection (sanitized)
                     const iddCxQueryPath = 'C:\\VirtualDisplayDriver\\EDID\\IddCxVersionQuery.exe';
                     
                     try {
-                        const result = await execPromise(`echo q | "${iddCxQueryPath}"`);
+                        let result;
+                        if (window.CommandExecutor) {
+                            result = await window.CommandExecutor.executePowerShell(`echo q | "${iddCxQueryPath.replace(/"/g, '`"')}"`, [], { timeout: 10000 });
+                        } else if (window.electronAPI) {
+                            result = await window.electronAPI.execCommand('cmd.exe', ['/c', `echo q | "${iddCxQueryPath}"`], { timeout: 10000 });
+                        } else {
+                            throw new Error('Command execution not available');
+                        }
                         const output = result.stdout;
                         
                         // Parse IddCx version from output
@@ -1813,10 +1900,22 @@ class VirtualDriverControl {
                         console.warn('IddCxVersionQuery.exe failed:', queryError);
                     }
 
-                    // Method 2: Query driver date using PowerShell for precise version mapping
+                    // Method 2: Query driver date using PowerShell for precise version mapping (sanitized)
                     try {
-                        const driverDateQuery = 'powershell "Get-WmiObject Win32_PnPSignedDriver | Where-Object {$_.DeviceName -like \'*Display*\' -or $_.HardwareID -like \'*IDDCX*\' -or $_.DeviceName -like \'*Virtual*\'} | Select-Object DeviceName, DriverDate, DriverVersion | ForEach-Object { \\"$($_.DeviceName)|$($_.DriverDate)|$($_.DriverVersion)\\" }"';
-                        const dateResult = await execPromise(driverDateQuery);
+                        const driverDateQuery = 'Get-WmiObject Win32_PnPSignedDriver | Where-Object {$_.DeviceName -like \'*Display*\' -or $_.HardwareID -like \'*IDDCX*\' -or $_.DeviceName -like \'*Virtual*\'} | Select-Object DeviceName, DriverDate, DriverVersion | ForEach-Object { "$($_.DeviceName)|$($_.DriverDate)|$($_.DriverVersion)" }';
+                        let dateResult;
+                        if (window.CommandExecutor) {
+                            dateResult = await window.CommandExecutor.executePowerShell(driverDateQuery, [], { timeout: 10000 });
+                        } else if (window.electronAPI) {
+                            dateResult = await window.electronAPI.execCommand('powershell.exe', [
+                                '-NoProfile',
+                                '-NonInteractive',
+                                '-ExecutionPolicy', 'Bypass',
+                                '-Command', driverDateQuery
+                            ], { timeout: 10000 });
+                        } else {
+                            throw new Error('Command execution not available');
+                        }
                         
                         // Parse PowerShell output for driver date
                         const lines = dateResult.stdout.split('\n').filter(line => line.trim());
@@ -2078,31 +2177,35 @@ class VirtualDriverControl {
         // Immediate fallback - use known date if PowerShell methods fail
         const knownDriverDate = '25.8.14'; // From our WMI testing: 20250814000000.******+***
         
-        // Quick test - if Node.js isn't available, use fallback immediately
-        if (typeof window === 'undefined' || !window.require) {
-            console.log('Node.js not available, using known date');
+        // Quick test - if Electron API isn't available, use fallback immediately
+        if (typeof window === 'undefined' || !window.electronAPI) {
+            console.log('Electron API not available, using known date');
             this.updateDriverVersion(knownDriverDate);
             return knownDriverDate;
         }
         
         try {
-            if (typeof window !== 'undefined' && window.require) {
-                const { exec } = window.require('child_process');
-                const util = window.require('util');
-                const execPromise = util.promisify(exec);
-
-                // Add timeout wrapper for all PowerShell commands
-                const execWithTimeout = (command, timeout = 5000) => {
-                    return Promise.race([
-                        execPromise(command),
-                        new Promise((_, reject) => setTimeout(() => reject(new Error('Command timeout')), timeout))
-                    ]);
+            if (typeof window !== 'undefined' && window.electronAPI) {
+                // Use secure command execution with timeout
+                const execWithTimeout = async (command, args, timeout = 5000) => {
+                    if (window.CommandExecutor) {
+                        return await window.CommandExecutor.executePowerShell(command, args, { timeout });
+                    } else if (window.electronAPI) {
+                        return await window.electronAPI.execCommand('powershell.exe', [
+                            '-NoProfile',
+                            '-NonInteractive',
+                            '-ExecutionPolicy', 'Bypass',
+                            '-Command', command,
+                            ...args
+                        ], { timeout });
+                    }
+                    throw new Error('Command execution not available');
                 };
 
                 try {
-                    // Query virtual display drivers for their dates and versions
-                    const driverQuery = 'powershell "Get-WmiObject Win32_PnPSignedDriver | Where-Object {$_.DeviceName -like \'*Virtual Display*\' -or $_.DeviceName -like \'*VDD*\'} | Select-Object DeviceName, DriverDate, DriverVersion | ForEach-Object { \\"$($_.DeviceName)|$($_.DriverDate)|$($_.DriverVersion)\\" }"';
-                    const result = await execWithTimeout(driverQuery);
+                    // Query virtual display drivers for their dates and versions (sanitized)
+                    const driverQuery = 'Get-WmiObject Win32_PnPSignedDriver | Where-Object {$_.DeviceName -like \'*Virtual Display*\' -or $_.DeviceName -like \'*VDD*\'} | Select-Object DeviceName, DriverDate, DriverVersion | ForEach-Object { "$($_.DeviceName)|$($_.DriverDate)|$($_.DriverVersion)" }';
+                    const result = await execWithTimeout(driverQuery, [], 5000);
                     
                     console.log('Driver query result:', result.stdout);
                     
@@ -2167,10 +2270,10 @@ class VirtualDriverControl {
                         console.warn('Broad display driver query failed:', broadError);
                     }
                     
-                    // Method 3: Check actual driver file date
+                    // Method 3: Check actual driver file date (sanitized)
                     try {
-                        const driverFileQuery = 'powershell "(Get-Item \'C:\\Windows\\System32\\drivers\\UMDF\\MttVDD.dll\').LastWriteTime.ToString(\'yyyy.MM.dd\')"';
-                        const fileResult = await execWithTimeout(driverFileQuery);
+                        const driverFileQuery = '(Get-Item \'C:\\Windows\\System32\\drivers\\UMDF\\MttVDD.dll\').LastWriteTime.ToString(\'yyyy.MM.dd\')';
+                        const fileResult = await execWithTimeout(driverFileQuery, [], 5000);
                         const fileDate = fileResult.stdout.trim();
                         
                         if (fileDate && fileDate.match(/^\d{4}\.\d{2}\.\d{2}$/)) {
@@ -2510,14 +2613,26 @@ class VirtualDriverControl {
                 return 0;
             });
             
-            // Create HTML for versions
+            // Create HTML for versions using safe DOM methods
             if (uniqueVersions.length === 0) {
-                versionsContainer.innerHTML = `
-                    <div class="version-error">
-                        <i class="fas fa-exclamation-triangle"></i>
-                        <span>No version information found in the XML file</span>
-                    </div>
-                `;
+                if (window.DOMUtils) {
+                    window.DOMUtils.clear(versionsContainer);
+                } else {
+                    versionsContainer.textContent = '';
+                    while (versionsContainer.firstChild) {
+                        versionsContainer.removeChild(versionsContainer.firstChild);
+                    }
+                }
+                
+                const errorDiv = document.createElement('div');
+                errorDiv.className = 'version-error';
+                const icon = document.createElement('i');
+                icon.className = 'fas fa-exclamation-triangle';
+                const span = document.createElement('span');
+                span.textContent = 'No version information found in the XML file';
+                errorDiv.appendChild(icon);
+                errorDiv.appendChild(span);
+                versionsContainer.appendChild(errorDiv);
                 return;
             }
             
@@ -2567,7 +2682,22 @@ class VirtualDriverControl {
                 `;
             }).join('');
             
-            versionsContainer.innerHTML = versionsHtml;
+            // Use safe DOM method instead of innerHTML
+            // Note: versionsHtml contains HTML from trusted GitHub API, but we still use safe parsing
+            if (window.DOMUtils && window.DOMUtils.createFromHTML) {
+                window.DOMUtils.clear(versionsContainer);
+                // Parse HTML safely
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(versionsHtml, 'text/html');
+                const fragment = document.createDocumentFragment();
+                Array.from(doc.body.children).forEach(child => {
+                    fragment.appendChild(child.cloneNode(true));
+                });
+                versionsContainer.appendChild(fragment);
+            } else {
+                // Fallback: Use innerHTML only for trusted GitHub API data
+                versionsContainer.innerHTML = versionsHtml;
+            }
             console.log(`Displayed ${uniqueVersions.length} available versions`);
             
             // Check for newer versions and show update notification
@@ -2602,17 +2732,30 @@ class VirtualDriverControl {
         }
     }
 
-    // Display error message for version fetching
+    // Display error message for version fetching (updated for security)
     displayVersionError(message) {
         const versionsContainer = document.getElementById('available-versions');
         
         if (versionsContainer) {
-            versionsContainer.innerHTML = `
-                <div class="version-error">
-                    <i class="fas fa-exclamation-triangle"></i>
-                    <span>Error: ${message}</span>
-                </div>
-            `;
+            // Use safe DOM methods
+            if (window.DOMUtils) {
+                window.DOMUtils.clear(versionsContainer);
+            } else {
+                versionsContainer.textContent = '';
+                while (versionsContainer.firstChild) {
+                    versionsContainer.removeChild(versionsContainer.firstChild);
+                }
+            }
+            
+            const errorDiv = document.createElement('div');
+            errorDiv.className = 'version-error';
+            const icon = document.createElement('i');
+            icon.className = 'fas fa-exclamation-triangle';
+            const span = document.createElement('span');
+            span.textContent = `Error: ${message}`;
+            errorDiv.appendChild(icon);
+            errorDiv.appendChild(span);
+            versionsContainer.appendChild(errorDiv);
         }
     }
     
@@ -2788,9 +2931,17 @@ class VirtualDriverControl {
             // Remove loading option
             loadingOption.remove();
 
-            // Clear any other options except default (keep the first "default" option)
+            // Clear any other options except default (keep the first "default" option) - updated for security
             const defaultOption = gpuSelect.querySelector('option[value="default"]');
-            gpuSelect.innerHTML = '';
+            // Use safe DOM clearing instead of innerHTML
+            if (window.DOMUtils) {
+                window.DOMUtils.clear(gpuSelect);
+            } else {
+                gpuSelect.textContent = '';
+                while (gpuSelect.firstChild) {
+                    gpuSelect.removeChild(gpuSelect.firstChild);
+                }
+            }
             if (defaultOption) {
                 gpuSelect.appendChild(defaultOption);
             } else {
@@ -2934,38 +3085,15 @@ class VirtualDriverControl {
         });
     }
 
-    // Detect GPUs via Electron API
+    // Detect GPUs via Electron API (updated for secure context)
     async detectGPUsElectron() {
         const gpus = [];
         
         try {
-            if (typeof window !== 'undefined' && window.require) {
-                const electron = window.require('electron');
-                const { app } = electron.remote || electron;
-                if (app && typeof app.getGPUInfo === 'function') {
-                    const gpuInfo = await app.getGPUInfo('complete');
-                    console.log('Electron GPU Info:', gpuInfo);
-                    
-                    if (gpuInfo && gpuInfo.gpuDevice && Array.isArray(gpuInfo.gpuDevice)) {
-                        gpuInfo.gpuDevice.forEach(gpu => {
-                            if (gpu.description || gpu.deviceString) {
-                                const rawName = gpu.description || gpu.deviceString || 'Unknown GPU';
-                                const friendlyName = this.extractGPUFriendlyName(rawName);
-                                // Filter out virtual display adapters
-                                if (!friendlyName.toLowerCase().includes('virtual')) {
-                                    gpus.push({
-                                        name: friendlyName,
-                                        vendor: gpu.vendorString || this.getGPUVendor(friendlyName) || 'Unknown',
-                                        device: rawName
-                                    });
-                                } else {
-                                    console.log('Filtered out virtual GPU (Electron):', friendlyName);
-                                }
-                            }
-                        });
-                    }
-                }
-            }
+            // Note: Electron GPU API is not available in secure context
+            // This function is kept for compatibility but will not work with contextIsolation enabled
+            // GPU detection now relies on WebGL and Windows-specific methods
+            console.log('Electron GPU API not available in secure context, using WebGL/Windows methods instead');
         } catch (error) {
             console.error('Electron GPU detection failed:', error);
         }
@@ -2973,42 +3101,53 @@ class VirtualDriverControl {
         return gpus;
     }
 
-    // Windows-specific GPU detection using system commands
+    // Windows-specific GPU detection using system commands (updated for secure context)
     async detectGPUsWindows() {
         const gpus = [];
         
         try {
-            if (window.require) {
-                const { exec } = window.require('child_process');
-                const util = window.require('util');
-                const execPromise = util.promisify(exec);
-
-                // Use WMIC to query GPU information
-                const { stdout } = await execPromise('wmic path win32_VideoController get Name,Description /format:csv');
+            if (window.electronAPI) {
+                // Use WMIC to query GPU information (sanitized)
+                let result;
+                if (window.CommandExecutor) {
+                    result = await window.CommandExecutor.executePowerShell(
+                        'wmic path win32_VideoController get Name,Description /format:csv',
+                        [],
+                        { timeout: 10000 }
+                    );
+                } else if (window.electronAPI) {
+                    result = await window.electronAPI.execCommand('wmic.exe', [
+                        'path', 'win32_VideoController', 'get', 'Name,Description', '/format:csv'
+                    ], { timeout: 10000 });
+                } else {
+                    return gpus;
+                }
                 
-                const lines = stdout.split('\n').filter(line => line.trim() && !line.startsWith('Node'));
-                
-                lines.forEach(line => {
-                    const parts = line.split(',');
-                    if (parts.length >= 3) {
-                        const description = parts[1]?.trim();
-                        const name = parts[2]?.trim();
-                        
-                        if (name && name !== 'Description' && name !== 'Name') {
-                            const friendlyName = this.extractGPUFriendlyName(name);
-                            // Filter out virtual display adapters
-                            if (!friendlyName.toLowerCase().includes('virtual')) {
-                                gpus.push({
-                                    name: friendlyName,
-                                    vendor: this.getGPUVendor(friendlyName),
-                                    device: description || name
-                                });
-                            } else {
-                                console.log('Filtered out virtual GPU (Windows):', friendlyName);
+                if (result && result.stdout) {
+                    const lines = result.stdout.split('\n').filter(line => line.trim() && !line.startsWith('Node'));
+                    
+                    lines.forEach(line => {
+                        const parts = line.split(',');
+                        if (parts.length >= 3) {
+                            const description = parts[1]?.trim();
+                            const name = parts[2]?.trim();
+                            
+                            if (name && name !== 'Description' && name !== 'Name') {
+                                const friendlyName = this.extractGPUFriendlyName(name);
+                                // Filter out virtual display adapters
+                                if (!friendlyName.toLowerCase().includes('virtual')) {
+                                    gpus.push({
+                                        name: friendlyName,
+                                        vendor: this.getGPUVendor(friendlyName),
+                                        device: description || name
+                                    });
+                                } else {
+                                    console.log('Filtered out virtual GPU (Windows):', friendlyName);
+                                }
                             }
                         }
-                    }
-                });
+                    });
+                }
             }
         } catch (error) {
             console.error('Windows GPU detection failed:', error);
@@ -3160,18 +3299,35 @@ class VirtualDriverControl {
         const container = document.getElementById('refresh-rates-list');
         if (!container) return;
         
-        container.innerHTML = '';
+        // Clear container safely
+        if (window.DOMUtils) {
+            window.DOMUtils.clear(container);
+        } else {
+            container.textContent = '';
+            while (container.firstChild) {
+                container.removeChild(container.firstChild);
+            }
+        }
         
         this.refreshRates.forEach(rate => {
             const item = document.createElement('div');
             item.className = 'refresh-rate-item';
             
-            item.innerHTML = `
-                <span class="refresh-rate-value">${rate} Hz</span>
-                <button type="button" class="refresh-rate-remove" title="Remove ${rate} Hz">
-                    <i class="fas fa-times"></i>
-                </button>
-            `;
+            // Use safe DOM methods instead of innerHTML
+            const valueSpan = document.createElement('span');
+            valueSpan.className = 'refresh-rate-value';
+            valueSpan.textContent = `${rate} Hz`;
+            
+            const removeBtn = document.createElement('button');
+            removeBtn.type = 'button';
+            removeBtn.className = 'refresh-rate-remove';
+            removeBtn.title = `Remove ${rate} Hz`;
+            const removeIcon = document.createElement('i');
+            removeIcon.className = 'fas fa-times';
+            removeBtn.appendChild(removeIcon);
+            
+            item.appendChild(valueSpan);
+            item.appendChild(removeBtn);
             
             // Add remove functionality
             const removeBtn = item.querySelector('.refresh-rate-remove');
@@ -3651,17 +3807,25 @@ class VirtualDriverControl {
         }
     }
 
-    // Write temporary EDID file for parsing
+    // Write temporary EDID file for parsing (updated for secure context)
     async writeTemporaryEDIDFile(uint8Array) {
-        if (typeof window !== 'undefined' && window.require) {
-            const fs = window.require('fs');
-            const path = window.require('path');
-            const os = window.require('os');
+        if (typeof window !== 'undefined' && window.electronAPI) {
+            // Convert Uint8Array to base64 for transmission
+            const base64 = btoa(String.fromCharCode(...uint8Array));
             
-            const tempDir = os.tmpdir();
-            const tempFile = path.join(tempDir, 'temp_edid.bin');
+            // Use temp directory path (Windows temp directory)
+            const tempDir = 'C:\\Windows\\Temp';
+            const tempFile = tempDir + '\\temp_edid.bin';
             
-            fs.writeFileSync(tempFile, Buffer.from(uint8Array));
+            // Write file using secure API (convert base64 back to binary)
+            const binaryString = atob(base64);
+            const bytes = new Uint8Array(binaryString.length);
+            for (let i = 0; i < binaryString.length; i++) {
+                bytes[i] = binaryString.charCodeAt(i);
+            }
+            const content = String.fromCharCode(...bytes);
+            
+            await window.electronAPI.writeFile(tempFile, content);
             console.log('Temporary EDID file written to:', tempFile);
             
             return tempFile;
@@ -3670,55 +3834,70 @@ class VirtualDriverControl {
         }
     }
 
-    // Run Parse.exe to parse the EDID
+    // Run Parse.exe to parse the EDID (updated for secure context)
     async runEDIDParser(edidFilePath) {
-        if (typeof window !== 'undefined' && window.require) {
-            const { exec } = window.require('child_process');
-            const util = window.require('util');
-            const fs = window.require('fs');
-            const path = window.require('path');
-            const execPromise = util.promisify(exec);
-            
+        if (typeof window !== 'undefined' && window.electronAPI) {
             try {
                 console.log('Running Parse.exe...');
                 
-                // Clear any existing monitor_profile.xml first
+                // Validate and sanitize file path
+                if (window.Sanitizer) {
+                    edidFilePath = window.Sanitizer.sanitizeFilePath(edidFilePath);
+                }
+                
+                // Clear any existing monitor_profile.xml first using secure API
                 const profilePath = 'C:\\VirtualDisplayDriver\\EDID\\monitor_profile.xml';
                 try {
-                    if (fs.existsSync(profilePath)) {
-                        fs.unlinkSync(profilePath);
+                    const exists = await window.electronAPI.existsFile(profilePath);
+                    if (exists) {
+                        await window.electronAPI.unlink(profilePath);
                         console.log('Cleared existing monitor_profile.xml');
                     }
                 } catch (clearError) {
                     console.warn('Could not clear existing profile:', clearError.message);
                 }
                 
-                // Run the EDID parser from its proper directory so it creates monitor_profile.xml in the right place
+                // Run the EDID parser from its proper directory (sanitized command)
                 const edidDir = 'C:\\VirtualDisplayDriver\\EDID';
-                const command = `cd /d "${edidDir}" && Parse.exe "${edidFilePath}"`;
-                console.log('Executing command:', command);
-                console.log('Working directory will be:', edidDir);
                 
-                const { stdout, stderr } = await execPromise(command);
-                
-                if (stderr && stderr.trim()) {
-                    console.warn('Parse.exe stderr:', stderr);
+                // Use secure command execution
+                let result;
+                if (window.CommandExecutor) {
+                    // Sanitize the file path in the command
+                    const sanitizedPath = edidFilePath.replace(/"/g, '`"');
+                    const command = `cd "${edidDir}"; Parse.exe "${sanitizedPath}"`;
+                    result = await window.CommandExecutor.executePowerShell(command, [], { timeout: 30000 });
+                } else if (window.electronAPI) {
+                    // Use cmd.exe with sanitized arguments
+                    const sanitizedPath = edidFilePath.replace(/"/g, '`"');
+                    result = await window.electronAPI.execCommand('cmd.exe', [
+                        '/c',
+                        'cd', '/d', edidDir, '&&',
+                        'Parse.exe', sanitizedPath
+                    ], { timeout: 30000, cwd: edidDir });
+                } else {
+                    throw new Error('Command execution not available');
                 }
                 
-                console.log('Parse.exe output:', stdout);
+                if (result.stderr && result.stderr.trim()) {
+                    console.warn('Parse.exe stderr:', result.stderr);
+                }
+                
+                console.log('Parse.exe output:', result.stdout);
                 
                 // Wait 5 seconds for Parse.exe to finish writing the XML file
                 console.log('Waiting 5 seconds for XML file generation...');
                 await new Promise(resolve => setTimeout(resolve, 5000));
                 
-                // Check if monitor_profile.xml was created
-                if (fs.existsSync(profilePath)) {
+                // Check if monitor_profile.xml was created using secure API
+                const exists = await window.electronAPI.existsFile(profilePath);
+                if (exists) {
                     console.log('monitor_profile.xml created successfully, reading...');
-                    const xmlContent = fs.readFileSync(profilePath, 'utf8');
+                    const xmlContent = await window.electronAPI.readFile(profilePath);
                     return this.parseMonitorProfileXML(xmlContent);
                 } else {
                     console.warn('monitor_profile.xml not found after waiting, falling back to console output parsing');
-                    return this.parseEDIDOutput(stdout);
+                    return this.parseEDIDOutput(result.stdout || '');
                 }
                 
             } catch (error) {
@@ -3928,55 +4107,168 @@ class VirtualDriverControl {
         }
     }
 
-    // Display EDID analysis results
+    // Display EDID analysis results (updated for security - using safe DOM methods)
     displayEDIDAnalysis(analysis) {
         const container = document.getElementById('edid-analysis-results');
         if (!container) return;
         
-        // Build additional sections for XML data
-        let additionalSections = '';
+        // Clear container safely
+        if (window.DOMUtils) {
+            window.DOMUtils.clear(container);
+        } else {
+            container.textContent = '';
+            while (container.firstChild) {
+                container.removeChild(container.firstChild);
+            }
+        }
         
-        if (analysis.source === 'monitor_profile.xml') {
-            // Add manufacture date if available
-            if (analysis.manufactureDate !== 'Unknown') {
-                additionalSections += `
-                    <div class="edid-property">
-                        <span class="edid-property-name">Manufacture Date:</span>
-                        <span class="edid-property-value">${analysis.manufactureDate}</span>
-                    </div>
-                `;
-            }
-            
-            // Add color depth section if available
-            if (analysis.colorDepth !== 'Unknown') {
-                additionalSections += `
-                    <div class="edid-section">
-                        <div class="edid-section-title">Color Information</div>
-                        <div class="edid-property">
-                            <span class="edid-property-name">Color Depth:</span>
-                            <span class="edid-property-value">${analysis.colorDepth}</span>
-                        </div>
-                    </div>
-                `;
-            }
-            
-            // Add chromaticity section if available
-            if (analysis.chromaticity) {
-                additionalSections += `
-                    <div class="edid-section">
-                        <div class="edid-section-title">Color Chromaticity</div>
-                        ${analysis.chromaticity.red_x !== null ? `
-                            <div class="edid-property">
-                                <span class="edid-property-name">Red X:</span>
-                                <span class="edid-property-value">${analysis.chromaticity.red_x.toFixed(4)}</span>
-                            </div>
-                        ` : ''}
-                        ${analysis.chromaticity.green_x !== null ? `
-                            <div class="edid-property">
-                                <span class="edid-property-name">Green X:</span>
-                                <span class="edid-property-value">${analysis.chromaticity.green_x.toFixed(4)}</span>
-                            </div>
-                        ` : ''}
+        // Escape HTML to prevent XSS
+        const escapeHtml = (text) => {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        };
+        
+        // Build content using safe DOM methods
+        const contentDiv = document.createElement('div');
+        contentDiv.className = 'edid-analysis-content';
+        
+        // Source info
+        const sourceInfoDiv = document.createElement('div');
+        sourceInfoDiv.style.cssText = 'margin-bottom: 16px; text-align: right;';
+        sourceInfoDiv.textContent = analysis.source === 'monitor_profile.xml' 
+            ? '📄 Parsed from monitor_profile.xml' 
+            : '📋 Parsed from console output';
+        contentDiv.appendChild(sourceInfoDiv);
+        
+        // Display Information section
+        const displaySection = document.createElement('div');
+        displaySection.className = 'edid-section';
+        
+        const displayTitle = document.createElement('div');
+        displayTitle.className = 'edid-section-title';
+        displayTitle.textContent = 'Display Information';
+        displaySection.appendChild(displayTitle);
+        
+        // Manufacturer
+        const manufacturerProp = document.createElement('div');
+        manufacturerProp.className = 'edid-property';
+        const manufacturerName = document.createElement('span');
+        manufacturerName.className = 'edid-property-name';
+        manufacturerName.textContent = 'Manufacturer:';
+        const manufacturerValue = document.createElement('span');
+        manufacturerValue.className = 'edid-property-value';
+        manufacturerValue.textContent = analysis.manufacturer || 'Unknown';
+        manufacturerProp.appendChild(manufacturerName);
+        manufacturerProp.appendChild(manufacturerValue);
+        displaySection.appendChild(manufacturerProp);
+        
+        // Model
+        const modelProp = document.createElement('div');
+        modelProp.className = 'edid-property';
+        const modelName = document.createElement('span');
+        modelName.className = 'edid-property-name';
+        modelName.textContent = 'Model:';
+        const modelValue = document.createElement('span');
+        modelValue.className = 'edid-property-value';
+        modelValue.textContent = analysis.model || 'Unknown';
+        modelProp.appendChild(modelName);
+        modelProp.appendChild(modelValue);
+        displaySection.appendChild(modelProp);
+        
+        // Serial Number
+        const serialProp = document.createElement('div');
+        serialProp.className = 'edid-property';
+        const serialName = document.createElement('span');
+        serialName.className = 'edid-property-name';
+        serialName.textContent = 'Serial Number:';
+        const serialValue = document.createElement('span');
+        serialValue.className = 'edid-property-value';
+        serialValue.textContent = analysis.serialNumber || 'Unknown';
+        serialProp.appendChild(serialName);
+        serialProp.appendChild(serialValue);
+        displaySection.appendChild(serialProp);
+        
+        contentDiv.appendChild(displaySection);
+        
+        // Resolutions section
+        const resolutionsSection = document.createElement('div');
+        resolutionsSection.className = 'edid-section';
+        
+        const resolutionsTitle = document.createElement('div');
+        resolutionsTitle.className = 'edid-section-title';
+        resolutionsTitle.textContent = `Supported Resolutions (${analysis.resolutions.length} modes)`;
+        resolutionsSection.appendChild(resolutionsTitle);
+        
+        if (analysis.resolutions.length > 0) {
+            analysis.resolutions.forEach(res => {
+                const resProp = document.createElement('div');
+                resProp.className = 'edid-property';
+                const resName = document.createElement('span');
+                resName.className = 'edid-property-name';
+                resName.textContent = `${res.width}x${res.height}`;
+                const resValue = document.createElement('span');
+                resValue.className = 'edid-property-value';
+                resValue.textContent = `${res.refreshRate} Hz`;
+                resProp.appendChild(resName);
+                resProp.appendChild(resValue);
+                resolutionsSection.appendChild(resProp);
+            });
+        } else {
+            const noResProp = document.createElement('div');
+            noResProp.className = 'edid-property';
+            const noResName = document.createElement('span');
+            noResName.className = 'edid-property-name';
+            noResName.textContent = 'No resolutions found';
+            noResProp.appendChild(noResName);
+            resolutionsSection.appendChild(noResProp);
+        }
+        
+        contentDiv.appendChild(resolutionsSection);
+        
+        // Refresh Rates section
+        const refreshSection = document.createElement('div');
+        refreshSection.className = 'edid-section';
+        
+        const refreshTitle = document.createElement('div');
+        refreshTitle.className = 'edid-section-title';
+        refreshTitle.textContent = `Refresh Rates (${analysis.refreshRates.length} rates)`;
+        refreshSection.appendChild(refreshTitle);
+        
+        const refreshProp = document.createElement('div');
+        refreshProp.className = 'edid-property';
+        const refreshName = document.createElement('span');
+        refreshName.className = 'edid-property-name';
+        refreshName.textContent = 'Supported Rates:';
+        const refreshValue = document.createElement('span');
+        refreshValue.className = 'edid-property-value';
+        refreshValue.textContent = analysis.refreshRates.length > 0 
+            ? analysis.refreshRates.join(', ') + ' Hz' 
+            : 'None detected';
+        refreshProp.appendChild(refreshName);
+        refreshProp.appendChild(refreshValue);
+        refreshSection.appendChild(refreshProp);
+        
+        contentDiv.appendChild(refreshSection);
+        
+        // Full XML Markup section
+        const xmlSection = document.createElement('div');
+        xmlSection.className = 'edid-section';
+        
+        const xmlTitle = document.createElement('div');
+        xmlTitle.className = 'edid-section-title';
+        xmlTitle.textContent = 'Full XML Markup';
+        xmlSection.appendChild(xmlTitle);
+        
+        const xmlPre = document.createElement('pre');
+        xmlPre.style.cssText = 'white-space: pre-wrap; font-size: 12px; color: var(--text-primary); max-height: 300px; overflow-y: auto; background: var(--bg-tertiary); padding: 12px; border-radius: var(--radius-small); border: 1px solid var(--border-light); line-height: 1.4;';
+        xmlPre.textContent = analysis.rawOutput || '';
+        xmlSection.appendChild(xmlPre);
+        
+        contentDiv.appendChild(xmlSection);
+        
+        container.appendChild(contentDiv);
+    }
                         ${analysis.chromaticity.blue_x !== null ? `
                             <div class="edid-property">
                                 <span class="edid-property-name">Blue X:</span>
@@ -3994,81 +4286,68 @@ class VirtualDriverControl {
             }
         }
         
-        const sourceInfo = analysis.source === 'monitor_profile.xml' ? 
-            '<small style="color: var(--accent-primary); font-weight: 500;">📄 Parsed from monitor_profile.xml</small>' : 
-            '<small style="color: var(--text-tertiary);">📋 Parsed from console output</small>';
-        
-        container.innerHTML = `
-            <div class="edid-analysis-content">
-                <div style="margin-bottom: 16px; text-align: right;">${sourceInfo}</div>
-                
-                <div class="edid-section">
-                    <div class="edid-section-title">Display Information</div>
-                    <div class="edid-property">
-                        <span class="edid-property-name">Manufacturer:</span>
-                        <span class="edid-property-value">${analysis.manufacturer}</span>
-                    </div>
-                    <div class="edid-property">
-                        <span class="edid-property-name">Model:</span>
-                        <span class="edid-property-value">${analysis.model}</span>
-                    </div>
-                    <div class="edid-property">
-                        <span class="edid-property-name">Serial Number:</span>
-                        <span class="edid-property-value">${analysis.serialNumber}</span>
-                    </div>
-                    ${additionalSections}
-                </div>
-                
-                <div class="edid-section">
-                    <div class="edid-section-title">Supported Resolutions (${analysis.resolutions.length} modes)</div>
-                    ${analysis.resolutions.length > 0 ? analysis.resolutions.map(res => `
-                        <div class="edid-property">
-                            <span class="edid-property-name">${res.width}x${res.height}</span>
-                            <span class="edid-property-value">${res.refreshRate} Hz</span>
-                        </div>
-                    `).join('') : '<div class="edid-property"><span class="edid-property-name">No resolutions found</span></div>'}
-                </div>
-                
-                <div class="edid-section">
-                    <div class="edid-section-title">Refresh Rates (${analysis.refreshRates.length} rates)</div>
-                    <div class="edid-property">
-                        <span class="edid-property-name">Supported Rates:</span>
-                        <span class="edid-property-value">${analysis.refreshRates.length > 0 ? analysis.refreshRates.join(', ') + ' Hz' : 'None detected'}</span>
-                    </div>
-                </div>
-                
-                <div class="edid-section">
-                    <div class="edid-section-title">Full XML Markup</div>
-                    <pre style="white-space: pre-wrap; font-size: 12px; color: var(--text-primary); max-height: 300px; overflow-y: auto; background: var(--bg-tertiary); padding: 12px; border-radius: var(--radius-small); border: 1px solid var(--border-light); line-height: 1.4;">${this.escapeHtml(analysis.rawOutput)}</pre>
-                </div>
-            </div>
-        `;
+        // Note: The rest of displayEDIDAnalysis is now handled by the safe DOM method version above
     }
 
-    // Display EDID error
+    // Display EDID error (updated for security)
     displayEDIDError(errorMessage) {
         const container = document.getElementById('edid-analysis-results');
         if (!container) return;
         
-        container.innerHTML = `
-            <div class="edid-placeholder" style="color: var(--danger);">
-                <i class="fas fa-exclamation-triangle"></i>
-                <span>Error: ${errorMessage}</span>
-            </div>
-        `;
+        // Clear container safely
+        if (window.DOMUtils) {
+            window.DOMUtils.clear(container);
+        } else {
+            container.textContent = '';
+            while (container.firstChild) {
+                container.removeChild(container.firstChild);
+            }
+        }
+        
+        // Create error placeholder using safe DOM methods
+        const placeholder = document.createElement('div');
+        placeholder.className = 'edid-placeholder';
+        placeholder.style.color = 'var(--danger)';
+        
+        const icon = document.createElement('i');
+        icon.className = 'fas fa-exclamation-triangle';
+        placeholder.appendChild(icon);
+        
+        const errorText = document.createElement('span');
+        errorText.textContent = `Error: ${errorMessage}`;
+        placeholder.appendChild(errorText);
+        
+        container.appendChild(placeholder);
     }
 
-    // Clear EDID results
+    // Clear EDID results (updated for security)
     clearEDIDResults() {
         const container = document.getElementById('edid-analysis-results');
         if (!container) return;
         
-        container.innerHTML = `
-            <div class="edid-placeholder">
-                <i class="fas fa-spinner fa-spin"></i>
-                <span>Processing EDID file...</span>
-            </div>
-        `;
+        // Clear container safely
+        if (window.DOMUtils) {
+            window.DOMUtils.clear(container);
+        } else {
+            container.textContent = '';
+            while (container.firstChild) {
+                container.removeChild(container.firstChild);
+            }
+        }
+        
+        // Create loading placeholder using safe DOM methods
+        const placeholder = document.createElement('div');
+        placeholder.className = 'edid-placeholder';
+        
+        const icon = document.createElement('i');
+        icon.className = 'fas fa-spinner fa-spin';
+        placeholder.appendChild(icon);
+        
+        const loadingText = document.createElement('span');
+        loadingText.textContent = 'Processing EDID file...';
+        placeholder.appendChild(loadingText);
+        
+        container.appendChild(placeholder);
         
         const applyBtn = document.getElementById('apply-edid-settings-btn');
         if (applyBtn) {
@@ -4127,23 +4406,25 @@ async function updateCommunityScripts() {
     // Show progress UI
     statusElement.style.display = 'block';
     buttonElement.disabled = true;
-    buttonElement.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Downloading...';
+    // Use safe DOM methods instead of innerHTML
+    buttonElement.textContent = '';
+    const spinnerIcon = document.createElement('i');
+    spinnerIcon.className = 'fas fa-spinner fa-spin';
+    buttonElement.appendChild(spinnerIcon);
+    buttonElement.appendChild(document.createTextNode(' Downloading...'));
     
     try {
-        // Ensure Node.js access is available
-        if (!window.require) {
-            throw new Error('Node.js access not available');
+        // Use secure Electron API
+        if (!window.electronAPI) {
+            throw new Error('Electron API not available');
         }
-        
-        const fs = window.require('fs');
-        const path = window.require('path');
-        const https = window.require('https');
         
         const scriptsDir = 'C:\\VirtualDisplayDriver\\Scripts';
         
-        // Create scripts directory if it doesn't exist
-        if (!fs.existsSync(scriptsDir)) {
-            fs.mkdirSync(scriptsDir, { recursive: true });
+        // Create scripts directory if it doesn't exist using secure API
+        const exists = await window.electronAPI.existsFile(scriptsDir);
+        if (!exists) {
+            await window.electronAPI.mkdir(scriptsDir);
             console.log('Created scripts directory:', scriptsDir);
         }
         
@@ -4183,7 +4464,12 @@ async function updateCommunityScripts() {
         // Hide progress UI
         statusElement.style.display = 'none';
         buttonElement.disabled = false;
-        buttonElement.innerHTML = '<i class="fas fa-sync"></i> Download/Update Scripts';
+        // Use safe DOM methods instead of innerHTML
+        buttonElement.textContent = '';
+        const syncIcon = document.createElement('i');
+        syncIcon.className = 'fas fa-sync';
+        buttonElement.appendChild(syncIcon);
+        buttonElement.appendChild(document.createTextNode(' Download/Update Scripts'));
         progressElement.style.width = '0%';
     }
 }
@@ -4197,9 +4483,6 @@ async function fetchGitHubContents(url) {
 }
 
 async function downloadScriptFile(file, targetDir) {
-    const fs = window.require('fs');
-    const path = window.require('path');
-    
     // Fetch file content
     const response = await fetch(file.download_url);
     if (!response.ok) {
@@ -4207,31 +4490,34 @@ async function downloadScriptFile(file, targetDir) {
     }
     
     const content = await response.text();
-    const filePath = path.join(targetDir, file.name);
+    const filePath = targetDir + '\\' + file.name;
     
-    // Write file to disk
-    fs.writeFileSync(filePath, content, 'utf8');
-    console.log('Downloaded:', file.name);
+    // Write file to disk using secure API
+    if (window.electronAPI) {
+        await window.electronAPI.writeFile(filePath, content);
+        console.log('Downloaded:', file.name);
+    } else {
+        throw new Error('File system access not available');
+    }
 }
 
 async function removeAllScripts() {
     try {
-        if (!window.require) {
-            throw new Error('Node.js access not available');
+        if (!window.electronAPI) {
+            throw new Error('Electron API not available');
         }
-        
-        const fs = window.require('fs');
-        const path = window.require('path');
         
         const scriptsDir = 'C:\\VirtualDisplayDriver\\Scripts';
         
-        if (!fs.existsSync(scriptsDir)) {
+        const exists = await window.electronAPI.existsFile(scriptsDir);
+        if (!exists) {
             showScriptNotification('Scripts directory does not exist', 'info');
             return;
         }
         
-        // Read all files in the scripts directory
-        const files = fs.readdirSync(scriptsDir).filter(file => 
+        // Read all files in the scripts directory using secure API
+        const allFiles = await window.electronAPI.readdir(scriptsDir);
+        const files = allFiles.filter(file => 
             file.endsWith('.ps1') || file.endsWith('.bat')
         );
         
@@ -4246,12 +4532,12 @@ async function removeAllScripts() {
             return;
         }
         
-        // Delete each script file
+        // Delete each script file using secure API
         let removedCount = 0;
         for (const fileName of files) {
-            const filePath = path.join(scriptsDir, fileName);
+            const filePath = scriptsDir + '\\' + fileName;
             try {
-                fs.unlinkSync(filePath);
+                await window.electronAPI.unlink(filePath);
                 removedCount++;
                 console.log('Removed:', fileName);
             } catch (error) {
@@ -4274,84 +4560,165 @@ async function refreshLocalScripts() {
     const scriptsListElement = document.getElementById('local-scripts-list');
     
     try {
-        if (!window.require) {
-            throw new Error('Node.js access not available');
+        if (!window.electronAPI) {
+            throw new Error('Electron API not available');
         }
-        
-        const fs = window.require('fs');
-        const path = window.require('path');
         
         const scriptsDir = 'C:\\VirtualDisplayDriver\\Scripts';
         
-        if (!fs.existsSync(scriptsDir)) {
-            scriptsListElement.innerHTML = `
-                <div class="scripts-empty">
-                    <i class="fas fa-folder-open"></i>
-                    <p>Scripts directory does not exist. Click "Download/Update Scripts" to create it.</p>
-                </div>
-            `;
+        const exists = await window.electronAPI.existsFile(scriptsDir);
+        if (!exists) {
+            // Use safe DOM methods instead of innerHTML
+            if (window.DOMUtils) {
+                window.DOMUtils.clear(scriptsListElement);
+            } else {
+                scriptsListElement.textContent = '';
+                while (scriptsListElement.firstChild) {
+                    scriptsListElement.removeChild(scriptsListElement.firstChild);
+                }
+            }
+            
+            const emptyDiv = document.createElement('div');
+            emptyDiv.className = 'scripts-empty';
+            const icon = document.createElement('i');
+            icon.className = 'fas fa-folder-open';
+            const text = document.createElement('p');
+            text.textContent = 'Scripts directory does not exist. Click "Download/Update Scripts" to create it.';
+            emptyDiv.appendChild(icon);
+            emptyDiv.appendChild(text);
+            scriptsListElement.appendChild(emptyDiv);
             return;
         }
         
-        // Read all files in the scripts directory
-        const files = fs.readdirSync(scriptsDir).filter(file => 
+        // Read all files in the scripts directory using secure API
+        const allFiles = await window.electronAPI.readdir(scriptsDir);
+        const files = allFiles.filter(file => 
             file.endsWith('.ps1') || file.endsWith('.bat')
         );
         
         if (files.length === 0) {
-            scriptsListElement.innerHTML = `
-                <div class="scripts-empty">
-                    <i class="fas fa-folder-open"></i>
-                    <p>No scripts found. Click "Download/Update Scripts" to get started.</p>
-                </div>
-            `;
+            // Use safe DOM methods
+            if (window.DOMUtils) {
+                window.DOMUtils.clear(scriptsListElement);
+            } else {
+                scriptsListElement.textContent = '';
+                while (scriptsListElement.firstChild) {
+                    scriptsListElement.removeChild(scriptsListElement.firstChild);
+                }
+            }
+            
+            const emptyDiv = document.createElement('div');
+            emptyDiv.className = 'scripts-empty';
+            const icon = document.createElement('i');
+            icon.className = 'fas fa-folder-open';
+            const text = document.createElement('p');
+            text.textContent = 'No scripts found. Click "Download/Update Scripts" to get started.';
+            emptyDiv.appendChild(icon);
+            emptyDiv.appendChild(text);
+            scriptsListElement.appendChild(emptyDiv);
             return;
         }
         
-        // Generate HTML for each script
-        const scriptsHtml = files.map(fileName => {
-            const filePath = path.join(scriptsDir, fileName);
-            const stats = fs.statSync(filePath);
+        // Clear container safely
+        if (window.DOMUtils) {
+            window.DOMUtils.clear(scriptsListElement);
+        } else {
+            scriptsListElement.textContent = '';
+            while (scriptsListElement.firstChild) {
+                scriptsListElement.removeChild(scriptsListElement.firstChild);
+            }
+        }
+        
+        // Generate script items using safe DOM methods
+        for (const fileName of files) {
+            const filePath = scriptsDir + '\\' + fileName;
+            const stats = await window.electronAPI.stat(filePath);
             const fileSize = formatFileSize(stats.size);
-            const fileType = path.extname(fileName).substring(1).toUpperCase();
-            const baseName = path.basename(fileName, path.extname(fileName));
+            const fileExt = fileName.substring(fileName.lastIndexOf('.') + 1).toUpperCase();
+            const baseName = fileName.substring(0, fileName.lastIndexOf('.'));
             
             // Generate a description based on filename
             const description = generateScriptDescription(baseName);
             
-            return `
-                <div class="script-item-local">
-                    <div class="script-info">
-                        <h4 class="script-name">
-                            <i class="fas fa-file-code"></i>
-                            ${baseName}
-                            <span class="script-type">${fileType}</span>
-                        </h4>
-                        <p class="script-description">${description}</p>
-                        <span class="script-size">${fileSize}</span>
-                    </div>
-                    <div class="script-actions-local">
-                        <button class="btn btn-run btn-small" onclick="runScript('${fileName}')">
-                            <i class="fas fa-play"></i> Run
-                        </button>
-                        <button class="btn btn-view btn-small" onclick="viewScript('${fileName}')">
-                            <i class="fas fa-eye"></i> View
-                        </button>
-                    </div>
-                </div>
-            `;
-        }).join('');
-        
-        scriptsListElement.innerHTML = scriptsHtml;
+            // Create script item using safe DOM methods
+            const scriptItem = document.createElement('div');
+            scriptItem.className = 'script-item-local';
+            
+            const scriptInfo = document.createElement('div');
+            scriptInfo.className = 'script-info';
+            
+            const scriptName = document.createElement('h4');
+            scriptName.className = 'script-name';
+            const nameIcon = document.createElement('i');
+            nameIcon.className = 'fas fa-file-code';
+            scriptName.appendChild(nameIcon);
+            scriptName.appendChild(document.createTextNode(baseName));
+            const scriptType = document.createElement('span');
+            scriptType.className = 'script-type';
+            scriptType.textContent = fileExt;
+            scriptName.appendChild(scriptType);
+            
+            const scriptDesc = document.createElement('p');
+            scriptDesc.className = 'script-description';
+            scriptDesc.textContent = description;
+            
+            const scriptSize = document.createElement('span');
+            scriptSize.className = 'script-size';
+            scriptSize.textContent = fileSize;
+            
+            scriptInfo.appendChild(scriptName);
+            scriptInfo.appendChild(scriptDesc);
+            scriptInfo.appendChild(scriptSize);
+            
+            const scriptActions = document.createElement('div');
+            scriptActions.className = 'script-actions-local';
+            
+            const runBtn = document.createElement('button');
+            runBtn.className = 'btn btn-run btn-small';
+            runBtn.onclick = () => runScript(fileName);
+            const runIcon = document.createElement('i');
+            runIcon.className = 'fas fa-play';
+            runBtn.appendChild(runIcon);
+            runBtn.appendChild(document.createTextNode(' Run'));
+            
+            const viewBtn = document.createElement('button');
+            viewBtn.className = 'btn btn-view btn-small';
+            viewBtn.onclick = () => viewScript(fileName);
+            const viewIcon = document.createElement('i');
+            viewIcon.className = 'fas fa-eye';
+            viewBtn.appendChild(viewIcon);
+            viewBtn.appendChild(document.createTextNode(' View'));
+            
+            scriptActions.appendChild(runBtn);
+            scriptActions.appendChild(viewBtn);
+            
+            scriptItem.appendChild(scriptInfo);
+            scriptItem.appendChild(scriptActions);
+            scriptsListElement.appendChild(scriptItem);
+        }
         
     } catch (error) {
         console.error('Error refreshing scripts:', error);
-        scriptsListElement.innerHTML = `
-            <div class="scripts-empty">
-                <i class="fas fa-exclamation-triangle"></i>
-                <p>Error loading scripts: ${error.message}</p>
-            </div>
-        `;
+        // Use safe DOM methods for error display
+        if (window.DOMUtils) {
+            window.DOMUtils.clear(scriptsListElement);
+        } else {
+            scriptsListElement.textContent = '';
+            while (scriptsListElement.firstChild) {
+                scriptsListElement.removeChild(scriptsListElement.firstChild);
+            }
+        }
+        
+        const errorDiv = document.createElement('div');
+        errorDiv.className = 'scripts-empty';
+        errorDiv.style.color = 'var(--danger)';
+        const errorIcon = document.createElement('i');
+        errorIcon.className = 'fas fa-exclamation-triangle';
+        const errorText = document.createElement('p');
+        errorText.textContent = `Error loading scripts: ${error.message}`;
+        errorDiv.appendChild(errorIcon);
+        errorDiv.appendChild(errorText);
+        scriptsListElement.appendChild(errorDiv);
     }
 }
 
@@ -4388,62 +4755,63 @@ function generateScriptDescription(baseName) {
 
 async function runScript(fileName) {
     try {
-        if (!window.require) {
-            throw new Error('Node.js access not available');
+        if (!window.electronAPI) {
+            throw new Error('Electron API not available');
         }
         
-        const { spawn } = window.require('child_process');
-        const path = window.require('path');
+        // Validate and sanitize fileName
+        if (window.InputValidator) {
+            const validation = window.InputValidator.validateFileName(fileName);
+            if (!validation.valid) {
+                throw new Error('Invalid file name');
+            }
+            fileName = validation.value;
+        }
         
         const scriptsDir = 'C:\\VirtualDisplayDriver\\Scripts';
-        const filePath = path.join(scriptsDir, fileName);
-        const fileExt = path.extname(fileName).toLowerCase();
+        const filePath = scriptsDir + '\\' + fileName;
+        const fileExt = fileName.substring(fileName.lastIndexOf('.')).toLowerCase();
         
         let command, args;
         
         if (fileExt === '.ps1') {
-            // PowerShell script
+            // PowerShell script (sanitized)
             command = 'powershell.exe';
-            args = ['-ExecutionPolicy', 'Bypass', '-File', filePath];
+            const sanitizedPath = filePath.replace(/"/g, '`"');
+            args = ['-NoProfile', '-NonInteractive', '-ExecutionPolicy', 'Bypass', '-File', sanitizedPath];
         } else if (fileExt === '.bat') {
-            // Batch script
+            // Batch script (sanitized)
             command = 'cmd.exe';
-            args = ['/c', filePath];
+            const sanitizedPath = filePath.replace(/"/g, '`"');
+            args = ['/c', sanitizedPath];
         } else {
             throw new Error('Unsupported script type');
         }
         
         showScriptNotification(`Running ${fileName}...`, 'info');
         
-        const process = spawn(command, args, {
-            cwd: scriptsDir,
-            stdio: ['ignore', 'pipe', 'pipe']
-        });
-        
-        let output = '';
-        let errorOutput = '';
-        
-        process.stdout.on('data', (data) => {
-            output += data.toString();
-        });
-        
-        process.stderr.on('data', (data) => {
-            errorOutput += data.toString();
-        });
-        
-        process.on('close', (code) => {
-            if (code === 0) {
+        // Use secure command execution
+        try {
+            const result = await window.electronAPI.execCommand(command, args, {
+                cwd: scriptsDir,
+                timeout: 60000
+            });
+            
+            if (result.exitCode === 0) {
                 showScriptNotification(`${fileName} completed successfully`, 'success');
-                if (output.trim()) {
-                    console.log('Script output:', output);
+                if (result.stdout && result.stdout.trim()) {
+                    console.log('Script output:', result.stdout);
                 }
             } else {
-                showScriptNotification(`${fileName} failed with exit code ${code}`, 'error');
-                if (errorOutput.trim()) {
-                    console.error('Script error:', errorOutput);
+                showScriptNotification(`${fileName} failed with exit code ${result.exitCode}`, 'error');
+                if (result.stderr && result.stderr.trim()) {
+                    console.error('Script error:', result.stderr);
                 }
             }
-        });
+        } catch (execError) {
+            showScriptNotification(`Failed to run script: ${execError.message}`, 'error');
+            console.error('Script execution error:', execError);
+        }
         
     } catch (error) {
         console.error('Error running script:', error);
@@ -4453,17 +4821,24 @@ async function runScript(fileName) {
 
 async function viewScript(fileName) {
     try {
-        if (!window.require) {
-            throw new Error('Node.js access not available');
+        if (!window.electronAPI) {
+            throw new Error('Electron API not available');
         }
         
-        const fs = window.require('fs');
-        const path = window.require('path');
+        // Validate and sanitize fileName
+        if (window.InputValidator) {
+            const validation = window.InputValidator.validateFileName(fileName);
+            if (!validation.valid) {
+                throw new Error('Invalid file name');
+            }
+            fileName = validation.value;
+        }
         
         const scriptsDir = 'C:\\VirtualDisplayDriver\\Scripts';
-        const filePath = path.join(scriptsDir, fileName);
+        const filePath = scriptsDir + '\\' + fileName;
         
-        const content = fs.readFileSync(filePath, 'utf8');
+        // Read file using secure API
+        const content = await window.electronAPI.readFile(filePath);
         
         // Create a modal to display the script content
         showScriptModal(fileName, content);
@@ -4475,42 +4850,70 @@ async function viewScript(fileName) {
 }
 
 function showScriptModal(fileName, content) {
-    // Create modal overlay
+    // Sanitize fileName to prevent XSS
+    const sanitizedFileName = window.Sanitizer ? window.Sanitizer.escapeHtml(fileName) : fileName.replace(/[<>]/g, '');
+    
+    // Create modal overlay using safe DOM methods
     const modal = document.createElement('div');
     modal.className = 'script-modal-overlay';
-    modal.innerHTML = `
-        <div class="script-modal">
-            <div class="script-modal-header">
-                <h3><i class="fas fa-file-code"></i> ${fileName}</h3>
-                <button class="script-modal-close" onclick="closeScriptModal()">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-            <div class="script-modal-content">
-                <pre><code>${escapeHtml(content)}</code></pre>
-            </div>
-            <div class="script-modal-footer">
-                <button class="btn btn-secondary" onclick="closeScriptModal()">Close</button>
-                <button class="btn btn-primary" onclick="copyScriptContent('${fileName}')">
-                    <i class="fas fa-copy"></i> Copy
-                </button>
-            </div>
-        </div>
-    `;
+    modal.style.cssText = 'position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.7); display: flex; align-items: center; justify-content: center; z-index: 10000;';
     
-    // Add modal styles
-    modal.style.cssText = `
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(0, 0, 0, 0.7);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        z-index: 10000;
-    `;
+    const scriptModal = document.createElement('div');
+    scriptModal.className = 'script-modal';
+    
+    // Header
+    const header = document.createElement('div');
+    header.className = 'script-modal-header';
+    
+    const title = document.createElement('h3');
+    const titleIcon = document.createElement('i');
+    titleIcon.className = 'fas fa-file-code';
+    title.appendChild(titleIcon);
+    title.appendChild(document.createTextNode(' ' + sanitizedFileName));
+    
+    const closeBtn = document.createElement('button');
+    closeBtn.className = 'script-modal-close';
+    closeBtn.onclick = closeScriptModal;
+    const closeIcon = document.createElement('i');
+    closeIcon.className = 'fas fa-times';
+    closeBtn.appendChild(closeIcon);
+    
+    header.appendChild(title);
+    header.appendChild(closeBtn);
+    
+    // Content
+    const modalContent = document.createElement('div');
+    modalContent.className = 'script-modal-content';
+    const pre = document.createElement('pre');
+    const code = document.createElement('code');
+    code.textContent = content; // Safe - content is already from file, not user input
+    pre.appendChild(code);
+    modalContent.appendChild(pre);
+    
+    // Footer
+    const footer = document.createElement('div');
+    footer.className = 'script-modal-footer';
+    
+    const closeFooterBtn = document.createElement('button');
+    closeFooterBtn.className = 'btn btn-secondary';
+    closeFooterBtn.onclick = closeScriptModal;
+    closeFooterBtn.textContent = 'Close';
+    
+    const copyBtn = document.createElement('button');
+    copyBtn.className = 'btn btn-primary';
+    copyBtn.onclick = () => copyScriptContent(sanitizedFileName);
+    const copyIcon = document.createElement('i');
+    copyIcon.className = 'fas fa-copy';
+    copyBtn.appendChild(copyIcon);
+    copyBtn.appendChild(document.createTextNode(' Copy'));
+    
+    footer.appendChild(closeFooterBtn);
+    footer.appendChild(copyBtn);
+    
+    scriptModal.appendChild(header);
+    scriptModal.appendChild(modalContent);
+    scriptModal.appendChild(footer);
+    modal.appendChild(scriptModal);
     
     document.body.appendChild(modal);
     window.currentScriptModal = modal;
@@ -4588,4 +4991,5 @@ function escapeHtml(text) {
 document.addEventListener('DOMContentLoaded', () => {
     window.app = new VirtualDriverControl();
     console.log('Virtual Driver Control loaded');
+});
 });

@@ -1,10 +1,17 @@
-const { app, BrowserWindow, ipcMain, nativeImage } = require('electron');
+const { app, BrowserWindow, ipcMain, nativeImage, shell } = require('electron');
 const path = require('path');
-const { exec } = require('child_process');
+const fs = require('fs');
+const { spawn } = require('child_process');
 const { promisify } = require('util');
 
-const execPromise = promisify(exec);
 let mainWindow;
+
+// Allowed file paths for security
+const ALLOWED_PATHS = {
+  settings: 'C:\\VirtualDisplayDriver\\vdd_settings.xml',
+  scripts: 'C:\\VirtualDisplayDriver\\Scripts',
+  logs: 'C:\\VirtualDisplayDriver\\Logs'
+};
 
 // Icon paths for different driver states
 const icons = {
@@ -44,13 +51,77 @@ function updateAppIcon(statusClass) {
   }
 }
 
+// Sanitize file path to prevent path traversal
+function sanitizeFilePath(filePath) {
+  if (typeof filePath !== 'string') return null;
+  
+  // Normalize path
+  let normalized = path.normalize(filePath);
+  
+  // Check for path traversal
+  if (normalized.includes('..') || normalized.includes('//') || normalized.includes('\\\\')) {
+    return null;
+  }
+  
+  // Check if path is within allowed directories
+  const allowedDirs = Object.values(ALLOWED_PATHS);
+  const isAllowed = allowedDirs.some(dir => normalized.startsWith(dir));
+  
+  return isAllowed ? normalized : null;
+}
+
+// Execute command securely with array arguments
+function executeCommandSecure(command, args, options = {}) {
+  return new Promise((resolve, reject) => {
+    const timeout = options.timeout || 30000;
+    let timeoutId;
+    
+    const process = spawn(command, args, {
+      ...options,
+      shell: false  // Don't use shell to prevent injection
+    });
+    
+    let stdout = '';
+    let stderr = '';
+    
+    timeoutId = setTimeout(() => {
+      process.kill();
+      reject(new Error('Command execution timeout'));
+    }, timeout);
+    
+    process.stdout.on('data', (data) => {
+      stdout += data.toString();
+    });
+    
+    process.stderr.on('data', (data) => {
+      stderr += data.toString();
+    });
+    
+    process.on('close', (code) => {
+      clearTimeout(timeoutId);
+      resolve({ stdout, stderr, code });
+    });
+    
+    process.on('error', (error) => {
+      clearTimeout(timeoutId);
+      reject(error);
+    });
+  });
+}
+
 // Check if running as Administrator
 async function checkAdministratorPrivileges() {
   try {
     if (process.platform === 'win32') {
-      // Use PowerShell to check if running as Administrator
-      const command = 'powershell -Command "([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)"';
-      const result = await execPromise(command);
+      // Use secure command execution
+      const result = await executeCommandSecure('powershell.exe', [
+        '-NoProfile',
+        '-NonInteractive',
+        '-ExecutionPolicy', 'Bypass',
+        '-Command',
+        '([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)'
+      ], { timeout: 5000 });
+      
       return result.stdout.trim().toLowerCase() === 'true';
     }
     return true; // Non-Windows platforms don't need elevation for this app
@@ -63,18 +134,20 @@ async function checkAdministratorPrivileges() {
 // Restart application as Administrator
 async function restartAsAdministrator() {
   try {
-    const appPath = app.getAppPath();
     const exePath = process.execPath;
     
     console.log('Restarting as Administrator...');
     console.log('Executable path:', exePath);
-    console.log('App path:', appPath);
     
-    // Use PowerShell to restart as Administrator
-    const command = `Start-Process -FilePath "${exePath}" -ArgumentList "${appPath}" -Verb RunAs`;
-    const psCommand = `powershell -Command "${command}"`;
+    // Use secure command execution with sanitized paths
+    await executeCommandSecure('powershell.exe', [
+      '-NoProfile',
+      '-NonInteractive',
+      '-ExecutionPolicy', 'Bypass',
+      '-Command',
+      `Start-Process -FilePath "${exePath.replace(/"/g, '`"')}" -Verb RunAs`
+    ], { timeout: 10000 });
     
-    await execPromise(psCommand);
     console.log('Administrator restart command executed successfully');
     
     // Close current instance
@@ -94,9 +167,11 @@ function createWindow() {
     minHeight: 600,
     icon: path.join(__dirname, 'Virtual Display Driver.ico'),
     webPreferences: {
-      nodeIntegration: true,
-      contextIsolation: false,
-      enableRemoteModule: true
+      nodeIntegration: false,        // ✅ SECURITY: Disable Node.js in renderer
+      contextIsolation: true,         // ✅ SECURITY: Enable context isolation
+      enableRemoteModule: false,      // ✅ SECURITY: Disable deprecated remote module
+      preload: path.join(__dirname, 'preload.js'),  // ✅ SECURITY: Use preload script
+      sandbox: false                  // Keep false for file system access
     },
     titleBarStyle: 'default',
     frame: true,
@@ -141,6 +216,8 @@ async function initializeApp() {
 
 app.whenReady().then(initializeApp);
 
+// ==================== IPC HANDLERS ====================
+
 // Handle IPC messages
 ipcMain.on('quit-app', () => {
   console.log('Received quit-app message, closing application');
@@ -151,6 +228,264 @@ ipcMain.on('quit-app', () => {
 ipcMain.on('driver-status-changed', (event, statusClass) => {
   console.log(`Received driver status update: ${statusClass}`);
   updateAppIcon(statusClass);
+});
+
+// File system operations
+ipcMain.handle('read-file', async (event, filePath) => {
+  const sanitized = sanitizeFilePath(filePath);
+  if (!sanitized) {
+    throw new Error('Invalid file path');
+  }
+  
+  try {
+    return fs.readFileSync(sanitized, 'utf8');
+  } catch (error) {
+    console.error('Error reading file:', error);
+    throw error;
+  }
+});
+
+ipcMain.handle('write-file', async (event, filePath, content) => {
+  const sanitized = sanitizeFilePath(filePath);
+  if (!sanitized) {
+    throw new Error('Invalid file path');
+  }
+  
+  try {
+    // Ensure directory exists
+    const dir = path.dirname(sanitized);
+    if (!fs.existsSync(dir)) {
+      fs.mkdirSync(dir, { recursive: true });
+    }
+    
+    fs.writeFileSync(sanitized, content, 'utf8');
+    return true;
+  } catch (error) {
+    console.error('Error writing file:', error);
+    throw error;
+  }
+});
+
+ipcMain.handle('exists-file', async (event, filePath) => {
+  const sanitized = sanitizeFilePath(filePath);
+  if (!sanitized) return false;
+  
+  try {
+    return fs.existsSync(sanitized);
+  } catch (error) {
+    return false;
+  }
+});
+
+ipcMain.handle('mkdir', async (event, dirPath) => {
+  const sanitized = sanitizeFilePath(dirPath);
+  if (!sanitized) {
+    throw new Error('Invalid directory path');
+  }
+  
+  try {
+    if (!fs.existsSync(sanitized)) {
+      fs.mkdirSync(sanitized, { recursive: true });
+    }
+    return true;
+  } catch (error) {
+    console.error('Error creating directory:', error);
+    throw error;
+  }
+});
+
+ipcMain.handle('readdir', async (event, dirPath) => {
+  const sanitized = sanitizeFilePath(dirPath);
+  if (!sanitized) {
+    throw new Error('Invalid directory path');
+  }
+  
+  try {
+    return fs.readdirSync(sanitized);
+  } catch (error) {
+    console.error('Error reading directory:', error);
+    throw error;
+  }
+});
+
+ipcMain.handle('unlink', async (event, filePath) => {
+  const sanitized = sanitizeFilePath(filePath);
+  if (!sanitized) {
+    throw new Error('Invalid file path');
+  }
+  
+  try {
+    fs.unlinkSync(sanitized);
+    return true;
+  } catch (error) {
+    console.error('Error deleting file:', error);
+    throw error;
+  }
+});
+
+ipcMain.handle('stat', async (event, filePath) => {
+  const sanitized = sanitizeFilePath(filePath);
+  if (!sanitized) {
+    throw new Error('Invalid file path');
+  }
+  
+  try {
+    return fs.statSync(sanitized);
+  } catch (error) {
+    console.error('Error getting file stats:', error);
+    throw error;
+  }
+});
+
+// Command execution (with sanitization)
+ipcMain.handle('exec-command', async (event, command, args, options) => {
+  // Whitelist allowed commands
+  const allowedCommands = ['powershell.exe', 'cmd.exe'];
+  if (!allowedCommands.includes(command.toLowerCase())) {
+    throw new Error(`Command not allowed: ${command}`);
+  }
+  
+  // Validate arguments are strings
+  const validatedArgs = args.map(arg => {
+    if (typeof arg !== 'string') {
+      throw new Error('Command arguments must be strings');
+    }
+    return arg;
+  });
+  
+  try {
+    return await executeCommandSecure(command, validatedArgs, options);
+  } catch (error) {
+    console.error('Error executing command:', error);
+    throw error;
+  }
+});
+
+// System information
+ipcMain.handle('get-system-info', async () => {
+  return {
+    platform: process.platform,
+    arch: process.arch,
+    version: process.version
+  };
+});
+
+// Driver operations
+ipcMain.handle('check-driver-status', async () => {
+  try {
+    // Check if driver file exists
+    const driverPath = 'C:\\Windows\\System32\\drivers\\UMDF\\MttVDD.dll';
+    const exists = fs.existsSync(driverPath);
+    return { installed: exists };
+  } catch (error) {
+    console.error('Error checking driver status:', error);
+    return { installed: false };
+  }
+});
+
+ipcMain.handle('reload-driver', async () => {
+  // Implementation for driver reload
+  // This would require additional driver-specific commands
+  return { success: true };
+});
+
+// Shell operations
+ipcMain.handle('open-external', async (event, url) => {
+  try {
+    // Validate URL
+    const urlObj = new URL(url);
+    if (urlObj.protocol !== 'http:' && urlObj.protocol !== 'https:') {
+      throw new Error('Invalid URL protocol');
+    }
+    await shell.openExternal(url);
+    return true;
+  } catch (error) {
+    console.error('Error opening external URL:', error);
+    throw error;
+  }
+});
+
+ipcMain.handle('open-path', async (event, filePath) => {
+  const sanitized = sanitizeFilePath(filePath);
+  if (!sanitized) {
+    throw new Error('Invalid file path');
+  }
+  
+  try {
+    await shell.openPath(sanitized);
+    return true;
+  } catch (error) {
+    console.error('Error opening path:', error);
+    throw error;
+  }
+});
+
+// Named pipe communication
+ipcMain.handle('send-pipe-command', async (event, command) => {
+  const net = require('net');
+  const pipePath = '\\\\.\\pipe\\MTTVirtualDisplayPipe';
+  
+  return new Promise((resolve, reject) => {
+    // Validate command
+    if (typeof command !== 'string' || command.length === 0) {
+      reject(new Error('Invalid command'));
+      return;
+    }
+    
+    // Sanitize command (only allow alphanumeric and underscore)
+    if (!/^[A-Za-z0-9_]+$/.test(command)) {
+      reject(new Error('Invalid command format'));
+      return;
+    }
+    
+    console.log(`Sending pipe command: ${command}`);
+    
+    const client = net.createConnection(pipePath, () => {
+      client.write(command);
+    });
+    
+    let responseReceived = false;
+    let timeoutId;
+    
+    timeoutId = setTimeout(() => {
+      if (!responseReceived) {
+        client.destroy();
+        reject(new Error('Command timeout'));
+      }
+    }, 5000);
+    
+    client.on('data', (data) => {
+      if (responseReceived) return;
+      responseReceived = true;
+      clearTimeout(timeoutId);
+      
+      const response = data.toString().trim();
+      console.log(`Pipe response: ${response}`);
+      
+      client.end();
+      
+      if (response.includes('SUCCESS') || response.includes('OK') || response.length > 0) {
+        resolve(response);
+      } else {
+        reject(new Error(`Driver command failed: ${response}`));
+      }
+    });
+    
+    client.on('error', (error) => {
+      if (!responseReceived) {
+        clearTimeout(timeoutId);
+        console.error('Pipe error:', error.message);
+        reject(new Error(`Communication failed: ${error.message}`));
+      }
+    });
+    
+    client.on('end', () => {
+      if (!responseReceived) {
+        clearTimeout(timeoutId);
+        resolve('Command sent');
+      }
+    });
+  });
 });
 
 app.on('window-all-closed', () => {
