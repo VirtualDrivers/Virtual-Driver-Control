@@ -185,8 +185,8 @@ function createWindow() {
       preload: path.join(__dirname, 'preload.js'),  // ✅ SECURITY: Use preload script
       sandbox: false                  // Keep false for file system access
     },
-    titleBarStyle: 'default',
-    frame: true,
+    frame: false,                     // ✅ Frameless window
+    titleBarStyle: 'hidden',          // ✅ Hide default title bar
     show: false,
     backgroundColor: '#f3f3f3',
     autoHideMenuBar: true
@@ -194,10 +194,29 @@ function createWindow() {
 
   mainWindow.loadFile('index.html');
 
+  // Developer ergonomics: when running via `npm start`, auto-open devtools.
+  // This also helps diagnose "clicks not working" issues.
+  if (!app.isPackaged) {
+    try {
+      mainWindow.webContents.openDevTools({ mode: 'detach' });
+    } catch (e) {
+      console.warn('Failed to open devtools:', e);
+    }
+  }
+
   mainWindow.once('ready-to-show', () => {
     mainWindow.show();
     // Set initial icon (will be updated when driver status is detected)
     updateAppIcon('default');
+  });
+  
+  // Update maximize button icon when window state changes
+  mainWindow.on('maximize', () => {
+    mainWindow.webContents.send('window-maximized');
+  });
+  
+  mainWindow.on('unmaximize', () => {
+    mainWindow.webContents.send('window-unmaximized');
   });
 
   mainWindow.on('closed', () => {
@@ -205,16 +224,118 @@ function createWindow() {
   });
 }
 
+// Ensure XML settings file exists, create from template if needed
+async function ensureSettingsFileExists() {
+  try {
+    const settingsPath = 'C:\\VirtualDisplayDriver\\vdd_settings.xml';
+    // Template is in the VirtualDisplayDriver folder at the project root
+    const templatePath = path.join(__dirname, '..', 'VirtualDisplayDriver', 'vdd_settings.xml');
+    console.log('Checking for template at:', templatePath);
+    
+    // Check if settings file exists
+    if (!fs.existsSync(settingsPath)) {
+      console.log('Settings file not found, creating from template...');
+      
+      // Ensure directory exists
+      const settingsDir = path.dirname(settingsPath);
+      if (!fs.existsSync(settingsDir)) {
+        fs.mkdirSync(settingsDir, { recursive: true });
+        console.log('Created directory:', settingsDir);
+      }
+      
+      // Check if template exists
+      if (fs.existsSync(templatePath)) {
+        // Copy template to settings location
+        fs.copyFileSync(templatePath, settingsPath);
+        console.log('Created settings file from template:', settingsPath);
+      } else {
+        // Create default XML if template doesn't exist
+        const defaultXML = `<?xml version='1.0' encoding='utf-8'?>
+<vdd_settings>
+    <monitors>
+        <count>1</count>
+    </monitors>
+    <gpu>
+        <friendlyname>default</friendlyname>
+    </gpu>
+    <global>
+        <g_refresh_rate>60</g_refresh_rate>
+        <g_refresh_rate>90</g_refresh_rate>
+        <g_refresh_rate>120</g_refresh_rate>
+        <g_refresh_rate>144</g_refresh_rate>
+    </global>
+    <resolutions>
+        <resolution>
+            <width>1920</width>
+            <height>1080</height>
+            <refresh_rate>60</refresh_rate>
+        </resolution>
+    </resolutions>
+    <logging>
+        <SendLogsThroughPipe>true</SendLogsThroughPipe>
+        <logging>false</logging>
+        <debuglogging>false</debuglogging>
+    </logging>
+    <colour>
+        <SDR10bit>false</SDR10bit>
+        <HDRPlus>false</HDRPlus>
+        <ColourFormat>RGB</ColourFormat>
+    </colour>
+    <cursor>
+        <HardwareCursor>true</HardwareCursor>
+        <CursorMaxX>128</CursorMaxX>
+        <CursorMaxY>128</CursorMaxY>
+        <AlphaCursorSupport>true</AlphaCursorSupport>
+        <XorCursorSupportLevel>2</XorCursorSupportLevel>
+    </cursor>
+    <edid>
+        <CustomEdid>false</CustomEdid>
+        <PreventSpoof>false</PreventSpoof>
+        <EdidCeaOverride>false</EdidCeaOverride>
+    </edid>
+    <edid_integration>
+        <enabled>false</enabled>
+        <auto_configure_from_edid>false</auto_configure_from_edid>
+        <edid_profile_path>EDID/monitor_profile.xml</edid_profile_path>
+        <override_manual_settings>false</override_manual_settings>
+        <fallback_on_error>true</fallback_on_error>
+    </edid_integration>
+</vdd_settings>`;
+        fs.writeFileSync(settingsPath, defaultXML, 'utf8');
+        console.log('Created default settings file:', settingsPath);
+      }
+    } else {
+      console.log('Settings file already exists:', settingsPath);
+    }
+  } catch (error) {
+    console.error('Error ensuring settings file exists:', error);
+    // Don't throw - allow app to continue
+  }
+}
+
 // Check for Administrator privileges before creating window
 async function initializeApp() {
   try {
+    // Ensure settings file exists first
+    await ensureSettingsFileExists();
+    
     const isAdmin = await checkAdministratorPrivileges();
     console.log('Running as Administrator:', isAdmin);
     
-    if (!isAdmin) {
+    // When running from npm scripts, don't auto-restart as admin.
+    // The elevated instance detaches from the terminal, making debugging hard.
+    // Packaged builds still request elevation (see electron-builder config).
+    const npmEvent = (process.env.npm_lifecycle_event || '').toLowerCase();
+    const shouldAutoElevate = !(npmEvent === 'start' || npmEvent === 'dev');
+
+    if (!isAdmin && shouldAutoElevate) {
       console.log('Not running as Administrator - requesting elevation');
       await restartAsAdministrator();
       return; // Exit here as we're restarting
+    }
+
+    if (!isAdmin && !shouldAutoElevate) {
+      console.warn('Not running as Administrator (auto-elevation disabled for npm run).');
     }
     
     console.log('Administrator privileges confirmed - creating window');
@@ -234,6 +355,29 @@ app.whenReady().then(initializeApp);
 ipcMain.on('quit-app', () => {
   console.log('Received quit-app message, closing application');
   app.quit();
+});
+
+// Window control handlers
+ipcMain.on('window-minimize', () => {
+  if (mainWindow) {
+    mainWindow.minimize();
+  }
+});
+
+ipcMain.on('window-maximize', () => {
+  if (mainWindow) {
+    if (mainWindow.isMaximized()) {
+      mainWindow.unmaximize();
+    } else {
+      mainWindow.maximize();
+    }
+  }
+});
+
+ipcMain.on('window-close', () => {
+  if (mainWindow) {
+    mainWindow.close();
+  }
 });
 
 // Handle driver status updates from renderer process

@@ -82,6 +82,7 @@ body {
   background: var(--bg-tertiary);
   overflow: hidden;
   position: relative;
+  pointer-events: auto;
 }
 
 body::before {
@@ -103,9 +104,10 @@ body::before {
   display: flex;
   flex-direction: column;
   height: 100vh;
+  pointer-events: auto;
 }
 
-/* Title Bar */
+/* Title Bar - Make entire bar draggable by default */
 .title-bar {
   height: var(--title-height);
   background: var(--bg-secondary);
@@ -122,13 +124,59 @@ body::before {
     inset 0 1px 0 rgba(255,255,255,0.1),
     0 1px 10px rgba(0,0,0,0.05);
   position: relative;
+  user-select: none;
+  /* IMPORTANT (Electron frameless): keep the bar clickable by default.
+     Only a dedicated area (title text) should be draggable. */
+  -webkit-app-region: no-drag;
+  pointer-events: auto;
+  z-index: 1000;
 }
 
-
+/* Title info area */
 .title-info {
+  flex: 1;
   display: flex;
   align-items: center;
   gap: 16px;
+  cursor: default;
+  /* Draggable region for moving the frameless window */
+  -webkit-app-region: drag;
+  pointer-events: auto;
+}
+
+/* CRITICAL: Make button containers and ALL their children non-draggable */
+.title-bar .title-actions,
+.title-bar .title-actions * {
+  -webkit-app-region: no-drag !important;
+  pointer-events: auto !important;
+  cursor: default !important;
+}
+
+.title-bar .window-controls,
+.title-bar .window-controls * {
+  -webkit-app-region: no-drag !important;
+  pointer-events: auto !important;
+  cursor: default !important;
+}
+
+/* Make all buttons explicitly non-draggable and clickable */
+.title-bar button,
+.title-bar .toolbar-button,
+.title-bar .window-control-btn {
+  -webkit-app-region: no-drag !important;
+  pointer-events: auto !important;
+  cursor: pointer !important;
+  z-index: 1002 !important;
+  position: relative;
+  user-select: none;
+}
+
+/* Ensure button icons and text are also clickable */
+.title-bar .toolbar-button *,
+.title-bar .window-control-btn * {
+  -webkit-app-region: no-drag !important;
+  pointer-events: auto !important;
+  cursor: pointer !important;
 }
 
 .app-icon {
@@ -148,6 +196,46 @@ body::before {
   padding: 12px 0;
 }
 
+.window-controls {
+  display: flex;
+  gap: 0;
+  margin-left: auto;
+  padding-left: 16px;
+}
+
+.window-control-btn {
+  width: 46px;
+  height: 32px;
+  border: none;
+  background: transparent;
+  color: var(--text-primary);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s ease;
+  font-size: 12px;
+  pointer-events: auto;
+}
+
+.window-control-btn:hover {
+  background: var(--bg-hover);
+}
+
+.window-control-btn.close:hover {
+  background: var(--danger);
+  color: white;
+}
+
+.window-control-btn i {
+  font-size: 12px;
+}
+
+/* Update maximize icon when window is maximized */
+.title-bar.maximized .window-control-btn#window-maximize-btn i.fa-square::before {
+  content: "\f2d0"; /* fa-window-restore */
+}
+
 /* Toolbar buttons styled to match app theme */
 .toolbar-button {
   display: flex;
@@ -158,6 +246,7 @@ body::before {
   border: 1px solid var(--border-medium);
   border-radius: var(--radius-small);
   cursor: pointer;
+  pointer-events: auto;
   font-family: inherit;
   font-size: 14px;
   font-weight: 500;
@@ -225,6 +314,9 @@ body::before {
   display: flex;
   flex: 1;
   overflow: hidden;
+  pointer-events: auto;
+  z-index: 1;
+  -webkit-app-region: no-drag; /* Defensive: never make content draggable */
 }
 
 /* Navigation */
@@ -242,6 +334,9 @@ body::before {
     inset -1px 0 0 rgba(255,255,255,0.1),
     2px 0 10px rgba(0,0,0,0.1);
   position: relative;
+  pointer-events: auto;
+  z-index: 1;
+  -webkit-app-region: no-drag; /* Defensive */
 }
 
 .nav-content {
@@ -274,6 +369,8 @@ body::before {
   gap: 12px;
   padding: 8px 12px;
   margin-bottom: 2px;
+  pointer-events: auto;
+  cursor: pointer;
   border-radius: var(--radius-medium);
   color: var(--text-secondary);
   cursor: pointer;
@@ -349,6 +446,9 @@ html body[data-theme="dark"] nav.navigation .nav-item.active {
   overflow-y: auto;
   padding: 24px;
   position: relative;
+  pointer-events: auto;
+  z-index: 1;
+  -webkit-app-region: no-drag; /* Defensive */
 }
 
 .page {
@@ -632,6 +732,7 @@ textarea.form-input {
   margin-right: 8px;
   margin-bottom: 8px;
   min-height: 40px;
+  pointer-events: auto;
 }
 
 .btn i {
@@ -1676,6 +1777,9 @@ textarea.form-input {
 
 [data-theme="dark"] .release-tag.alpha {
   background: rgba(244, 67, 54, 0.2);
+  color: #e57373;
+  border-color: #f44336;
+}
 
 /* Notification System */
 .notification-container {
@@ -1884,9 +1988,6 @@ textarea.form-input {
     transform: translateX(400px);
     opacity: 0;
   }
-}
-  color: #e57373;
-  border-color: #f44336;
 }
 
 [data-theme="dark"] .release-tag.preview {

@@ -70,6 +70,9 @@ class VirtualDriverControl {
                 this.applyColorsToActiveNavItem(initialActiveNavItem);
             }
             
+            // Setup window state listeners
+            this.setupWindowStateListeners();
+            
             console.log('App initialized successfully');
         } catch (error) {
             console.error('Error during initialization:', error);
@@ -977,6 +980,10 @@ class VirtualDriverControl {
             reloadDriverBtn.style.cursor = 'pointer';
         }
         
+        // Setup window controls
+        this.setupWindowControls();
+
+        // Status page controls
         const refreshVersionsBtn = document.getElementById('refresh-versions-btn');
         if (refreshVersionsBtn) {
             refreshVersionsBtn.addEventListener('click', () => {
@@ -985,7 +992,6 @@ class VirtualDriverControl {
             });
         }
 
-        // Driver Management Buttons
         const refreshStatusBtn = document.getElementById('refresh-status-btn');
         if (refreshStatusBtn) {
             refreshStatusBtn.addEventListener('click', () => {
@@ -993,14 +999,76 @@ class VirtualDriverControl {
             });
         }
 
-
         // Driver management button event handlers removed for system safety
 
-        // Log folder button
         const openLogFolderBtn = document.getElementById('open-log-folder-btn');
         if (openLogFolderBtn) {
             openLogFolderBtn.addEventListener('click', () => {
                 this.openLogFolder();
+            });
+        }
+    }
+    
+    // Setup window control buttons (minimize, maximize, close)
+    setupWindowControls() {
+        const minimizeBtn = document.getElementById('window-minimize-btn');
+        const maximizeBtn = document.getElementById('window-maximize-btn');
+        const closeBtn = document.getElementById('window-close-btn');
+        
+        console.log('Setting up window controls:', { minimizeBtn: !!minimizeBtn, maximizeBtn: !!maximizeBtn, closeBtn: !!closeBtn, electronAPI: !!window.electronAPI });
+        
+        if (minimizeBtn && window.electronAPI) {
+            minimizeBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                console.log('Minimize button clicked');
+                window.electronAPI.minimizeWindow();
+            });
+            // Force pointer events
+            minimizeBtn.style.pointerEvents = 'auto';
+            minimizeBtn.style.cursor = 'pointer';
+        }
+        
+        if (maximizeBtn && window.electronAPI) {
+            maximizeBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                console.log('Maximize button clicked');
+                window.electronAPI.maximizeWindow();
+            });
+            maximizeBtn.style.pointerEvents = 'auto';
+            maximizeBtn.style.cursor = 'pointer';
+        }
+        
+        if (closeBtn && window.electronAPI) {
+            closeBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                console.log('Close button clicked');
+                window.electronAPI.closeWindow();
+            });
+            closeBtn.style.pointerEvents = 'auto';
+            closeBtn.style.cursor = 'pointer';
+        } else {
+            console.error('Close button or electronAPI not available!', { closeBtn: !!closeBtn, electronAPI: !!window.electronAPI });
+        }
+    }
+    
+    // Setup window state listeners to update maximize button icon
+    setupWindowStateListeners() {
+        if (window.electronAPI) {
+            window.electronAPI.on('window-maximized', () => {
+                const titleBar = document.getElementById('title-bar');
+                if (titleBar) {
+                    titleBar.classList.add('maximized');
+                }
+            });
+            
+            window.electronAPI.on('window-unmaximized', () => {
+                const titleBar = document.getElementById('title-bar');
+                if (titleBar) {
+                    titleBar.classList.remove('maximized');
+                }
             });
         }
     }

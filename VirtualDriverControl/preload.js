@@ -39,9 +39,14 @@ contextBridge.exposeInMainWorld('electronAPI', {
     // Named pipe operations
     sendPipeCommand: (command) => ipcRenderer.invoke('send-pipe-command', command),
     
+    // Window controls
+    minimizeWindow: () => ipcRenderer.send('window-minimize'),
+    maximizeWindow: () => ipcRenderer.send('window-maximize'),
+    closeWindow: () => ipcRenderer.send('window-close'),
+    
     // Event listeners
     on: (channel, callback) => {
-        const validChannels = ['driver-status-update'];
+        const validChannels = ['driver-status-update', 'window-maximized', 'window-unmaximized'];
         if (validChannels.includes(channel)) {
             ipcRenderer.on(channel, (event, ...args) => callback(...args));
         }

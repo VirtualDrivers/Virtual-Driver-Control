@@ -10,7 +10,7 @@
 <body data-theme="dark">
     <div class="app-container">
         <!-- Title Bar -->
-        <header class="title-bar">
+        <header class="title-bar" id="title-bar">
             <div class="title-info">
                 <i class="fas fa-desktop app-icon"></i>
                 <span class="app-title">Virtual Driver Control</span>
@@ -27,6 +27,17 @@
                 <button id="save-reload-driver-btn" class="toolbar-button primary">
                     <i class="fas fa-sync-alt button-icon"></i>
                     <span class="button-text">Save & Reload Driver</span>
+                </button>
+            </div>
+            <div class="window-controls">
+                <button id="window-minimize-btn" class="window-control-btn" title="Minimize">
+                    <i class="fas fa-minus"></i>
+                </button>
+                <button id="window-maximize-btn" class="window-control-btn" title="Maximize">
+                    <i class="fas fa-square"></i>
+                </button>
+                <button id="window-close-btn" class="window-control-btn close" title="Close">
+                    <i class="fas fa-times"></i>
                 </button>
             </div>
         </header>
