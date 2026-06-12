@@ -1,14 +1,26 @@
 {
   "name": "virtual-driver-control",
-  "version": "1.0.0",
-  "description": "WinUI3-style control panel for Virtual Display Driver",
-  "main": "main.js",
+  "version": "2.0.0",
+  "description": "Modern control panel for the Virtual Display Driver (MttVDD)",
+  "main": "./out/main/index.js",
+  "author": "Virtual Driver Control",
+  "license": "MIT",
+  "keywords": [
+    "electron",
+    "virtual-display",
+    "driver-control",
+    "iddcx"
+  ],
   "scripts": {
-    "start": "electron .",
-    "dev": "electron . --dev",
-    "build": "electron-builder",
-    "build-portable": "electron-builder --win portable",
-    "build-dir": "electron-builder --dir"
+    "dev": "electron-vite dev",
+    "start": "electron-vite preview",
+    "build": "electron-vite build",
+    "typecheck:node": "tsc --noEmit -p tsconfig.node.json --composite false",
+    "typecheck:web": "tsc --noEmit -p tsconfig.web.json --composite false",
+    "typecheck": "npm run typecheck:node && npm run typecheck:web",
+    "build:win": "electron-vite build && electron-builder --win",
+    "build-portable": "electron-vite build && electron-builder --win portable",
+    "build-dir": "electron-vite build && electron-builder --dir"
   },
   "build": {
     "appId": "com.virtualdriver.control",
@@ -16,23 +28,14 @@
     "directories": {
       "output": "dist"
     },
-    "icon": "./VirtualDisplayDriver.ico",
+    "icon": "./resources/VirtualDisplayDriver.ico",
     "files": [
-      "**/*",
-      "!**/node_modules/*/{CHANGELOG.md,README.md,README,readme.md,readme}",
-      "!**/node_modules/*/{test,__tests__,tests,powered-test,example,examples}",
-      "!**/node_modules/*.d.ts",
-      "!**/node_modules/.bin",
-      "!**/*.{iml,o,hprof,orig,pyc,pyo,rbc,swp,csproj,sln,xproj}",
-      "!.editorconfig",
-      "!**/._*",
-      "!**/{.DS_Store,.git,.hg,.svn,CVS,RCS,SCCS,.gitignore,.gitattributes}",
-      "!**/{__pycache__,thumbs.db,.flowconfig,.idea,.vs,.nyc_output}",
-      "!**/{appveyor.yml,.travis.yml,circle.yml}",
-      "!**/{npm-debug.log,yarn.lock,.yarn-integrity,.yarn-metadata.json}"
+      "out/**",
+      "resources/**",
+      "package.json"
     ],
     "win": {
-      "icon": "./VirtualDisplayDriver.ico",
+      "icon": "./resources/VirtualDisplayDriver.ico",
       "target": [
         {
           "target": "portable",
@@ -45,28 +48,23 @@
     },
     "portable": {
       "requestExecutionLevel": "admin"
-    },
-    "linux": {
-      "target": [
-        {
-          "target": "AppImage",
-          "arch": [
-            "x64"
-          ]
-        }
-      ]
     }
   },
-  "keywords": [
-    "electron",
-    "winui3",
-    "virtual-display",
-    "driver-control"
-  ],
-  "author": "Virtual Driver Control",
-  "license": "MIT",
   "devDependencies": {
-    "electron": "^27.0.0",
-    "electron-builder": "^26.0.12"
+    "@types/node": "^25.9.3",
+    "@types/react": "^19.2.17",
+    "@types/react-dom": "^19.2.3",
+    "@vitejs/plugin-react": "^5.2.0",
+    "electron": "^42.4.0",
+    "electron-builder": "^26.15.2",
+    "electron-vite": "^5.0.0",
+    "fast-xml-parser": "^5.8.0",
+    "lucide-react": "^1.17.0",
+    "motion": "^12.40.0",
+    "react": "^19.2.7",
+    "react-dom": "^19.2.7",
+    "typescript": "^6.0.3",
+    "vite": "^7.3.5",
+    "zustand": "^5.0.14"
   }
 }
